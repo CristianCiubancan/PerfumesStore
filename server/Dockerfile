@@ -20,6 +20,9 @@ RUN npm run build
 FROM node:20-alpine AS runner
 WORKDIR /app
 
+# Platform argument for handling OS-specific issues (windows, linux, darwin)
+ARG PLATFORM=linux
+
 ENV NODE_ENV=production
 
 # Install only production dependencies
@@ -38,7 +41,10 @@ RUN mkdir -p uploads
 
 # Copy entrypoint script for migration handling
 COPY entrypoint.sh .
-RUN chmod +x entrypoint.sh
+# Convert CRLF to LF on Windows (harmless no-op on unix systems)
+RUN if [ "$PLATFORM" = "windows" ]; then \
+      sed -i 's/\r$//' entrypoint.sh; \
+    fi && chmod +x entrypoint.sh
 
 # Create non-root user for security
 RUN addgroup --system --gid 1001 nodejs && \

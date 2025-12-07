@@ -305,7 +305,7 @@ export function StorePageClient() {
         <aside
           className="flex-shrink-0 overflow-y-auto"
           style={{
-            width: sidePadding + 288 + 16, // padding + sidebar (18rem) + gap (2rem)
+            width: sidePadding + 288 + 32, // padding + sidebar (18rem) + gap (2rem)
             paddingLeft: sidePadding
           }}
         >

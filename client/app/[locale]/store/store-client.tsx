@@ -305,11 +305,11 @@ export function StorePageClient() {
         <aside
           className="flex-shrink-0 overflow-y-auto"
           style={{
-            width: sidePadding + 288 + 32, // padding + sidebar (18rem) + gap (2rem)
+            width: sidePadding + 288 + 16, // padding + sidebar (18rem) + gap (2rem)
             paddingLeft: sidePadding
           }}
         >
-          <div className="w-72 pt-8 pb-6 pr-8">
+          <div className="w-72 pt-8 pb-6">
             {FilterSidebar}
           </div>
         </aside>
@@ -320,7 +320,7 @@ export function StorePageClient() {
           className="flex-1 overflow-y-auto"
           style={{ paddingRight: sidePadding }}
         >
-          <div style={{ maxWidth: 960 }} className='pl-10'> {/* 1280 - 288 - 32 = 960 */}
+          <div style={{ maxWidth: 960 }} className='pl-4'>
             {PageHeader}
             {ProductsContent}
           </div>

@@ -15,6 +15,7 @@ services:
       - API_URL=http://server:4000
       - NEXT_PUBLIC_SITE_URL=${NEXT_PUBLIC_SITE_URL:-http://localhost:3000}
       - NEXT_PUBLIC_SITE_NAME=${NEXT_PUBLIC_SITE_NAME:-Perfumes Store}
+      - NEXT_PRIVATE_POLL=1
     volumes:
       - ./client:/app
       - /app/node_modules
@@ -47,6 +48,7 @@ services:
       - ADMIN_SEED_PASSWORD=${ADMIN_SEED_PASSWORD:-}
       - CLIENT_URL=http://localhost:${CLIENT_PORT:-3000}
       - BACKEND_URL=http://localhost:${SERVER_PORT:-4000}
+      - CHOKIDAR_USEPOLLING=true
     volumes:
       - ./server:/app
       - /app/node_modules

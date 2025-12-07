@@ -34,6 +34,8 @@ services:
     build:
       context: ./server
       dockerfile: Dockerfile.dev
+      args:
+        - PLATFORM=${PLATFORM:-linux}
     ports:
       - "${SERVER_PORT:-4000}:4000"
     environment:

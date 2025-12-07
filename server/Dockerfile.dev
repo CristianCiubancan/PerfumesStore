@@ -1,5 +1,8 @@
 FROM node:20-alpine
 
+# Platform argument for handling OS-specific issues (windows, linux, darwin)
+ARG PLATFORM=linux
+
 # Create non-root user for security
 RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 expressjs
@@ -18,7 +21,10 @@ RUN npx prisma generate
 
 # Copy and prepare entrypoint
 COPY --chown=expressjs:nodejs entrypoint.dev.sh .
-RUN chmod +x entrypoint.dev.sh
+# Convert CRLF to LF on Windows (harmless no-op on unix systems)
+RUN if [ "$PLATFORM" = "windows" ]; then \
+      sed -i 's/\r$//' entrypoint.dev.sh; \
+    fi && chmod +x entrypoint.dev.sh
 
 # Switch to non-root user
 USER expressjs

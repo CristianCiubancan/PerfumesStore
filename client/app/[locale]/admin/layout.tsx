@@ -39,7 +39,7 @@ export default function AdminLayout({
   }
 
   return (
-    <div className="flex h-[calc(100vh-3.5rem)] overflow-hidden bg-muted/30">
+    <div className="flex h-[calc(100vh-3.5rem-1px)] overflow-hidden bg-muted/30">
       {/* Desktop Sidebar */}
       <AdminSidebar />
 

@@ -300,7 +300,7 @@ export function StorePageClient() {
   return (
     <>
       {/* Desktop Layout - Two panel full-width design */}
-      <div className="hidden lg:flex lg:h-[calc(100vh-3.5rem)]">
+      <div className="hidden lg:flex lg:h-[calc(100vh-3.5rem-1px)]">
         {/* Left Panel - Sidebar with dynamic left padding for centering */}
         <aside
           className="flex-shrink-0 overflow-y-auto"
@@ -320,7 +320,7 @@ export function StorePageClient() {
           className="flex-1 overflow-y-auto"
           style={{ paddingRight: sidePadding }}
         >
-          <div style={{ maxWidth: 960 }}> {/* 1280 - 288 - 32 = 960 */}
+          <div style={{ maxWidth: 960 }} className='pl-10'> {/* 1280 - 288 - 32 = 960 */}
             {PageHeader}
             {ProductsContent}
           </div>

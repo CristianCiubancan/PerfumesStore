@@ -1,0 +1,781 @@
+{
+  "common": {
+    "loading": "Chargement...",
+    "error": "Une erreur s'est produite",
+    "save": "Enregistrer",
+    "saving": "Enregistrement...",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "deleting": "Suppression...",
+    "edit": "Modifier",
+    "create": "Créer",
+    "update": "Mettre à jour",
+    "close": "Fermer",
+    "back": "Retour",
+    "toggleTheme": "Changer le thème",
+    "changeLanguage": "Changer la langue",
+    "decreaseQuantity": "Diminuer la quantité",
+    "increaseQuantity": "Augmenter la quantité",
+    "theme": {
+      "light": "Clair",
+      "dark": "Sombre",
+      "system": "Système"
+    },
+    "next": "Suivant",
+    "previous": "Précédent",
+    "search": "Rechercher",
+    "filter": "Filtrer",
+    "sort": "Trier",
+    "actions": "Actions",
+    "yes": "Oui",
+    "no": "Non",
+    "confirm": "Confirmer",
+    "optional": "optionnel",
+    "pagination": "Pagination",
+    "goToPage": "Aller à la page {page}",
+    "upload": {
+      "clickOrDrag": "Cliquez pour télécharger ou glissez-déposez",
+      "allowedFormats": "PNG, JPG, WebP ou GIF (max {maxSize}Mo)",
+      "uploading": "Téléchargement...",
+      "success": "Image téléchargée avec succès",
+      "invalidType": "Type de fichier invalide. Veuillez télécharger PNG, JPG, WebP ou GIF.",
+      "tooLarge": "Fichier trop volumineux. La taille maximale est de {maxSize}Mo.",
+      "error": "Échec du téléchargement",
+      "remove": "Supprimer l'image"
+    }
+  },
+  "nav": {
+    "home": "Accueil",
+    "store": "Boutique",
+    "cart": "Panier",
+    "menu": "Menu",
+    "signIn": "Connexion",
+    "signOut": "Déconnexion",
+    "signUp": "Inscription",
+    "createAccount": "Créer un compte",
+    "adminDashboard": "Tableau de bord Admin",
+    "openMenu": "Ouvrir le menu"
+  },
+  "home": {
+    "title": "Découvrez Votre Parfum Idéal",
+    "subtitle": "Explorez notre collection de parfums de luxe des plus grandes marques mondiales. Trouvez le parfum qui vous définit.",
+    "welcomeBack": "Bienvenue,",
+    "getStarted": "Commencer",
+    "hero": {
+      "badge": "Nouvelle Collection Disponible",
+      "titleLine1": "Découvrez Votre",
+      "titleLine2": "Parfum Signature",
+      "subtitle": "Explorez notre collection de parfums de luxe des plus grandes maisons. Chaque fragrance raconte une histoire unique.",
+      "cta": "Explorer la Collection",
+      "ctaSecondary": "Parfums Femme",
+      "stats": {
+        "products": "Produits",
+        "brands": "Marques",
+        "customers": "Clients Satisfaits"
+      }
+    },
+    "featured": {
+      "title": "Nouveautés",
+      "subtitle": "Découvrez les dernières additions à notre collection",
+      "viewAll": "Voir Tout"
+    },
+    "bestSellers": {
+      "badge": "Top Notes",
+      "title": "Meilleures Ventes",
+      "subtitle": "Nos parfums les plus aimés, choisis par nos clients",
+      "viewAll": "Voir Toutes les Meilleures Ventes"
+    },
+    "categories": {
+      "title": "Acheter par Catégorie",
+      "subtitle": "Trouvez votre parfum idéal en parcourant nos catégories sélectionnées",
+      "shopNow": "Acheter",
+      "women": {
+        "title": "Parfums Femme",
+        "description": "Senteurs élégantes et féminines"
+      },
+      "men": {
+        "title": "Parfums Homme",
+        "description": "Senteurs audacieuses et sophistiquées"
+      },
+      "unisex": {
+        "title": "Parfums Unisexe",
+        "description": "Senteurs modernes et polyvalentes"
+      },
+      "edp": {
+        "title": "Eau de Parfum",
+        "description": "Intensité longue durée"
+      },
+      "edt": {
+        "title": "Eau de Toilette",
+        "description": "Légères et rafraîchissantes"
+      },
+      "niche": {
+        "title": "Niche & Extrait",
+        "description": "Senteurs de luxe exclusives"
+      }
+    },
+    "brandStory": {
+      "title": "L'Art du Parfum",
+      "description1": "Chez Perfumes Store, nous croyons que le parfum est plus qu'une simple odeur—c'est une expression de votre personnalité unique et une porte vers des souvenirs précieux.",
+      "description2": "Nous collaborons avec les maisons de parfumerie les plus prestigieuses au monde pour vous offrir une collection exceptionnelle de fragrances authentiques. Chaque flacon que nous proposons est garanti original.",
+      "quote": "Un parfum est comme une signature—rendez la vôtre inoubliable.",
+      "cta": "Explorer Notre Collection",
+      "features": {
+        "authentic": "100% Authentique",
+        "secure": "Achats Sécurisés",
+        "shipping": "Livraison Rapide"
+      }
+    },
+    "fragranceFinder": {
+      "badge": "Trouvez Votre Match",
+      "title": "Vous Ne Savez Pas Par Où Commencer ?",
+      "subtitle": "Explorez nos familles olfactives pour découvrir des parfums qui correspondent à votre style et personnalité",
+      "cta": "Parcourir Tous les Parfums",
+      "families": {
+        "floral": {
+          "title": "Floral",
+          "description": "Romantique et féminin"
+        },
+        "woody": {
+          "title": "Boisé",
+          "description": "Chaud et terreux"
+        },
+        "fresh": {
+          "title": "Frais",
+          "description": "Propre et vivifiant"
+        },
+        "oriental": {
+          "title": "Oriental",
+          "description": "Riche et sensuel"
+        }
+      }
+    },
+    "specialOffer": {
+      "badge": "Offre Limitée",
+      "title": "15% de Réduction sur Votre Première Commande",
+      "description": "Rejoignez notre famille de parfums et recevez une réduction exclusive sur votre premier achat. Plus un accès anticipé aux nouveautés et promotions spéciales.",
+      "endsIn": "L'offre se termine dans :",
+      "days": "Jours",
+      "hours": "Heures",
+      "minutes": "Min",
+      "seconds": "Sec",
+      "off": "RÉDUCTION",
+      "cta": "Acheter Maintenant"
+    },
+    "trustSignals": {
+      "title": "Pourquoi Nous Choisir",
+      "items": {
+        "authentic": {
+          "title": "100% Authentique",
+          "description": "Produits originaux garantis"
+        },
+        "shipping": {
+          "title": "Livraison Rapide",
+          "description": "Livraison express disponible"
+        },
+        "returns": {
+          "title": "Retours Faciles",
+          "description": "Politique de retour 30 jours"
+        },
+        "support": {
+          "title": "Support 24/7",
+          "description": "Toujours là pour vous aider"
+        },
+        "quality": {
+          "title": "Qualité Premium",
+          "description": "Sélection soignée"
+        },
+        "payment": {
+          "title": "Paiement Sécurisé",
+          "description": "Transactions sûres"
+        }
+      }
+    },
+    "testimonials": {
+      "title": "Ce Que Disent Nos Clients",
+      "subtitle": "Avis réels d'amateurs de parfums",
+      "aria": {
+        "carousel": "carrousel",
+        "carouselLabel": "Témoignages clients",
+        "slide": "diapositive",
+        "slideLabel": "Témoignage {current} sur {total}",
+        "rating": "{rating} étoiles sur 5",
+        "navigation": "Navigation des témoignages",
+        "previous": "Témoignage précédent",
+        "next": "Témoignage suivant",
+        "indicators": "Diapositives des témoignages",
+        "goToSlide": "Aller au témoignage {slide}"
+      },
+      "reviews": {
+        "1": {
+          "name": "Marie R.",
+          "text": "J'adore absolument mon achat ! Le parfum est exactement comme décrit et la livraison était super rapide. Je commanderai certainement à nouveau.",
+          "product": "Acheté : Chanel No. 5"
+        },
+        "2": {
+          "name": "Alex A.",
+          "text": "Meilleure expérience d'achat de parfum en ligne que j'ai eue. Produits authentiques, excellents prix et le service client est exceptionnel.",
+          "product": "Acheté : Dior Sauvage"
+        },
+        "3": {
+          "name": "Carmen D.",
+          "text": "J'hésitais à acheter du parfum en ligne, mais cette boutique a dépassé mes attentes. L'emballage était magnifique et le parfum est divin.",
+          "product": "Acheté : Tom Ford Black Orchid"
+        },
+        "4": {
+          "name": "Elena P.",
+          "text": "J'ai trouvé mon parfum signature ici ! Les descriptions détaillées des produits m'ont aidée à choisir le parfait parfum sans le tester d'abord.",
+          "product": "Acheté : YSL Libre"
+        }
+      }
+    },
+    "brands": {
+      "title": "Les Plus Grandes Marques du Monde"
+    },
+    "newsletter": {
+      "title": "Restez Informé",
+      "subtitle": "Abonnez-vous pour recevoir des offres exclusives, nouveautés et conseils parfumés directement dans votre boîte mail.",
+      "placeholder": "Entrez votre email",
+      "cta": "S'abonner",
+      "subscribed": "Abonné !",
+      "success": "Bienvenue ! Vérifiez votre boîte mail pour une offre spéciale.",
+      "error": "L'abonnement a échoué. Veuillez réessayer.",
+      "rateLimited": "Trop de tentatives. Veuillez réessayer plus tard.",
+      "privacy": "Nous respectons votre vie privée. Désabonnez-vous à tout moment."
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Bon retour",
+      "description": "Connectez-vous pour continuer",
+      "email": "E-mail",
+      "emailPlaceholder": "vous@exemple.com",
+      "password": "Mot de passe",
+      "passwordPlaceholder": "Entrez votre mot de passe",
+      "submit": "Se connecter",
+      "submitting": "Connexion en cours...",
+      "noAccount": "Pas encore de compte ?",
+      "signUpLink": "Inscrivez-vous",
+      "success": "Bienvenue !",
+      "unexpectedError": "Une erreur inattendue s'est produite"
+    },
+    "register": {
+      "title": "Créer un Compte",
+      "description": "Rejoignez-nous pour découvrir votre parfum idéal",
+      "fullName": "Nom Complet",
+      "namePlaceholder": "Jean Dupont",
+      "email": "E-mail",
+      "emailPlaceholder": "vous@exemple.com",
+      "password": "Mot de passe",
+      "passwordPlaceholder": "Créez un mot de passe fort",
+      "confirmPassword": "Confirmer le mot de passe",
+      "confirmPasswordPlaceholder": "Confirmez votre mot de passe",
+      "submit": "Créer un compte",
+      "submitting": "Création du compte...",
+      "hasAccount": "Déjà un compte ?",
+      "signInLink": "Connectez-vous",
+      "success": "Compte créé avec succès !",
+      "unexpectedError": "Une erreur inattendue s'est produite"
+    }
+  },
+  "admin": {
+    "title": "Gestion des Produits",
+    "description": "Ajoutez, modifiez et supprimez des produits de votre boutique",
+    "addProduct": "Ajouter un Produit",
+    "loadingProducts": "Chargement des produits...",
+    "noProducts": "Aucun produit pour le moment",
+    "noProductsDescription": "Commencez par ajouter votre premier produit",
+    "failedToLoad": "Échec du chargement des produits",
+    "accessDenied": "Accès refusé. Privilèges administrateur requis.",
+    "sidebar": {
+      "title": "Panneau Admin",
+      "products": "Produits",
+      "promotions": "Promotions",
+      "auditLogs": "Journal d'Audit",
+      "newsletter": "Newsletter",
+      "settings": "Paramètres",
+      "orders": "Commandes",
+      "customers": "Clients",
+      "analytics": "Analytique",
+      "logout": "Déconnexion",
+      "openMenu": "Ouvrir le menu",
+      "comingSoon": "Bientôt disponible"
+    },
+    "products": {
+      "title": "Produits",
+      "description": "{total, plural, =0 {Aucun produit} =1 {1 produit au total} other {# produits au total}}",
+      "searchPlaceholder": "Rechercher par nom ou marque...",
+      "concentration": "Concentration",
+      "allConcentrations": "Toutes les concentrations",
+      "gender": "Genre",
+      "allGenders": "Tous les genres",
+      "stockStatus": "Stock",
+      "allStock": "Tout le stock",
+      "inStock": "En stock",
+      "lowStock": "Stock faible",
+      "outOfStock": "Rupture de stock",
+      "clearFilters": "Effacer les filtres",
+      "noMatchingProducts": "Aucun produit ne correspond aux filtres",
+      "selectedCount": "{count, plural, =1 {1 produit sélectionné} other {# produits sélectionnés}}",
+      "deleteSelected": "Supprimer la sélection",
+      "clearSelection": "Effacer la sélection",
+      "selectAll": "Tout sélectionner",
+      "selectProduct": "Sélectionner {name}",
+      "rowsPerPage": "Lignes par page :",
+      "pageInfo": "{from}-{to} sur {total}",
+      "pageOf": "Page {current} sur {total}",
+      "bulkDeleteTitle": "Supprimer les produits sélectionnés",
+      "bulkDeleteDescription": "Êtes-vous sûr de vouloir supprimer {count, plural, =1 {ce produit} other {ces # produits}} ? Cette action est irréversible.",
+      "bulkDeleteSuccess": "{count, plural, =1 {1 produit supprimé} other {# produits supprimés}} avec succès",
+      "bulkDeleteError": "Échec de la suppression des produits"
+    },
+    "table": {
+      "product": "Produit",
+      "brand": "Marque",
+      "concentration": "Concentration",
+      "gender": "Genre",
+      "price": "Prix",
+      "stock": "Stock",
+      "actions": "Actions"
+    },
+    "deleteDialog": {
+      "title": "Supprimer le Produit",
+      "description": "Êtes-vous sûr de vouloir supprimer « {name} » ? Cette action est irréversible.",
+      "success": "Produit supprimé avec succès",
+      "error": "Échec de la suppression du produit"
+    },
+    "productDialog": {
+      "createTitle": "Ajouter un Nouveau Produit",
+      "editTitle": "Modifier le Produit",
+      "createDescription": "Remplissez les détails pour ajouter un nouveau produit",
+      "editDescription": "Mettez à jour les informations du produit ci-dessous",
+      "name": "Nom",
+      "brand": "Marque",
+      "concentration": "Concentration",
+      "selectConcentration": "Sélectionner la concentration",
+      "gender": "Genre",
+      "selectGender": "Sélectionner le genre",
+      "fragranceFamily": "Famille Olfactive",
+      "selectFragranceFamily": "Sélectionner la famille olfactive",
+      "topNotes": "Notes de Tête",
+      "heartNotes": "Notes de Cœur",
+      "baseNotes": "Notes de Fond",
+      "volume": "Volume (ml)",
+      "price": "Prix (RON)",
+      "launchYear": "Année de Lancement",
+      "stock": "Stock",
+      "perfumer": "Parfumeur",
+      "longevity": "Longévité",
+      "selectLongevity": "Sélectionner la longévité",
+      "sillage": "Sillage",
+      "selectSillage": "Sélectionner le sillage",
+      "season": "Saison",
+      "selectSeasons": "Sélectionner les saisons...",
+      "occasion": "Occasion",
+      "selectOccasions": "Sélectionner les occasions...",
+      "rating": "Note (0-5)",
+      "image": "Image",
+      "description": "Description",
+      "createButton": "Créer le Produit",
+      "updateButton": "Mettre à jour le Produit",
+      "creating": "Création...",
+      "updating": "Mise à jour...",
+      "createSuccess": "Produit créé avec succès",
+      "updateSuccess": "Produit mis à jour avec succès",
+      "error": "Une erreur inattendue s'est produite",
+      "errorLoadingOptions": "Échec du chargement des options produit"
+    },
+    "settings": {
+      "title": "Paramètres",
+      "description": "Configurer les paramètres de la boutique",
+      "failedToLoad": "Impossible de charger les paramètres",
+      "exchangeRate": {
+        "title": "Frais de Change",
+        "description": "Définissez un pourcentage de frais à ajouter au taux de change BNR lors de la conversion des prix en devises étrangères.",
+        "feeLabel": "Pourcentage de Frais",
+        "feeHint": "Entrez une valeur entre 0 et 50. Par exemple, 2 signifie que les prix seront 2% plus élevés en EUR ou GBP.",
+        "invalidFee": "Veuillez entrer des frais valides entre 0 et 50",
+        "saveSuccess": "Paramètres de change enregistrés avec succès",
+        "saveError": "Impossible d'enregistrer les paramètres"
+      }
+    },
+    "promotions": {
+      "title": "Promotions",
+      "description": "Gérer les promotions et réductions du magasin",
+      "addPromotion": "Ajouter une Promotion",
+      "loading": "Chargement des promotions...",
+      "noPromotions": "Aucune promotion pour le moment",
+      "noPromotionsDescription": "Créez votre première promotion pour attirer des clients",
+      "failedToLoad": "Échec du chargement des promotions",
+      "table": {
+        "name": "Nom",
+        "discount": "Réduction",
+        "startDate": "Date de Début",
+        "endDate": "Date de Fin",
+        "status": "Statut",
+        "actions": "Actions"
+      },
+      "status": {
+        "active": "Active",
+        "scheduled": "Programmée",
+        "expired": "Expirée",
+        "inactive": "Inactive"
+      },
+      "deleteDialog": {
+        "title": "Supprimer la Promotion",
+        "description": "Êtes-vous sûr de vouloir supprimer « {name} » ? Cette action est irréversible.",
+        "success": "Promotion supprimée avec succès",
+        "error": "Échec de la suppression de la promotion"
+      },
+      "dialog": {
+        "createTitle": "Créer une Promotion",
+        "editTitle": "Modifier la Promotion",
+        "createDescription": "Configurez une nouvelle promotion pour le magasin",
+        "editDescription": "Mettez à jour les détails de la promotion",
+        "name": "Nom de la Promotion",
+        "namePlaceholder": "ex., Soldes d'Été",
+        "discountPercent": "Pourcentage de Réduction",
+        "startDate": "Date et Heure de Début",
+        "endDate": "Date et Heure de Fin",
+        "isActive": "Active",
+        "createButton": "Créer la Promotion",
+        "updateButton": "Mettre à jour la Promotion",
+        "creating": "Création...",
+        "updating": "Mise à jour...",
+        "createSuccess": "Promotion créée avec succès",
+        "updateSuccess": "Promotion mise à jour avec succès",
+        "error": "Une erreur inattendue s'est produite"
+      }
+    },
+    "auditLogs": {
+      "title": "Journal d'Audit",
+      "description": "Suivre toutes les actions et modifications des administrateurs",
+      "loading": "Chargement du journal...",
+      "noLogs": "Aucune entrée pour le moment",
+      "noLogsDescription": "Les actions des administrateurs apparaîtront ici",
+      "noMatchingLogs": "Aucune entrée ne correspond aux filtres actuels",
+      "failedToLoad": "Impossible de charger le journal",
+      "totalLogs": "{count, plural, =0 {Aucune entrée} =1 {1 entrée} other {# entrées}}",
+      "pageInfo": "Page {current} sur {total}",
+      "viewDetails": "Voir",
+      "deletedUser": "Utilisateur Supprimé",
+      "filters": {
+        "title": "Filtres",
+        "action": "Action",
+        "entityType": "Entité",
+        "allActions": "Toutes les actions",
+        "allEntities": "Toutes les entités",
+        "clear": "Effacer"
+      },
+      "table": {
+        "timestamp": "Horodatage",
+        "user": "Utilisateur",
+        "action": "Action",
+        "entityType": "Entité",
+        "entityId": "ID",
+        "details": "Détails"
+      },
+      "actions": {
+        "CREATE": "Création",
+        "UPDATE": "Mise à jour",
+        "DELETE": "Suppression",
+        "BULK_DELETE": "Suppression en masse",
+        "LOGIN": "Connexion",
+        "LOGOUT": "Déconnexion",
+        "PASSWORD_CHANGE": "Changement de mot de passe"
+      },
+      "entities": {
+        "PRODUCT": "Produit",
+        "PROMOTION": "Promotion",
+        "USER": "Utilisateur",
+        "SETTINGS": "Paramètres",
+        "FILE": "Fichier",
+        "NEWSLETTER_SUBSCRIBER": "Abonné Newsletter"
+      },
+      "detailsDialog": {
+        "title": "Détails du Journal",
+        "user": "Utilisateur",
+        "action": "Action",
+        "entityType": "Type d'Entité",
+        "entityId": "ID de l'Entité",
+        "ipAddress": "Adresse IP",
+        "userAgent": "Agent Utilisateur",
+        "oldValue": "Valeur Précédente",
+        "newValue": "Nouvelle Valeur"
+      }
+    },
+    "newsletter": {
+      "title": "Abonnés Newsletter",
+      "description": "Gérer les abonnements à la newsletter",
+      "loading": "Chargement des abonnés...",
+      "noSubscribers": "Aucun abonné pour le moment",
+      "noSubscribersDescription": "Les abonnés à la newsletter apparaîtront ici une fois inscrits",
+      "noMatchingSubscribers": "Aucun abonné ne correspond au filtre actuel",
+      "failedToLoad": "Impossible de charger les abonnés",
+      "totalSubscribers": "{count, plural, =0 {Aucun abonné} =1 {1 abonné} other {# abonnés}}",
+      "pageInfo": "Page {current} sur {total}",
+      "unsubscribe": "Désabonner",
+      "table": {
+        "email": "Email",
+        "subscribedAt": "Date d'inscription",
+        "status": "Statut",
+        "actions": "Actions"
+      },
+      "status": {
+        "active": "Actif",
+        "unsubscribed": "Désabonné"
+      },
+      "filters": {
+        "status": "Statut",
+        "allStatus": "Tous les statuts",
+        "active": "Actif",
+        "unsubscribed": "Désabonné",
+        "clear": "Effacer le filtre"
+      },
+      "unsubscribeDialog": {
+        "title": "Désabonner l'utilisateur",
+        "description": "Êtes-vous sûr de vouloir désabonner \"{email}\" ? Il ne recevra plus d'emails de newsletter.",
+        "success": "Abonné désabonné avec succès",
+        "error": "Échec de la désabonnement"
+      },
+      "deleteDialog": {
+        "title": "Supprimer l'abonné",
+        "description": "Êtes-vous sûr de vouloir supprimer définitivement \"{email}\" ? Cette action est irréversible.",
+        "success": "Abonné supprimé avec succès",
+        "error": "Échec de la suppression de l'abonné"
+      }
+    }
+  },
+  "product": {
+    "concentration": {
+      "Parfum": "Parfum",
+      "Eau_de_Parfum": "Eau de Parfum",
+      "Eau_de_Toilette": "Eau de Toilette",
+      "Eau_de_Cologne": "Eau de Cologne",
+      "Extrait_de_Parfum": "Extrait de Parfum"
+    },
+    "gender": {
+      "Men": "Homme",
+      "Women": "Femme",
+      "Unisex": "Unisexe"
+    },
+    "fragranceFamily": {
+      "Floral": "Floral",
+      "Oriental": "Oriental",
+      "Woody": "Boisé",
+      "Fresh": "Frais",
+      "Citrus": "Agrumes",
+      "Aromatic": "Aromatique",
+      "Fougere": "Fougère",
+      "Chypre": "Chypre",
+      "Gourmand": "Gourmand",
+      "Aquatic": "Aquatique",
+      "Amber Floral": "Ambré Floral",
+      "Amber Spicy": "Ambré Épicé",
+      "Amber Woody": "Ambré Boisé",
+      "Aquatic Aromatic": "Aquatique Aromatique",
+      "Aromatic Aquatic": "Aromatique Aquatique",
+      "Aromatic Fougere": "Aromatique Fougère",
+      "Chypre Floral": "Chypre Floral",
+      "Chypre Fruity": "Chypre Fruité",
+      "Citrus Aromatic": "Agrumes Aromatique",
+      "Citrus Floral": "Agrumes Floral",
+      "Floral Aldehyde": "Floral Aldéhydé",
+      "Floral Aquatic": "Floral Aquatique",
+      "Floral Chypre": "Floral Chypre",
+      "Floral Fruity": "Floral Fruité",
+      "Floral Fruity Gourmand": "Floral Fruité Gourmand",
+      "Floral Musky": "Floral Musqué",
+      "Floral Oriental": "Floral Oriental",
+      "Floral Powdery": "Floral Poudré",
+      "Floral Spicy": "Floral Épicé",
+      "Floral White": "Floral Blanc",
+      "Floral Woody": "Floral Boisé",
+      "Fruity Chypre": "Fruité Chypre",
+      "Gourmand Fruity": "Gourmand Fruité",
+      "Gourmand Oriental": "Gourmand Oriental",
+      "Leather": "Cuir",
+      "Musky Floral": "Musqué Floral",
+      "Oriental Chypre": "Oriental Chypre",
+      "Oriental Floral": "Oriental Floral",
+      "Oriental Fougere": "Oriental Fougère",
+      "Oriental Spicy": "Oriental Épicé",
+      "Oriental Vanilla": "Oriental Vanillé",
+      "Oriental Woody": "Oriental Boisé",
+      "Spicy Leather": "Épicé Cuir",
+      "Spicy Oriental": "Épicé Oriental",
+      "White Floral": "Floral Blanc",
+      "Woody Aquatic": "Boisé Aquatique",
+      "Woody Aromatic": "Boisé Aromatique",
+      "Woody Floral": "Boisé Floral",
+      "Woody Fresh Spicy": "Boisé Frais Épicé",
+      "Woody Oriental": "Boisé Oriental",
+      "Woody Spicy": "Boisé Épicé"
+    },
+    "season": {
+      "Spring": "Printemps",
+      "Summer": "Été",
+      "Fall": "Automne",
+      "Winter": "Hiver"
+    },
+    "occasion": {
+      "Daily": "Quotidien",
+      "Office": "Bureau",
+      "Date Night": "Soirée Romantique",
+      "Special Event": "Événement Spécial",
+      "Casual": "Décontracté",
+      "Sport": "Sport",
+      "Evening": "Soirée",
+      "Special": "Spécial"
+    },
+    "longevity": {
+      "Weak": "Faible",
+      "Moderate": "Modérée",
+      "Long-lasting": "Longue durée",
+      "Very Long-lasting": "Très longue durée",
+      "Very long-lasting": "Très longue durée"
+    },
+    "sillage": {
+      "Intimate": "Intime",
+      "Moderate": "Modéré",
+      "Strong": "Fort",
+      "Enormous": "Énorme"
+    },
+    "outOfStock": "Rupture de Stock"
+  },
+  "metadata": {
+    "title": "Boutique de Parfums - Parfums de Luxe en Ligne",
+    "description": "Découvrez des parfums de luxe authentiques des plus grandes marques mondiales. Achetez Eau de Parfum, Eau de Toilette et parfums de niche avec livraison rapide.",
+    "keywords": "parfum, fragrance, parfum de luxe, eau de parfum, eau de toilette, parfum designer, parfum de niche, acheter parfum en ligne"
+  },
+  "seo": {
+    "store": {
+      "title": "Achetez des Parfums de Luxe",
+      "description": "Parcourez notre collection de parfums de luxe sélectionnés. Filtrez par marque, famille olfactive, concentration et plus."
+    },
+    "home": {
+      "title": "Découvrez Votre Parfum Signature",
+      "description": "Explorez notre collection de parfums de luxe des plus grandes maisons du monde. Trouvez le parfum qui vous définit."
+    }
+  },
+  "currency": {
+    "changeCurrency": "Changer de devise",
+    "RON": "Leu roumain",
+    "EUR": "Euro",
+    "GBP": "Livre sterling"
+  },
+  "store": {
+    "title": "Notre Collection",
+    "subtitle": "Parcourez notre sélection de parfums de luxe",
+    "searchPlaceholder": "Rechercher des parfums...",
+    "resultsCount": "{count, plural, =0 {Aucun produit trouvé} =1 {1 produit} other {# produits}}",
+    "errorLoading": "Échec du chargement des produits",
+    "retry": "Réessayer",
+    "noProducts": "Aucun produit trouvé",
+    "noProductsDescription": "Essayez d'ajuster vos filtres ou termes de recherche",
+    "filters": {
+      "title": "Filtres",
+      "gender": "Genre",
+      "allGenders": "Tous les genres",
+      "concentration": "Concentration",
+      "allConcentrations": "Toutes les concentrations",
+      "priceRange": "Gamme de prix",
+      "min": "Min",
+      "max": "Max",
+      "clearAll": "Effacer tous les filtres",
+      "fragranceFamily": "Famille Olfactive",
+      "allFragranceFamilies": "Toutes les familles",
+      "season": "Saison",
+      "selectSeasons": "Sélectionner saisons...",
+      "occasion": "Occasion",
+      "selectOccasions": "Sélectionner occasions...",
+      "rating": "Note",
+      "longevity": "Longévité",
+      "allLongevities": "Toutes les longévités",
+      "sillage": "Sillage",
+      "allSillages": "Tous les sillages",
+      "matchAny": "Un",
+      "matchAll": "Tous"
+    },
+    "sort": {
+      "newest": "Plus récents",
+      "priceLowHigh": "Prix: Croissant",
+      "priceHighLow": "Prix: Décroissant",
+      "nameAZ": "Nom: A à Z",
+      "nameZA": "Nom: Z à A",
+      "ratingHighLow": "Note: Décroissant"
+    }
+  },
+  "cart": {
+    "title": "Panier",
+    "empty": {
+      "title": "Votre panier est vide",
+      "description": "Découvrez notre collection de parfums de luxe et trouvez votre fragrance idéale.",
+      "continueShopping": "Continuer mes Achats"
+    },
+    "item": {
+      "remove": "Supprimer",
+      "quantity": "Quantité",
+      "price": "Prix",
+      "total": "Total"
+    },
+    "summary": {
+      "title": "Récapitulatif",
+      "items": "{count, plural, =1 {1 article} other {# articles}}",
+      "subtotal": "Sous-total",
+      "discount": "Réduction ({percent}%)",
+      "total": "Total",
+      "checkout": "Passer à la Caisse",
+      "clearCart": "Vider le Panier",
+      "youSave": "Vous économisez"
+    },
+    "addToCart": {
+      "add": "Ajouter au Panier",
+      "adding": "Ajout en cours...",
+      "added": "Ajouté !",
+      "inCart": "Dans le Panier ({quantity})",
+      "outOfStock": "Rupture de Stock"
+    },
+    "toast": {
+      "added": "{name} a été ajouté au panier",
+      "removed": "{name} a été retiré du panier",
+      "updated": "Panier mis à jour",
+      "cleared": "Panier vidé",
+      "stockExceeded": "Maximum {stock} articles disponibles",
+      "outOfStock": "Ce produit n'est pas en stock"
+    },
+    "confirmClear": {
+      "title": "Vider le Panier",
+      "description": "Êtes-vous sûr de vouloir retirer tous les articles de votre panier ? Cette action est irréversible.",
+      "confirm": "Vider le Panier",
+      "cancel": "Annuler"
+    }
+  },
+  "error": {
+    "title": "Une erreur s'est produite",
+    "description": "Une erreur inattendue s'est produite. Veuillez réessayer.",
+    "tryAgain": "Réessayer"
+  },
+  "notFound": {
+    "title": "Page non trouvée",
+    "description": "La page que vous recherchez n'existe pas ou a été déplacée.",
+    "backHome": "Retour à l'accueil"
+  },
+  "productDetail": {
+    "backToStore": "Retour à la Boutique",
+    "notFound": "Produit non trouvé",
+    "outOfStock": "Rupture de Stock",
+    "inStock": "{count, plural, =1 {1 article en stock} other {# articles en stock}}",
+    "quantity": "Quantité",
+    "description": "Description",
+    "topNotes": "Notes de Tête",
+    "heartNotes": "Notes de Cœur",
+    "baseNotes": "Notes de Fond",
+    "longevity": "Longévité",
+    "sillage": "Sillage",
+    "seasons": "Saisons",
+    "occasions": "Occasions",
+    "perfumer": "Parfumeur",
+    "launchYear": "Année de Lancement"
+  }
+}

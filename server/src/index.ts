@@ -1,0 +1,82 @@
+import express from 'express'
+import cors from 'cors'
+import helmet from 'helmet'
+import cookieParser from 'cookie-parser'
+import morgan from 'morgan'
+import path from 'path'
+import { config } from './config'
+import routes from './routes'
+import { errorHandler, notFoundHandler } from './middleware/errorHandler'
+import { logger } from './lib/logger'
+import { prisma } from './lib/prisma'
+import {
+  registerCronJobs,
+  initExchangeRates,
+  initTokenCleanup,
+  initImageCleanup,
+} from './cron'
+
+const app = express()
+
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: 'cross-origin' },
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'"],
+      styleSrc: ["'self'"],
+      imgSrc: ["'self'", config.CLIENT_URL],
+      connectSrc: ["'self'", config.CLIENT_URL],
+      fontSrc: ["'self'"],
+      objectSrc: ["'none'"],
+      mediaSrc: ["'self'"],
+      frameSrc: ["'none'"],
+    },
+  },
+  hsts: {
+    maxAge: 31536000,
+    includeSubDomains: true,
+    preload: true,
+  },
+}))
+app.use(cors({
+  origin: config.CLIENT_URL,
+  credentials: true,
+}))
+app.use(express.json({ limit: '50kb' }))
+app.use(cookieParser())
+app.use(morgan(config.NODE_ENV === 'production' ? 'combined' : 'dev'))
+
+// Serve uploaded files statically
+app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')))
+
+app.use('/api', routes)
+app.use(notFoundHandler)
+app.use(errorHandler)
+
+const server = app.listen(config.PORT, () => {
+  logger.info(`Server running on port ${config.PORT}`, 'Server')
+  registerCronJobs()
+  initExchangeRates()
+  initTokenCleanup()
+  initImageCleanup()
+})
+
+async function gracefulShutdown(signal: string) {
+  logger.info(`Received ${signal}, shutting down gracefully`, 'Server')
+
+  server.close(async () => {
+    await prisma.$disconnect()
+    logger.info('Server closed', 'Server')
+    process.exit(0)
+  })
+
+  // Force exit after 10 seconds
+  setTimeout(() => {
+    logger.error('Forcing shutdown', 'Server')
+    process.exit(1)
+  }, 10000)
+}
+
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'))
+process.on('SIGINT', () => gracefulShutdown('SIGINT'))

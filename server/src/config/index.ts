@@ -1,0 +1,41 @@
+import { z } from 'zod'
+import 'dotenv/config'
+
+const envSchema = z.object({
+  NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
+  PORT: z.coerce.number().default(4000),
+  DATABASE_URL: z.string().url(),
+  JWT_SECRET: z.string().min(32),
+  JWT_REFRESH_SECRET: z.string().min(32),
+  CLIENT_URL: z.string().url().default('http://localhost:3000'),
+  BACKEND_URL: z.string().url().default('http://localhost:4000'),
+  // Comma-separated list of allowed external image hosts (e.g., "cdn.example.com,bucket.r2.cloudflarestorage.com")
+  ALLOWED_IMAGE_HOSTS: z.string().default(''),
+})
+
+/**
+ * Parses comma-separated host string into array of lowercase hosts.
+ * Note: Similar function exists in client/lib/env.ts - kept separate due to package boundary.
+ */
+function parseAllowedHosts(hostsString: string): string[] {
+  if (!hostsString.trim()) return []
+  return hostsString.split(',').map(h => h.trim().toLowerCase()).filter(Boolean)
+}
+
+const parsed = envSchema.safeParse(process.env)
+
+if (!parsed.success) {
+  console.error('Invalid environment variables:', parsed.error.flatten().fieldErrors)
+  process.exit(1)
+}
+
+export const config = {
+  ...parsed.data,
+  allowedImageHosts: parseAllowedHosts(parsed.data.ALLOWED_IMAGE_HOSTS),
+}
+
+/**
+ * Environment flag for production mode.
+ * Use this instead of checking process.env.NODE_ENV directly.
+ */
+export const isProduction = parsed.data.NODE_ENV === 'production'

@@ -1,0 +1,5 @@
+export { BasicInfoSection } from './basic-info'
+export { NotesSection } from './notes'
+export { DetailsSection } from './details'
+export { AttributesSection } from './attributes'
+export { OptionalSection } from './optional'

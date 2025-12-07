@@ -1,0 +1,781 @@
+{
+  "common": {
+    "loading": "Se încarcă...",
+    "error": "A apărut o eroare",
+    "save": "Salvează",
+    "saving": "Se salvează...",
+    "cancel": "Anulează",
+    "delete": "Șterge",
+    "deleting": "Se șterge...",
+    "edit": "Editează",
+    "create": "Creează",
+    "update": "Actualizează",
+    "close": "Închide",
+    "back": "Înapoi",
+    "toggleTheme": "Comută tema",
+    "changeLanguage": "Schimbă limba",
+    "decreaseQuantity": "Scade cantitatea",
+    "increaseQuantity": "Crește cantitatea",
+    "theme": {
+      "light": "Luminos",
+      "dark": "Întunecat",
+      "system": "Sistem"
+    },
+    "next": "Următorul",
+    "previous": "Anterior",
+    "search": "Caută",
+    "filter": "Filtrează",
+    "sort": "Sortează",
+    "actions": "Acțiuni",
+    "yes": "Da",
+    "no": "Nu",
+    "confirm": "Confirmă",
+    "optional": "opțional",
+    "pagination": "Paginare",
+    "goToPage": "Mergi la pagina {page}",
+    "upload": {
+      "clickOrDrag": "Click pentru încărcare sau trage și plasează",
+      "allowedFormats": "PNG, JPG, WebP sau GIF (max {maxSize}MB)",
+      "uploading": "Se încarcă...",
+      "success": "Imaginea a fost încărcată cu succes",
+      "invalidType": "Tip de fișier invalid. Te rugăm să încarci PNG, JPG, WebP sau GIF.",
+      "tooLarge": "Fișierul este prea mare. Dimensiunea maximă este {maxSize}MB.",
+      "error": "Încărcarea a eșuat",
+      "remove": "Elimină imaginea"
+    }
+  },
+  "nav": {
+    "home": "Acasă",
+    "store": "Magazin",
+    "cart": "Coș",
+    "menu": "Meniu",
+    "signIn": "Autentificare",
+    "signOut": "Deconectare",
+    "signUp": "Înregistrare",
+    "createAccount": "Creează Cont",
+    "adminDashboard": "Panou Admin",
+    "openMenu": "Deschide meniu"
+  },
+  "home": {
+    "title": "Descoperă Parfumul Perfect",
+    "subtitle": "Explorează colecția noastră curată de parfumuri de lux de la cele mai renumite branduri din lume. Găsește aroma care te definește.",
+    "welcomeBack": "Bine ai revenit,",
+    "getStarted": "Începe",
+    "hero": {
+      "badge": "Colecție Nouă Disponibilă",
+      "titleLine1": "Descoperă-ți",
+      "titleLine2": "Parfumul Semnătură",
+      "subtitle": "Explorează colecția noastră curată de parfumuri de lux de la cele mai prestigioase case. Fiecare parfum spune o poveste unică.",
+      "cta": "Explorează Colecția",
+      "ctaSecondary": "Parfumuri Femei",
+      "stats": {
+        "products": "Produse",
+        "brands": "Branduri",
+        "customers": "Clienți Mulțumiți"
+      }
+    },
+    "featured": {
+      "title": "Noutăți",
+      "subtitle": "Descoperă cele mai recente adăugiri în colecția noastră",
+      "viewAll": "Vezi Tot"
+    },
+    "bestSellers": {
+      "badge": "Top Rating",
+      "title": "Cele Mai Vândute",
+      "subtitle": "Parfumurile noastre cele mai îndrăgite, alese de clienții noștri",
+      "viewAll": "Vezi Toate Best Sellers"
+    },
+    "categories": {
+      "title": "Cumpără pe Categorii",
+      "subtitle": "Găsește parfumul perfect navigând prin categoriile noastre selectate",
+      "shopNow": "Cumpără Acum",
+      "women": {
+        "title": "Parfumuri pentru Femei",
+        "description": "Arome elegante și feminine"
+      },
+      "men": {
+        "title": "Parfumuri pentru Bărbați",
+        "description": "Arome îndrăznețe și sofisticate"
+      },
+      "unisex": {
+        "title": "Parfumuri Unisex",
+        "description": "Arome moderne și versatile"
+      },
+      "edp": {
+        "title": "Eau de Parfum",
+        "description": "Intensitate de lungă durată"
+      },
+      "edt": {
+        "title": "Eau de Toilette",
+        "description": "Ușoare și revigorante"
+      },
+      "niche": {
+        "title": "Nișă & Extrait",
+        "description": "Arome exclusive de lux"
+      }
+    },
+    "brandStory": {
+      "title": "Arta Parfumului",
+      "description1": "La Perfumes Store, credem că parfumul este mai mult decât un simplu miros—este o expresie a personalității tale unice și o poartă către amintiri prețioase.",
+      "description2": "Colaborăm cu cele mai prestigioase case de parfumuri din lume pentru a-ți oferi o colecție excepțională de parfumuri autentice. Fiecare sticlă pe care o oferim este garantat originală, selectată cu grijă pentru calitate și măiestrie.",
+      "quote": "Un parfum este ca o semnătură—fă-o de neuitat.",
+      "cta": "Explorează Colecția Noastră",
+      "features": {
+        "authentic": "100% Autentic",
+        "secure": "Cumpărături Sigure",
+        "shipping": "Livrare Rapidă"
+      }
+    },
+    "fragranceFinder": {
+      "badge": "Găsește-ți Perechea",
+      "title": "Nu Știi de Unde Să Începi?",
+      "subtitle": "Explorează familiile olfactive pentru a descoperi arome care se potrivesc stilului și personalității tale",
+      "cta": "Răsfoiește Toate Parfumurile",
+      "families": {
+        "floral": {
+          "title": "Floral",
+          "description": "Romantic și feminin"
+        },
+        "woody": {
+          "title": "Lemnos",
+          "description": "Cald și pământesc"
+        },
+        "fresh": {
+          "title": "Fresh",
+          "description": "Curat și revigorant"
+        },
+        "oriental": {
+          "title": "Oriental",
+          "description": "Bogat și senzual"
+        }
+      }
+    },
+    "specialOffer": {
+      "badge": "Ofertă Limitată",
+      "title": "Primește 15% Reducere la Prima Comandă",
+      "description": "Alătură-te familiei noastre de iubitori de parfumuri și primește o reducere exclusivă la prima ta achiziție. În plus, primești acces timpuriu la noutăți și promoții speciale.",
+      "endsIn": "Oferta se termină în:",
+      "days": "Zile",
+      "hours": "Ore",
+      "minutes": "Min",
+      "seconds": "Sec",
+      "off": "REDUCERE",
+      "cta": "Cumpără Acum"
+    },
+    "trustSignals": {
+      "title": "De Ce Să Ne Alegi",
+      "items": {
+        "authentic": {
+          "title": "100% Autentic",
+          "description": "Produse originale garantate"
+        },
+        "shipping": {
+          "title": "Livrare Rapidă",
+          "description": "Livrare express disponibilă"
+        },
+        "returns": {
+          "title": "Retururi Ușoare",
+          "description": "Politică de retur 30 de zile"
+        },
+        "support": {
+          "title": "Suport 24/7",
+          "description": "Mereu aici să ajutăm"
+        },
+        "quality": {
+          "title": "Calitate Premium",
+          "description": "Selecție curată"
+        },
+        "payment": {
+          "title": "Plată Securizată",
+          "description": "Tranzacții sigure"
+        }
+      }
+    },
+    "testimonials": {
+      "title": "Ce Spun Clienții Noștri",
+      "subtitle": "Recenzii reale de la pasionații de parfumuri",
+      "aria": {
+        "carousel": "carusel",
+        "carouselLabel": "Mărturii ale clienților",
+        "slide": "slide",
+        "slideLabel": "Mărturie {current} din {total}",
+        "rating": "{rating} din 5 stele",
+        "navigation": "Navigare mărturii",
+        "previous": "Mărturie anterioară",
+        "next": "Mărturie următoare",
+        "indicators": "Slide-uri mărturii",
+        "goToSlide": "Mergi la mărturie {slide}"
+      },
+      "reviews": {
+        "1": {
+          "name": "Maria R.",
+          "text": "Îmi place enorm achiziția mea! Parfumul este exact așa cum a fost descris și livrarea a fost super rapidă. Cu siguranță voi mai comanda.",
+          "product": "A cumpărat: Chanel No. 5"
+        },
+        "2": {
+          "name": "Alexandru A.",
+          "text": "Cea mai bună experiență de cumpărare de parfumuri online pe care am avut-o. Produse autentice, prețuri excelente și serviciul clienți este excepțional.",
+          "product": "A cumpărat: Dior Sauvage"
+        },
+        "3": {
+          "name": "Carmen D.",
+          "text": "Am fost ezitantă să cumpăr parfum online, dar acest magazin mi-a depășit așteptările. Ambalajul a fost frumos și mirosul este divin.",
+          "product": "A cumpărat: Tom Ford Black Orchid"
+        },
+        "4": {
+          "name": "Elena P.",
+          "text": "Mi-am găsit aici parfumul semnătură! Descrierile detaliate ale produselor m-au ajutat să aleg parfumul perfect fără să-l testez mai întâi.",
+          "product": "A cumpărat: YSL Libre"
+        }
+      }
+    },
+    "brands": {
+      "title": "Prezentând Cele Mai Fine Branduri din Lume"
+    },
+    "newsletter": {
+      "title": "Fii la Curent",
+      "subtitle": "Abonează-te pentru a primi oferte exclusive, noutăți și sfaturi despre parfumuri direct în inbox-ul tău.",
+      "placeholder": "Introdu email-ul tău",
+      "cta": "Abonează-te",
+      "subscribed": "Abonat!",
+      "success": "Bine ai venit! Verifică inbox-ul pentru o ofertă specială.",
+      "error": "Abonarea a eșuat. Te rugăm să încerci din nou.",
+      "rateLimited": "Prea multe încercări. Te rugăm să încerci mai târziu.",
+      "privacy": "Respectăm confidențialitatea ta. Te poți dezabona oricând."
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Bine ai revenit",
+      "description": "Autentifică-te pentru a continua",
+      "email": "Email",
+      "emailPlaceholder": "tu@exemplu.com",
+      "password": "Parolă",
+      "passwordPlaceholder": "Introdu parola",
+      "submit": "Autentifică-te",
+      "submitting": "Se autentifică...",
+      "noAccount": "Nu ai cont?",
+      "signUpLink": "Înregistrează-te",
+      "success": "Bine ai revenit!",
+      "unexpectedError": "A apărut o eroare neașteptată"
+    },
+    "register": {
+      "title": "Creează un Cont",
+      "description": "Alătură-te nouă pentru a descoperi parfumul perfect",
+      "fullName": "Nume Complet",
+      "namePlaceholder": "Ion Popescu",
+      "email": "Email",
+      "emailPlaceholder": "tu@exemplu.com",
+      "password": "Parolă",
+      "passwordPlaceholder": "Creează o parolă puternică",
+      "confirmPassword": "Confirmă Parola",
+      "confirmPasswordPlaceholder": "Confirmă parola",
+      "submit": "Creează Cont",
+      "submitting": "Se creează contul...",
+      "hasAccount": "Ai deja un cont?",
+      "signInLink": "Autentifică-te",
+      "success": "Contul a fost creat cu succes!",
+      "unexpectedError": "A apărut o eroare neașteptată"
+    }
+  },
+  "admin": {
+    "title": "Gestionare Produse",
+    "description": "Adaugă, editează și șterge produse din magazin",
+    "addProduct": "Adaugă Produs",
+    "loadingProducts": "Se încarcă produsele...",
+    "noProducts": "Niciun produs încă",
+    "noProductsDescription": "Începe prin adăugarea primului tău produs",
+    "failedToLoad": "Nu s-au putut încărca produsele",
+    "accessDenied": "Acces interzis. Sunt necesare privilegii de administrator.",
+    "sidebar": {
+      "title": "Panou Admin",
+      "products": "Produse",
+      "promotions": "Promoții",
+      "newsletter": "Newsletter",
+      "auditLogs": "Jurnal Audit",
+      "settings": "Setări",
+      "orders": "Comenzi",
+      "customers": "Clienți",
+      "analytics": "Analiză",
+      "logout": "Deconectare",
+      "openMenu": "Deschide meniu",
+      "comingSoon": "În curând"
+    },
+    "products": {
+      "title": "Produse",
+      "description": "{total, plural, =0 {Niciun produs} =1 {1 produs în total} other {# produse în total}}",
+      "searchPlaceholder": "Caută după nume sau brand...",
+      "concentration": "Concentrație",
+      "allConcentrations": "Toate concentrațiile",
+      "gender": "Gen",
+      "allGenders": "Toate genurile",
+      "stockStatus": "Stoc",
+      "allStock": "Tot stocul",
+      "inStock": "În stoc",
+      "lowStock": "Stoc redus",
+      "outOfStock": "Stoc epuizat",
+      "clearFilters": "Șterge filtrele",
+      "noMatchingProducts": "Niciun produs nu corespunde filtrelor",
+      "selectedCount": "{count, plural, =1 {1 produs selectat} other {# produse selectate}}",
+      "deleteSelected": "Șterge selecția",
+      "clearSelection": "Anulează selecția",
+      "selectAll": "Selectează tot",
+      "selectProduct": "Selectează {name}",
+      "rowsPerPage": "Rânduri pe pagină:",
+      "pageInfo": "{from}-{to} din {total}",
+      "pageOf": "Pagina {current} din {total}",
+      "bulkDeleteTitle": "Șterge produsele selectate",
+      "bulkDeleteDescription": "Ești sigur că vrei să ștergi {count, plural, =1 {acest produs} other {aceste # produse}}? Această acțiune nu poate fi anulată.",
+      "bulkDeleteSuccess": "S-au șters cu succes {count, plural, =1 {1 produs} other {# produse}}",
+      "bulkDeleteError": "Nu s-au putut șterge produsele"
+    },
+    "table": {
+      "product": "Produs",
+      "brand": "Brand",
+      "concentration": "Concentrație",
+      "gender": "Gen",
+      "price": "Preț",
+      "stock": "Stoc",
+      "actions": "Acțiuni"
+    },
+    "deleteDialog": {
+      "title": "Șterge Produs",
+      "description": "Ești sigur că vrei să ștergi \"{name}\"? Această acțiune nu poate fi anulată.",
+      "success": "Produsul a fost șters cu succes",
+      "error": "Nu s-a putut șterge produsul"
+    },
+    "productDialog": {
+      "createTitle": "Adaugă Produs Nou",
+      "editTitle": "Editează Produs",
+      "createDescription": "Completează detaliile pentru a adăuga un produs nou",
+      "editDescription": "Actualizează informațiile produsului mai jos",
+      "name": "Nume",
+      "brand": "Brand",
+      "concentration": "Concentrație",
+      "selectConcentration": "Selectează concentrația",
+      "gender": "Gen",
+      "selectGender": "Selectează genul",
+      "fragranceFamily": "Familia Olfactivă",
+      "selectFragranceFamily": "Selectează familia olfactivă",
+      "topNotes": "Note de Vârf",
+      "heartNotes": "Note de Inimă",
+      "baseNotes": "Note de Bază",
+      "volume": "Volum (ml)",
+      "price": "Preț (RON)",
+      "launchYear": "An Lansare",
+      "stock": "Stoc",
+      "perfumer": "Parfumier",
+      "longevity": "Longevitate",
+      "selectLongevity": "Selectează longevitatea",
+      "sillage": "Sillage",
+      "selectSillage": "Selectează sillage-ul",
+      "season": "Sezon",
+      "selectSeasons": "Selectează sezoanele...",
+      "occasion": "Ocazie",
+      "selectOccasions": "Selectează ocaziile...",
+      "rating": "Rating (0-5)",
+      "image": "Imagine",
+      "description": "Descriere",
+      "createButton": "Creează Produs",
+      "updateButton": "Actualizează Produs",
+      "creating": "Se creează...",
+      "updating": "Se actualizează...",
+      "createSuccess": "Produsul a fost creat cu succes",
+      "updateSuccess": "Produsul a fost actualizat cu succes",
+      "error": "A apărut o eroare neașteptată",
+      "errorLoadingOptions": "Nu s-au putut încărca opțiunile produsului"
+    },
+    "settings": {
+      "title": "Setări",
+      "description": "Configurează setările magazinului",
+      "failedToLoad": "Nu s-au putut încărca setările",
+      "exchangeRate": {
+        "title": "Comision Curs Valutar",
+        "description": "Setează un procent de comision care se adaugă la cursul BNR pentru conversia prețurilor în valute străine. Aceasta compensează diferențele dintre cursul oficial și cel comercial.",
+        "feeLabel": "Procent Comision",
+        "feeHint": "Introdu o valoare între 0 și 50. De exemplu, 2 înseamnă că prețurile vor fi cu 2% mai mari când sunt afișate în EUR sau GBP.",
+        "invalidFee": "Te rugăm să introduci un comision valid între 0 și 50",
+        "saveSuccess": "Setările cursului valutar au fost salvate cu succes",
+        "saveError": "Nu s-au putut salva setările"
+      }
+    },
+    "promotions": {
+      "title": "Promoții",
+      "description": "Gestionează promoțiile și reducerile magazinului",
+      "addPromotion": "Adaugă Promoție",
+      "loading": "Se încarcă promoțiile...",
+      "noPromotions": "Nicio promoție încă",
+      "noPromotionsDescription": "Creează prima ta promoție pentru a atrage clienți",
+      "failedToLoad": "Nu s-au putut încărca promoțiile",
+      "table": {
+        "name": "Nume",
+        "discount": "Reducere",
+        "startDate": "Data Început",
+        "endDate": "Data Sfârșit",
+        "status": "Status",
+        "actions": "Acțiuni"
+      },
+      "status": {
+        "active": "Activă",
+        "scheduled": "Programată",
+        "expired": "Expirată",
+        "inactive": "Inactivă"
+      },
+      "deleteDialog": {
+        "title": "Șterge Promoție",
+        "description": "Ești sigur că vrei să ștergi \"{name}\"? Această acțiune nu poate fi anulată.",
+        "success": "Promoția a fost ștearsă cu succes",
+        "error": "Nu s-a putut șterge promoția"
+      },
+      "dialog": {
+        "createTitle": "Creează Promoție",
+        "editTitle": "Editează Promoție",
+        "createDescription": "Configurează o nouă promoție pentru magazin",
+        "editDescription": "Actualizează detaliile promoției",
+        "name": "Numele Promoției",
+        "namePlaceholder": "ex., Reduceri de Vară",
+        "discountPercent": "Procentaj Reducere",
+        "startDate": "Data și Ora Începerii",
+        "endDate": "Data și Ora Încheierii",
+        "isActive": "Activă",
+        "createButton": "Creează Promoție",
+        "updateButton": "Actualizează Promoție",
+        "creating": "Se creează...",
+        "updating": "Se actualizează...",
+        "createSuccess": "Promoția a fost creată cu succes",
+        "updateSuccess": "Promoția a fost actualizată cu succes",
+        "error": "A apărut o eroare neașteptată"
+      }
+    },
+    "auditLogs": {
+      "title": "Jurnal Audit",
+      "description": "Urmărește toate acțiunile și modificările administratorilor",
+      "loading": "Se încarcă jurnalul...",
+      "noLogs": "Nicio înregistrare încă",
+      "noLogsDescription": "Acțiunile administratorilor vor apărea aici",
+      "noMatchingLogs": "Nicio înregistrare nu corespunde filtrelor curente",
+      "failedToLoad": "Nu s-a putut încărca jurnalul",
+      "totalLogs": "{count, plural, =0 {Nicio înregistrare} =1 {1 înregistrare} other {# înregistrări}}",
+      "pageInfo": "Pagina {current} din {total}",
+      "viewDetails": "Vezi",
+      "deletedUser": "Utilizator Șters",
+      "filters": {
+        "title": "Filtre",
+        "action": "Acțiune",
+        "entityType": "Entitate",
+        "allActions": "Toate acțiunile",
+        "allEntities": "Toate entitățile",
+        "clear": "Șterge"
+      },
+      "table": {
+        "timestamp": "Data/Ora",
+        "user": "Utilizator",
+        "action": "Acțiune",
+        "entityType": "Entitate",
+        "entityId": "ID",
+        "details": "Detalii"
+      },
+      "actions": {
+        "CREATE": "Creare",
+        "UPDATE": "Actualizare",
+        "DELETE": "Ștergere",
+        "BULK_DELETE": "Ștergere în Masă",
+        "LOGIN": "Autentificare",
+        "LOGOUT": "Deconectare",
+        "PASSWORD_CHANGE": "Schimbare Parolă"
+      },
+      "entities": {
+        "PRODUCT": "Produs",
+        "PROMOTION": "Promoție",
+        "USER": "Utilizator",
+        "SETTINGS": "Setări",
+        "FILE": "Fișier",
+        "NEWSLETTER_SUBSCRIBER": "Abonat Newsletter"
+      },
+      "detailsDialog": {
+        "title": "Detalii Jurnal Audit",
+        "user": "Utilizator",
+        "action": "Acțiune",
+        "entityType": "Tip Entitate",
+        "entityId": "ID Entitate",
+        "ipAddress": "Adresă IP",
+        "userAgent": "Agent Utilizator",
+        "oldValue": "Valoare Anterioară",
+        "newValue": "Valoare Nouă"
+      }
+    },
+    "newsletter": {
+      "title": "Abonați Newsletter",
+      "description": "Gestionează abonamentele la newsletter",
+      "loading": "Se încarcă abonații...",
+      "noSubscribers": "Niciun abonat încă",
+      "noSubscribersDescription": "Abonații la newsletter vor apărea aici după ce utilizatorii se abonează",
+      "noMatchingSubscribers": "Niciun abonat nu corespunde filtrului curent",
+      "failedToLoad": "Nu s-au putut încărca abonații",
+      "totalSubscribers": "{count, plural, =0 {Niciun abonat} =1 {1 abonat} other {# abonați}}",
+      "pageInfo": "Pagina {current} din {total}",
+      "unsubscribe": "Dezabonare",
+      "table": {
+        "email": "Email",
+        "subscribedAt": "Data Abonării",
+        "status": "Status",
+        "actions": "Acțiuni"
+      },
+      "status": {
+        "active": "Activ",
+        "unsubscribed": "Dezabonat"
+      },
+      "filters": {
+        "status": "Status",
+        "allStatus": "Toate statusurile",
+        "active": "Activ",
+        "unsubscribed": "Dezabonat",
+        "clear": "Șterge filtrul"
+      },
+      "unsubscribeDialog": {
+        "title": "Dezabonare Utilizator",
+        "description": "Ești sigur că vrei să dezabonezi \"{email}\"? Nu va mai primi emailuri de newsletter.",
+        "success": "Abonatul a fost dezabonat cu succes",
+        "error": "Nu s-a putut dezabona"
+      },
+      "deleteDialog": {
+        "title": "Șterge Abonat",
+        "description": "Ești sigur că vrei să ștergi permanent \"{email}\"? Această acțiune nu poate fi anulată.",
+        "success": "Abonatul a fost șters cu succes",
+        "error": "Nu s-a putut șterge abonatul"
+      }
+    }
+  },
+  "product": {
+    "concentration": {
+      "Parfum": "Parfum",
+      "Eau_de_Parfum": "Eau de Parfum",
+      "Eau_de_Toilette": "Eau de Toilette",
+      "Eau_de_Cologne": "Eau de Cologne",
+      "Extrait_de_Parfum": "Extrait de Parfum"
+    },
+    "gender": {
+      "Men": "Bărbați",
+      "Women": "Femei",
+      "Unisex": "Unisex"
+    },
+    "fragranceFamily": {
+      "Floral": "Floral",
+      "Oriental": "Oriental",
+      "Woody": "Lemnos",
+      "Fresh": "Fresh",
+      "Citrus": "Citric",
+      "Aromatic": "Aromatic",
+      "Fougere": "Fougère",
+      "Chypre": "Chypre",
+      "Gourmand": "Gourmand",
+      "Aquatic": "Acvatic",
+      "Amber Floral": "Ambrat Floral",
+      "Amber Spicy": "Ambrat Condimentat",
+      "Amber Woody": "Ambrat Lemnos",
+      "Aquatic Aromatic": "Acvatic Aromatic",
+      "Aromatic Aquatic": "Aromatic Acvatic",
+      "Aromatic Fougere": "Aromatic Fougère",
+      "Chypre Floral": "Chypre Floral",
+      "Chypre Fruity": "Chypre Fructat",
+      "Citrus Aromatic": "Citric Aromatic",
+      "Citrus Floral": "Citric Floral",
+      "Floral Aldehyde": "Floral Aldehidic",
+      "Floral Aquatic": "Floral Acvatic",
+      "Floral Chypre": "Floral Chypre",
+      "Floral Fruity": "Floral Fructat",
+      "Floral Fruity Gourmand": "Floral Fructat Gourmand",
+      "Floral Musky": "Floral Mosc",
+      "Floral Oriental": "Floral Oriental",
+      "Floral Powdery": "Floral Pudrat",
+      "Floral Spicy": "Floral Condimentat",
+      "Floral White": "Floral Alb",
+      "Floral Woody": "Floral Lemnos",
+      "Fruity Chypre": "Fructat Chypre",
+      "Gourmand Fruity": "Gourmand Fructat",
+      "Gourmand Oriental": "Gourmand Oriental",
+      "Leather": "Piele",
+      "Musky Floral": "Mosc Floral",
+      "Oriental Chypre": "Oriental Chypre",
+      "Oriental Floral": "Oriental Floral",
+      "Oriental Fougere": "Oriental Fougère",
+      "Oriental Spicy": "Oriental Condimentat",
+      "Oriental Vanilla": "Oriental Vanilat",
+      "Oriental Woody": "Oriental Lemnos",
+      "Spicy Leather": "Condimentat Piele",
+      "Spicy Oriental": "Condimentat Oriental",
+      "White Floral": "Floral Alb",
+      "Woody Aquatic": "Lemnos Acvatic",
+      "Woody Aromatic": "Lemnos Aromatic",
+      "Woody Floral": "Lemnos Floral",
+      "Woody Fresh Spicy": "Lemnos Fresh Condimentat",
+      "Woody Oriental": "Lemnos Oriental",
+      "Woody Spicy": "Lemnos Condimentat"
+    },
+    "season": {
+      "Spring": "Primăvară",
+      "Summer": "Vară",
+      "Fall": "Toamnă",
+      "Winter": "Iarnă"
+    },
+    "occasion": {
+      "Daily": "Zilnic",
+      "Office": "Birou",
+      "Date Night": "Întâlnire",
+      "Special Event": "Eveniment Special",
+      "Casual": "Casual",
+      "Sport": "Sport",
+      "Evening": "Seară",
+      "Special": "Special"
+    },
+    "longevity": {
+      "Weak": "Slabă",
+      "Moderate": "Moderată",
+      "Long-lasting": "Durabilă",
+      "Very Long-lasting": "Foarte Durabilă",
+      "Very long-lasting": "Foarte Durabilă"
+    },
+    "sillage": {
+      "Intimate": "Intim",
+      "Moderate": "Moderat",
+      "Strong": "Puternic",
+      "Enormous": "Enorm"
+    },
+    "outOfStock": "Stoc Epuizat"
+  },
+  "metadata": {
+    "title": "Magazin de Parfumuri - Parfumuri de Lux Online",
+    "description": "Descoperă parfumuri autentice de lux de la cele mai prestigioase branduri din lume. Cumpără Eau de Parfum, Eau de Toilette și parfumuri nișă cu livrare rapidă.",
+    "keywords": "parfum, parfumuri, parfumuri de lux, eau de parfum, eau de toilette, parfum designer, parfum nișă, cumpără parfum online"
+  },
+  "seo": {
+    "store": {
+      "title": "Cumpără Parfumuri de Lux",
+      "description": "Răsfoiește colecția noastră selectată de parfumuri de lux. Filtrează după brand, familie olfactivă, concentrație și altele."
+    },
+    "home": {
+      "title": "Descoperă-ți Parfumul Semnatură",
+      "description": "Explorează colecția noastră de parfumuri de lux de la cele mai prestigioase case. Găsește parfumul care te definește."
+    }
+  },
+  "currency": {
+    "changeCurrency": "Schimbă moneda",
+    "RON": "Leu Românesc",
+    "EUR": "Euro",
+    "GBP": "Liră Sterlină"
+  },
+  "store": {
+    "title": "Colecția Noastră",
+    "subtitle": "Răsfoiește selecția noastră de parfumuri de lux",
+    "searchPlaceholder": "Caută parfumuri...",
+    "resultsCount": "{count, plural, =0 {Niciun produs găsit} =1 {1 produs} other {# produse}}",
+    "errorLoading": "Nu s-au putut încărca produsele",
+    "retry": "Încearcă din nou",
+    "noProducts": "Niciun produs găsit",
+    "noProductsDescription": "Încearcă să ajustezi filtrele sau termenii de căutare",
+    "filters": {
+      "title": "Filtre",
+      "gender": "Gen",
+      "allGenders": "Toate genurile",
+      "concentration": "Concentrație",
+      "allConcentrations": "Toate concentrațiile",
+      "priceRange": "Interval preț",
+      "min": "Min",
+      "max": "Max",
+      "clearAll": "Șterge toate filtrele",
+      "fragranceFamily": "Familie Olfactivă",
+      "allFragranceFamilies": "Toate familiile",
+      "season": "Sezon",
+      "selectSeasons": "Selectează sezoane...",
+      "occasion": "Ocazie",
+      "selectOccasions": "Selectează ocazii...",
+      "rating": "Rating",
+      "longevity": "Longevitate",
+      "allLongevities": "Toate longevitățile",
+      "sillage": "Sillage",
+      "allSillages": "Toate tipurile",
+      "matchAny": "Oricare",
+      "matchAll": "Toate"
+    },
+    "sort": {
+      "newest": "Cele mai noi",
+      "priceLowHigh": "Preț: Mic la Mare",
+      "priceHighLow": "Preț: Mare la Mic",
+      "nameAZ": "Nume: A la Z",
+      "nameZA": "Nume: Z la A",
+      "ratingHighLow": "Rating: Mare la Mic"
+    }
+  },
+  "cart": {
+    "title": "Coșul de Cumpărături",
+    "empty": {
+      "title": "Coșul tău este gol",
+      "description": "Descoperă colecția noastră de parfumuri de lux și găsește aroma perfectă.",
+      "continueShopping": "Continuă Cumpărăturile"
+    },
+    "item": {
+      "remove": "Șterge",
+      "quantity": "Cantitate",
+      "price": "Preț",
+      "total": "Total"
+    },
+    "summary": {
+      "title": "Sumar Comandă",
+      "items": "{count, plural, =1 {1 produs} other {# produse}}",
+      "subtotal": "Subtotal",
+      "discount": "Reducere ({percent}%)",
+      "total": "Total",
+      "checkout": "Finalizează Comanda",
+      "clearCart": "Golește Coșul",
+      "youSave": "Economisești"
+    },
+    "addToCart": {
+      "add": "Adaugă în Coș",
+      "adding": "Se adaugă...",
+      "added": "Adăugat!",
+      "inCart": "În Coș ({quantity})",
+      "outOfStock": "Stoc Epuizat"
+    },
+    "toast": {
+      "added": "{name} a fost adăugat în coș",
+      "removed": "{name} a fost eliminat din coș",
+      "updated": "Coș actualizat",
+      "cleared": "Coșul a fost golit",
+      "stockExceeded": "Nu poți adăuga mai mult de {stock} produse",
+      "outOfStock": "Acest produs nu este în stoc"
+    },
+    "confirmClear": {
+      "title": "Golește Coșul",
+      "description": "Ești sigur că vrei să elimini toate produsele din coș? Această acțiune nu poate fi anulată.",
+      "confirm": "Golește Coșul",
+      "cancel": "Anulează"
+    }
+  },
+  "error": {
+    "title": "Ceva nu a mers bine",
+    "description": "A apărut o eroare neașteptată. Vă rugăm să încercați din nou.",
+    "tryAgain": "Încearcă din nou"
+  },
+  "notFound": {
+    "title": "Pagina nu a fost găsită",
+    "description": "Pagina pe care o căutați nu există sau a fost mutată.",
+    "backHome": "Înapoi la pagina principală"
+  },
+  "productDetail": {
+    "backToStore": "Înapoi la Magazin",
+    "notFound": "Produsul nu a fost găsit",
+    "outOfStock": "Stoc Epuizat",
+    "inStock": "{count, plural, =1 {1 produs în stoc} other {# produse în stoc}}",
+    "quantity": "Cantitate",
+    "description": "Descriere",
+    "topNotes": "Note de Vârf",
+    "heartNotes": "Note de Inimă",
+    "baseNotes": "Note de Bază",
+    "longevity": "Longevitate",
+    "sillage": "Sillage",
+    "seasons": "Sezoane",
+    "occasions": "Ocazii",
+    "perfumer": "Parfumier",
+    "launchYear": "An Lansare"
+  }
+}

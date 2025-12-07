@@ -1,0 +1,290 @@
+import request from 'supertest'
+import app from './app'
+import { prisma } from '../lib/prisma'
+
+describe('API Routes Integration Tests', () => {
+  describe('GET /api/health', () => {
+    it('should return health status when database is connected', async () => {
+      ;(prisma.$queryRaw as jest.Mock).mockResolvedValue([{ '?column?': 1 }])
+
+      const response = await request(app).get('/api/health')
+
+      expect(response.status).toBe(200)
+      expect(response.body.status).toBe('ok')
+      expect(response.body.database).toBe('connected')
+      expect(response.body.timestamp).toBeDefined()
+    })
+
+    it('should return degraded status when database is disconnected', async () => {
+      ;(prisma.$queryRaw as jest.Mock).mockRejectedValue(new Error('Connection failed'))
+
+      const response = await request(app).get('/api/health')
+
+      expect(response.status).toBe(503)
+      expect(response.body.status).toBe('degraded')
+      expect(response.body.database).toBe('disconnected')
+    })
+  })
+
+  describe('GET /api/nonexistent', () => {
+    it('should return 404 for non-existent routes', async () => {
+      const response = await request(app).get('/api/nonexistent')
+
+      expect(response.status).toBe(404)
+      expect(response.body.error.code).toBe('NOT_FOUND')
+    })
+  })
+
+  describe('POST /api/auth/register', () => {
+    it('should return validation error for missing fields', async () => {
+      const response = await request(app)
+        .post('/api/auth/register')
+        .send({ email: 'invalid' })
+
+      expect(response.status).toBe(400)
+      expect(response.body.error.code).toBe('VALIDATION_ERROR')
+    })
+
+    it('should return validation error for weak password', async () => {
+      const response = await request(app)
+        .post('/api/auth/register')
+        .send({
+          email: 'test@example.com',
+          password: 'weak',
+          name: 'Test User',
+        })
+
+      expect(response.status).toBe(400)
+      expect(response.body.error.code).toBe('VALIDATION_ERROR')
+    })
+  })
+
+  describe('POST /api/auth/login', () => {
+    it('should return validation error for missing password', async () => {
+      const response = await request(app)
+        .post('/api/auth/login')
+        .send({ email: 'test@example.com' })
+
+      expect(response.status).toBe(400)
+      expect(response.body.error.code).toBe('VALIDATION_ERROR')
+    })
+
+    it('should return validation error for invalid email', async () => {
+      const response = await request(app)
+        .post('/api/auth/login')
+        .send({
+          email: 'invalid-email',
+          password: 'password123',
+        })
+
+      expect(response.status).toBe(400)
+      expect(response.body.error.code).toBe('VALIDATION_ERROR')
+    })
+  })
+
+  describe('GET /api/products', () => {
+    it('should return products list', async () => {
+      ;(prisma.product.findMany as jest.Mock).mockResolvedValue([])
+      ;(prisma.product.count as jest.Mock).mockResolvedValue(0)
+
+      const response = await request(app).get('/api/products')
+
+      expect(response.status).toBe(200)
+      expect(response.body.data.products).toEqual([])
+      expect(response.body.data.pagination).toBeDefined()
+    })
+
+    it('should accept pagination query params', async () => {
+      ;(prisma.product.findMany as jest.Mock).mockResolvedValue([])
+      ;(prisma.product.count as jest.Mock).mockResolvedValue(0)
+
+      const response = await request(app)
+        .get('/api/products')
+        .query({ page: '2', limit: '10' })
+
+      expect(response.status).toBe(200)
+      expect(prisma.product.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          skip: 10,
+          take: 10,
+        })
+      )
+    })
+
+    it('should return validation error for invalid page param', async () => {
+      const response = await request(app)
+        .get('/api/products')
+        .query({ page: 'abc' })
+
+      expect(response.status).toBe(400)
+    })
+  })
+
+  describe('GET /api/products/:id', () => {
+    it('should return product by id', async () => {
+      const mockProduct = {
+        id: 1,
+        name: 'Test Product',
+        brand: 'Test Brand',
+        fragranceFamily: { id: 1, name: 'Woody' },
+        longevity: { id: 1, name: 'Long', sortOrder: 1 },
+        sillage: { id: 1, name: 'Moderate', sortOrder: 1 },
+        seasons: [],
+        occasions: [],
+      }
+      // getProduct uses findFirst with deletedAt: null
+      ;(prisma.product.findFirst as jest.Mock).mockResolvedValue(mockProduct)
+
+      const response = await request(app).get('/api/products/1')
+
+      expect(response.status).toBe(200)
+      expect(response.body.data.id).toBe(1)
+    })
+
+    it('should return validation error for invalid id', async () => {
+      const response = await request(app).get('/api/products/invalid')
+
+      expect(response.status).toBe(400)
+    })
+  })
+
+  describe('GET /api/products/filter-options', () => {
+    it('should return filter options', async () => {
+      ;(prisma.fragranceFamily.findMany as jest.Mock).mockResolvedValue([])
+      ;(prisma.longevity.findMany as jest.Mock).mockResolvedValue([])
+      ;(prisma.sillage.findMany as jest.Mock).mockResolvedValue([])
+      ;(prisma.season.findMany as jest.Mock).mockResolvedValue([])
+      ;(prisma.occasion.findMany as jest.Mock).mockResolvedValue([])
+
+      const response = await request(app).get('/api/products/filter-options')
+
+      expect(response.status).toBe(200)
+      expect(response.body.data).toBeDefined()
+    })
+  })
+
+  describe('GET /api/products/brands', () => {
+    it('should return brands list with pagination', async () => {
+      ;(prisma.product.groupBy as jest.Mock)
+        .mockResolvedValueOnce([{ brand: 'Brand A' }, { brand: 'Brand B' }])
+        .mockResolvedValueOnce([{ brand: 'Brand A' }, { brand: 'Brand B' }])
+
+      const response = await request(app).get('/api/products/brands')
+
+      expect(response.status).toBe(200)
+      expect(response.body.data.brands).toEqual(['Brand A', 'Brand B'])
+      expect(response.body.data.pagination).toBeDefined()
+    })
+  })
+
+  describe('GET /api/products/stats', () => {
+    it('should return product stats', async () => {
+      ;(prisma.product.count as jest.Mock).mockResolvedValue(100)
+      ;(prisma.product.findMany as jest.Mock).mockResolvedValue([
+        { brand: 'A' },
+        { brand: 'B' },
+      ])
+
+      const response = await request(app).get('/api/products/stats')
+
+      expect(response.status).toBe(200)
+      expect(response.body.data.productCount).toBe(100)
+      expect(response.body.data.brandCount).toBe(2)
+    })
+  })
+
+  describe('GET /api/promotions/active', () => {
+    it('should return active promotion', async () => {
+      const mockPromotion = {
+        id: 1,
+        name: 'Summer Sale',
+        discountPercent: 20,
+        startDate: new Date(),
+        endDate: new Date(),
+        isActive: true,
+      }
+      ;(prisma.promotion.findFirst as jest.Mock).mockResolvedValue(mockPromotion)
+
+      const response = await request(app).get('/api/promotions/active')
+
+      expect(response.status).toBe(200)
+      expect(response.body.data.promotion).toBeDefined()
+      expect(response.body.data.serverTime).toBeDefined()
+    })
+
+    it('should return null when no active promotion', async () => {
+      ;(prisma.promotion.findFirst as jest.Mock).mockResolvedValue(null)
+
+      const response = await request(app).get('/api/promotions/active')
+
+      expect(response.status).toBe(200)
+      expect(response.body.data.promotion).toBeNull()
+    })
+  })
+
+  describe('POST /api/newsletter/subscribe', () => {
+    it('should return validation error for invalid email', async () => {
+      const response = await request(app)
+        .post('/api/newsletter/subscribe')
+        .set('Content-Type', 'application/json')
+        .send({ email: 'invalid-email' })
+
+      expect(response.status).toBe(400)
+    })
+
+    it('should return validation error for missing email', async () => {
+      const response = await request(app)
+        .post('/api/newsletter/subscribe')
+        .set('Content-Type', 'application/json')
+        .send({})
+
+      expect(response.status).toBe(400)
+    })
+  })
+
+  describe('Protected Routes', () => {
+    describe('POST /api/products', () => {
+      it('should require authentication', async () => {
+        const response = await request(app)
+          .post('/api/products')
+          .send({ name: 'Test' })
+
+        expect(response.status).toBe(401)
+      })
+    })
+
+    describe('DELETE /api/products/:id', () => {
+      it('should require authentication', async () => {
+        const response = await request(app).delete('/api/products/1')
+
+        expect(response.status).toBe(401)
+      })
+    })
+
+    describe('GET /api/promotions', () => {
+      it('should require authentication', async () => {
+        const response = await request(app).get('/api/promotions')
+
+        expect(response.status).toBe(401)
+      })
+    })
+
+    describe('POST /api/promotions', () => {
+      it('should require authentication', async () => {
+        const response = await request(app)
+          .post('/api/promotions')
+          .send({ name: 'Test' })
+
+        expect(response.status).toBe(401)
+      })
+    })
+
+    describe('GET /api/admin/newsletter', () => {
+      it('should require authentication', async () => {
+        const response = await request(app).get('/api/admin/newsletter')
+
+        expect(response.status).toBe(401)
+      })
+    })
+  })
+})

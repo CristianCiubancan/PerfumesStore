@@ -1,0 +1,339 @@
+'use client'
+
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
+import { useTranslations } from 'next-intl'
+import { Filter, Loader2 } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet'
+import { ProductCard } from '@/components/store/product-card'
+import { ProductFilters } from '@/components/store/product-filters'
+import { Pagination } from '@/components/store/pagination'
+import { productsApi } from '@/lib/api/products'
+import { Product } from '@/types'
+import { useFilterParams, FilterValues } from '@/hooks/use-filter-params'
+import { useFilterOptions } from '@/hooks/use-filter-options'
+import { useCurrencyStore } from '@/store/currency'
+import { PAGINATION, TIMING } from '@/lib/constants'
+
+// Convert price from selected currency to RON for API filtering
+// This reverses the conversion done in formatPrice/convertPrice
+function convertToRON(
+  price: number,
+  currency: 'RON' | 'EUR' | 'GBP',
+  exchangeRates: { EUR: number; GBP: number; feePercent: number } | null
+): number {
+  if (currency === 'RON' || !exchangeRates) {
+    return price
+  }
+  // BNR rates are: 1 EUR = X RON, so to convert to RON, multiply by X
+  const priceInAdjustedRON = price * exchangeRates[currency]
+
+  // Remove the fee that was applied when displaying prices
+  // (formatPrice applies: priceRON * feeMultiplier / rate, so we reverse it)
+  const feeMultiplier = 1 + (exchangeRates.feePercent / 100)
+  return priceInAdjustedRON / feeMultiplier
+}
+
+export function StorePageClient() {
+  const t = useTranslations()
+  const { filters, page, setFilters, setPage, resetFilters } = useFilterParams()
+  const { currency, exchangeRates } = useCurrencyStore()
+  const [products, setProducts] = useState<Product[]>([])
+  const [pagination, setPagination] = useState({
+    page: 1,
+    totalPages: 1,
+    total: 0,
+  })
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
+
+  // Filter options from API
+  const { filterOptions, isLoadingOptions } = useFilterOptions()
+
+  // Memoize API params to prevent unnecessary re-fetches
+  const apiParams = useMemo(() => {
+    const minPriceRON = filters.minPrice
+      ? convertToRON(parseFloat(filters.minPrice), currency, exchangeRates)
+      : undefined
+    const maxPriceRON = filters.maxPrice
+      ? convertToRON(parseFloat(filters.maxPrice), currency, exchangeRates)
+      : undefined
+
+    return {
+      page,
+      limit: PAGINATION.PRODUCTS_PER_PAGE,
+      search: filters.search || undefined,
+      gender: filters.gender || undefined,
+      concentration: filters.concentration || undefined,
+      minPrice: minPriceRON,
+      maxPrice: maxPriceRON,
+      sortBy: filters.sortBy,
+      sortOrder: filters.sortOrder,
+      fragranceFamilyId: filters.fragranceFamilyId ?? undefined,
+      longevityId: filters.longevityId ?? undefined,
+      sillageId: filters.sillageId ?? undefined,
+      seasonIds: filters.seasonIds.length > 0 ? filters.seasonIds : undefined,
+      seasonMatchMode: filters.seasonMatchMode,
+      occasionIds: filters.occasionIds.length > 0 ? filters.occasionIds : undefined,
+      occasionMatchMode: filters.occasionMatchMode,
+      minRating: filters.minRating ? parseFloat(filters.minRating) : undefined,
+      maxRating: filters.maxRating ? parseFloat(filters.maxRating) : undefined,
+    }
+  }, [
+    page,
+    filters.search,
+    filters.gender,
+    filters.concentration,
+    filters.minPrice,
+    filters.maxPrice,
+    filters.sortBy,
+    filters.sortOrder,
+    filters.fragranceFamilyId,
+    filters.longevityId,
+    filters.sillageId,
+    filters.seasonIds,
+    filters.seasonMatchMode,
+    filters.occasionIds,
+    filters.occasionMatchMode,
+    filters.minRating,
+    filters.maxRating,
+    currency,
+    exchangeRates,
+  ])
+
+  // Ref to track the current AbortController for cancelling in-flight requests
+  const abortControllerRef = useRef<AbortController | null>(null)
+
+  const fetchProducts = useCallback(async (signal?: AbortSignal) => {
+    setIsLoading(true)
+    setError(null)
+
+    try {
+      const response = await productsApi.list(apiParams, { signal })
+
+      setProducts(response.products)
+      setPagination({
+        page: response.pagination.page,
+        totalPages: response.pagination.totalPages,
+        total: response.pagination.total,
+      })
+    } catch (err) {
+      // Don't set error state for aborted requests
+      if (err instanceof Error && err.name === 'AbortError') {
+        return
+      }
+      setError(t('store.errorLoading'))
+    } finally {
+      // Only clear loading if request wasn't aborted
+      if (!signal?.aborted) {
+        setIsLoading(false)
+      }
+    }
+  }, [apiParams, t])
+
+  // Debounced fetch when filters or page change
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      // Abort any in-flight request before starting a new one
+      abortControllerRef.current?.abort()
+
+      const controller = new AbortController()
+      abortControllerRef.current = controller
+
+      fetchProducts(controller.signal)
+    }, TIMING.DEBOUNCE_SHORT_MS)
+
+    return () => {
+      clearTimeout(timeoutId)
+      // Abort on cleanup (component unmount or deps change before debounce fires)
+      abortControllerRef.current?.abort()
+    }
+  }, [fetchProducts])
+
+  const handleFiltersChange = (newFilters: FilterValues) => {
+    setFilters(newFilters)
+  }
+
+  const handleResetFilters = () => {
+    resetFilters()
+  }
+
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage)
+    // On desktop, scroll the products container; on mobile, scroll the page
+    const productsContainer = document.getElementById('products-scroll-container')
+    if (productsContainer && window.innerWidth >= 1024) {
+      productsContainer.scrollTo({ top: 0, behavior: 'smooth' })
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+  }
+
+  const FilterSidebar = (
+    <ProductFilters
+      filters={filters}
+      onFiltersChange={handleFiltersChange}
+      onReset={handleResetFilters}
+      filterOptions={filterOptions}
+      isLoadingOptions={isLoadingOptions}
+    />
+  )
+
+  // Calculate side padding for centering content (1280px max) with 16px minimum
+  // This is computed in JS to avoid CSS calc/max compatibility issues
+  const [sidePadding, setSidePadding] = useState(16)
+
+  useEffect(() => {
+    const updatePadding = () => {
+      const viewportWidth = window.innerWidth
+      const contentMax = 1280
+      const minPadding = 16
+      const calculatedPadding = Math.max(minPadding, (viewportWidth - contentMax) / 2)
+      setSidePadding(calculatedPadding)
+    }
+
+    updatePadding()
+    window.addEventListener('resize', updatePadding)
+    return () => window.removeEventListener('resize', updatePadding)
+  }, [])
+
+  // Shared content components for mobile and desktop
+  const PageHeader = (
+    <div className="pt-8 pb-4">
+      <h1 className="text-3xl font-bold">{t('store.title')}</h1>
+      <p className="text-muted-foreground mt-2">{t('store.subtitle')}</p>
+    </div>
+  )
+
+  const ProductsContent = (
+    <>
+      {/* Results Count */}
+      <div className="flex items-center justify-between mb-6">
+        <p className="text-sm text-muted-foreground">
+          {t('store.resultsCount', { count: pagination.total })}
+        </p>
+
+        {/* Mobile Filter Button */}
+        <Sheet open={mobileFiltersOpen} onOpenChange={setMobileFiltersOpen}>
+          <SheetTrigger asChild>
+            <Button variant="outline" className="lg:hidden">
+              <Filter className="mr-2 h-4 w-4" />
+              {t('common.filter')}
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="left" className="w-[300px] overflow-y-auto px-4">
+            <SheetHeader>
+              <SheetTitle>{t('store.filters.title')}</SheetTitle>
+            </SheetHeader>
+            <div className="mt-6">{FilterSidebar}</div>
+          </SheetContent>
+        </Sheet>
+      </div>
+
+      {/* Error State */}
+      {error && (
+        <div className="text-center py-12">
+          <p className="text-destructive">{error}</p>
+          <Button
+            variant="outline"
+            className="mt-4"
+            onClick={() => fetchProducts()}
+          >
+            {t('store.retry')}
+          </Button>
+        </div>
+      )}
+
+      {/* Loading State */}
+      {isLoading && (
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+      )}
+
+      {/* Empty State */}
+      {!isLoading && !error && products.length === 0 && (
+        <div className="text-center py-12">
+          <p className="text-lg font-medium">{t('store.noProducts')}</p>
+          <p className="text-muted-foreground mt-2">
+            {t('store.noProductsDescription')}
+          </p>
+          <Button
+            variant="outline"
+            className="mt-4"
+            onClick={handleResetFilters}
+          >
+            {t('store.filters.clearAll')}
+          </Button>
+        </div>
+      )}
+
+      {/* Products Grid */}
+      {!isLoading && !error && products.length > 0 && (
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {products.map((product, index) => (
+              <ProductCard key={product.id} product={product} priority={index === 0} />
+            ))}
+          </div>
+
+          {/* Pagination */}
+          <div className="mt-8 pb-6">
+            <Pagination
+              currentPage={page}
+              totalPages={pagination.totalPages}
+              onPageChange={handlePageChange}
+            />
+          </div>
+        </>
+      )}
+    </>
+  )
+
+  return (
+    <>
+      {/* Desktop Layout - Two panel full-width design */}
+      <div className="hidden lg:flex lg:h-[calc(100vh-3.5rem)]">
+        {/* Left Panel - Sidebar with dynamic left padding for centering */}
+        <aside
+          className="flex-shrink-0 overflow-y-auto"
+          style={{
+            width: sidePadding + 288 + 32, // padding + sidebar (18rem) + gap (2rem)
+            paddingLeft: sidePadding
+          }}
+        >
+          <div className="w-72 pt-8 pb-6 pr-8">
+            {FilterSidebar}
+          </div>
+        </aside>
+
+        {/* Right Panel - Title + Products with dynamic right padding for centering */}
+        <div
+          id="products-scroll-container"
+          className="flex-1 overflow-y-auto"
+          style={{ paddingRight: sidePadding }}
+        >
+          <div style={{ maxWidth: 960 }}> {/* 1280 - 288 - 32 = 960 */}
+            {PageHeader}
+            {ProductsContent}
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile Layout - Standard stacked layout */}
+      <div className="lg:hidden flex-1">
+        <div className="container mx-auto px-4">
+          {PageHeader}
+          {ProductsContent}
+        </div>
+      </div>
+    </>
+  )
+}

@@ -1,0 +1,197 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            Int            @id @default(autoincrement())
+  email         String         @unique
+  passwordHash  String
+  name          String
+  role          Role           @default(USER)
+  tokenVersion  Int            @default(0) // Incremented to invalidate all tokens
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  refreshTokens RefreshToken[]
+  auditLogs     AuditLog[]
+}
+
+// Refresh token storage for revocation support
+model RefreshToken {
+  id        String   @id @default(uuid())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String   // SHA-256 hash of the token (never store plain tokens)
+  expiresAt DateTime
+  revokedAt DateTime? // Null if active, timestamp if revoked
+  createdAt DateTime @default(now())
+  userAgent String?  // Optional: track device/browser
+  ipAddress String?  // Optional: track IP for security audit
+
+  @@index([userId])
+  @@index([tokenHash])
+  @@index([expiresAt])
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum Gender {
+  Men
+  Women
+  Unisex
+}
+
+enum Concentration {
+  Eau_de_Cologne
+  Eau_de_Toilette
+  Eau_de_Parfum
+  Parfum
+  Extrait_de_Parfum
+}
+
+// Lookup tables for filter options
+model FragranceFamily {
+  id       Int       @id @default(autoincrement())
+  name     String    @unique
+  products Product[]
+}
+
+model Longevity {
+  id       Int       @id @default(autoincrement())
+  name     String    @unique
+  sortOrder Int      @default(0)
+  products Product[]
+}
+
+model Sillage {
+  id       Int       @id @default(autoincrement())
+  name     String    @unique
+  sortOrder Int      @default(0)
+  products Product[]
+}
+
+model Season {
+  id       Int       @id @default(autoincrement())
+  name     String    @unique
+  products Product[] @relation("ProductSeasons")
+}
+
+model Occasion {
+  id       Int       @id @default(autoincrement())
+  name     String    @unique
+  products Product[] @relation("ProductOccasions")
+}
+
+model Product {
+  id                Int             @id @default(autoincrement())
+  slug              String          @unique
+  name              String
+  brand             String
+  concentration     Concentration
+  gender            Gender
+  fragranceFamilyId Int
+  fragranceFamily   FragranceFamily @relation(fields: [fragranceFamilyId], references: [id], onDelete: Restrict)
+  topNotes          String[]
+  heartNotes        String[]
+  baseNotes         String[]
+  volumeMl          Int
+  priceRON          Decimal         @db.Decimal(10, 2)
+  launchYear        Int
+  perfumer          String?
+  longevityId       Int
+  longevity         Longevity       @relation(fields: [longevityId], references: [id], onDelete: Restrict)
+  sillageId         Int
+  sillage           Sillage         @relation(fields: [sillageId], references: [id], onDelete: Restrict)
+  seasons           Season[]        @relation("ProductSeasons")
+  occasions         Occasion[]      @relation("ProductOccasions")
+  rating            Decimal         @db.Decimal(2, 1)
+  stock             Int             @default(0)
+  imageUrl          String?
+  description       String?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  deletedAt         DateTime?       // Soft delete - null means active, timestamp means deleted
+
+  // Indexes for filtering and sorting
+  @@index([slug])
+  @@index([gender])
+  @@index([concentration])
+  @@index([brand])
+  @@index([priceRON])
+  @@index([rating])
+  @@index([stock])
+  @@index([createdAt])
+  @@index([fragranceFamilyId])
+  @@index([longevityId])
+  @@index([sillageId])
+  @@index([deletedAt])
+}
+
+// Global promotion - only one active at a time
+model Promotion {
+  id              Int      @id @default(autoincrement())
+  name            String
+  discountPercent Int      // Percentage off (e.g., 15 for 15%)
+  startDate       DateTime
+  endDate         DateTime
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+// Exchange rates from BNR (Romanian National Bank)
+model ExchangeRate {
+  id        Int      @id @default(autoincrement())
+  currency  String   @unique // EUR, GBP, etc.
+  rate      Decimal  @db.Decimal(10, 4) // Rate: 1 currency = X RON
+  fetchedAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Exchange rate fee settings (singleton - only one row)
+model ExchangeRateSettings {
+  id            Int      @id @default(1)
+  feePercent    Decimal  @db.Decimal(5, 2) @default(0) // Fee percentage (e.g., 2.00 for 2%)
+  updatedAt     DateTime @updatedAt
+}
+
+// Audit log for tracking admin actions
+model AuditLog {
+  id         Int      @id @default(autoincrement())
+  userId     Int?     // Nullable to preserve logs when user is deleted
+  user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action     String   // CREATE, UPDATE, DELETE, LOGIN, LOGOUT, PASSWORD_CHANGE
+  entityType String   // PRODUCT, PROMOTION, USER, etc.
+  entityId   Int?     // ID of the affected entity (nullable for actions like login)
+  oldValue   Json?    // Previous state (for updates/deletes)
+  newValue   Json?    // New state (for creates/updates)
+  result     String?  // Operation result: SUCCESS, FAILURE, PARTIAL
+  ipAddress  String?  // IP address of the request
+  userAgent  String?  // Browser/client info
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
+  @@index([entityType])
+  @@index([entityId])
+  @@index([action])
+  @@index([createdAt])
+}
+
+// Newsletter subscribers
+model NewsletterSubscriber {
+  id           Int       @id @default(autoincrement())
+  email        String    @unique
+  isActive     Boolean   @default(true)
+  subscribedAt DateTime  @default(now())
+  unsubscribedAt DateTime?
+
+  @@index([isActive])
+  @@index([subscribedAt])
+}

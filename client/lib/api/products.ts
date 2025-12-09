@@ -78,8 +78,10 @@ export const productsApi = {
   getFilterOptions: () =>
     api.get<FilterOptions>('/api/products/filter-options'),
 
-  getBrands: () =>
-    api.get<string[]>('/api/products/brands'),
+  getBrands: async () => {
+    const result = await api.get<{ brands: string[] }>('/api/products/brands')
+    return result.brands
+  },
 
   getStats: () =>
     api.get<{ productCount: number; brandCount: number }>('/api/products/stats'),

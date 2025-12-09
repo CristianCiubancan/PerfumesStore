@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useState, useEffect } from 'react'
-import { motion, useInView } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { useTranslations } from 'next-intl'
 
 interface BrandsShowcaseProps {
@@ -12,7 +12,6 @@ export function BrandsShowcase({ brands }: BrandsShowcaseProps) {
   const t = useTranslations('home')
   const containerRef = useRef<HTMLDivElement>(null)
   const trackRef = useRef<HTMLDivElement>(null)
-  const isInView = useInView(containerRef, { once: true, margin: '-100px' })
   const [singleSetWidth, setSingleSetWidth] = useState(0)
 
   // Calculate how many times to repeat brands to fill the screen
@@ -44,7 +43,8 @@ export function BrandsShowcase({ brands }: BrandsShowcaseProps) {
       <div className="container mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-100px' }}
           transition={{ duration: 0.5 }}
           className="text-center mb-10"
         >

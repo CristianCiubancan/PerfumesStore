@@ -52,7 +52,7 @@ const BrandsShowcase = dynamic(
 
 const Newsletter = dynamic(
   () => import('@/components/home/newsletter').then((mod) => mod.Newsletter),
-  { loading: () => <NewsletterSkeleton />, ssr: true }
+  { loading: () => <NewsletterSkeleton />, ssr: false }
 )
 
 export function HomePage() {

@@ -135,8 +135,20 @@ export function StorePageClient() {
 
   // Ref to track the current AbortController for cancelling in-flight requests
   const abortControllerRef = useRef<AbortController | null>(null)
+  // Track if this is the initial load (don't scroll on first load)
+  const isInitialLoadRef = useRef(true)
 
-  const fetchProducts = useCallback(async (signal?: AbortSignal) => {
+  // Scroll to top of products - on desktop scroll the container, on mobile scroll the page
+  const scrollToTop = useCallback(() => {
+    const productsContainer = document.getElementById('products-scroll-container')
+    if (productsContainer && window.innerWidth >= UI_DIMENSIONS.DESKTOP_BREAKPOINT) {
+      productsContainer.scrollTo({ top: UI_DIMENSIONS.SCROLL_TOP, behavior: 'smooth' })
+    } else {
+      window.scrollTo({ top: UI_DIMENSIONS.SCROLL_TOP, behavior: 'smooth' })
+    }
+  }, [])
+
+  const fetchProducts = useCallback(async (signal?: AbortSignal, shouldScroll = false) => {
     setIsLoading(true)
     setError(null)
 
@@ -149,6 +161,11 @@ export function StorePageClient() {
         totalPages: response.pagination.totalPages,
         total: response.pagination.total,
       })
+
+      // Scroll to top after successful fetch (but not on initial load)
+      if (shouldScroll) {
+        scrollToTop()
+      }
     } catch (err: unknown) {
       // Don't set error state for aborted requests
       if (err instanceof Error && err.name === 'AbortError') {
@@ -161,10 +178,12 @@ export function StorePageClient() {
         setIsLoading(false)
       }
     }
-  }, [apiParams, t])
+  }, [apiParams, t, scrollToTop])
 
   // Debounced fetch when filters or page change
   useEffect(() => {
+    const shouldScroll = !isInitialLoadRef.current
+
     const timeoutId = setTimeout(() => {
       // Abort any in-flight request before starting a new one
       abortControllerRef.current?.abort()
@@ -172,7 +191,12 @@ export function StorePageClient() {
       const controller = new AbortController()
       abortControllerRef.current = controller
 
-      fetchProducts(controller.signal)
+      fetchProducts(controller.signal, shouldScroll)
+
+      // Mark initial load as complete after first fetch
+      if (isInitialLoadRef.current) {
+        isInitialLoadRef.current = false
+      }
     }, TIMING.DEBOUNCE_SHORT_MS)
 
     return () => {
@@ -192,13 +216,6 @@ export function StorePageClient() {
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage)
-    // On desktop, scroll the products container; on mobile, scroll the page
-    const productsContainer = document.getElementById('products-scroll-container')
-    if (productsContainer && window.innerWidth >= UI_DIMENSIONS.DESKTOP_BREAKPOINT) {
-      productsContainer.scrollTo({ top: UI_DIMENSIONS.SCROLL_TOP, behavior: 'smooth' })
-    } else {
-      window.scrollTo({ top: UI_DIMENSIONS.SCROLL_TOP, behavior: 'smooth' })
-    }
   }
 
   const FilterSidebar = (

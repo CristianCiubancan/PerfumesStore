@@ -779,6 +779,7 @@
     "seasons": "Sezoane",
     "occasions": "Ocazii",
     "perfumer": "Parfumier",
-    "launchYear": "An Lansare"
+    "launchYear": "An Lansare",
+    "rating": "Rating: {rating} din {max}"
   }
 }

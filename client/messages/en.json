@@ -779,6 +779,7 @@
     "seasons": "Seasons",
     "occasions": "Occasions",
     "perfumer": "Perfumer",
-    "launchYear": "Launch Year"
+    "launchYear": "Launch Year",
+    "rating": "Rating: {rating} out of {max}"
   }
 }

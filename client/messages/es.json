@@ -779,6 +779,7 @@
     "seasons": "Temporadas",
     "occasions": "Ocasiones",
     "perfumer": "Perfumista",
-    "launchYear": "Año de Lanzamiento"
+    "launchYear": "Año de Lanzamiento",
+    "rating": "Calificación: {rating} de {max}"
   }
 }

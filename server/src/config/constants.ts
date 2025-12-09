@@ -5,6 +5,9 @@
  * These can be overridden by environment variables where appropriate.
  */
 
+import { SHARED_CONSTANTS } from '../../../shared/shared-constants'
+import { VALIDATION_CONSTANTS } from '../../../shared/validation-constants'
+
 // Authentication & JWT
 export const AUTH = {
   ACCESS_TOKEN_EXPIRY: '15m',
@@ -27,21 +30,15 @@ export const IMAGE = {
   RESIZE_FIT: 'inside',
 } as const
 
-// Pagination
-// NOTE: DEFAULT_LIMIT is shared with client (/client/lib/constants.ts)
-// and documented in /shared/shared-constants.ts - must be kept in sync
+// Pagination - extends shared constants with server-specific values
 export const PAGINATION = {
-  DEFAULT_LIMIT: 20, // Synchronized via /shared/shared-constants.ts
+  ...SHARED_CONSTANTS.PAGINATION,
   MAX_LIMIT: 100,
   SITEMAP_LIMIT: 1000,
 } as const
 
-// Stock Management
-// NOTE: LOW_STOCK_THRESHOLD is shared with client (/client/lib/constants.ts)
-// and documented in /shared/shared-constants.ts - must be kept in sync
-export const STOCK = {
-  LOW_STOCK_THRESHOLD: 10, // Synchronized via /shared/shared-constants.ts
-} as const
+// Stock Management - re-exports shared constants
+export const STOCK = SHARED_CONSTANTS.STOCK
 
 // Exchange Rates
 export const EXCHANGE_RATE = {
@@ -55,13 +52,10 @@ export const CACHE = {
   EXCHANGE_RATE_REVALIDATE_SECONDS: 3600, // 1 hour
 } as const
 
-// Validation Rules
-// NOTE: PASSWORD_MIN_LENGTH and NAME_MIN_LENGTH are defined in /shared/validation-constants.ts
-// and used by both client and server auth schemas for consistency.
-// These constants here are kept for reference and non-auth validation.
+// Validation Rules - extends shared validation constants with server-specific values
 export const VALIDATION = {
-  PASSWORD_MIN_LENGTH: 12, // Synchronized via /shared/validation-constants.ts
-  NAME_MIN_LENGTH: 2, // Synchronized via /shared/validation-constants.ts
+  PASSWORD_MIN_LENGTH: VALIDATION_CONSTANTS.PASSWORD_MIN_LENGTH,
+  NAME_MIN_LENGTH: VALIDATION_CONSTANTS.NAME_MIN_LENGTH,
   PRODUCT_MIN_LAUNCH_YEAR: 1800,
   DISCOUNT_MIN_PERCENT: 1,
   DISCOUNT_MAX_PERCENT: 99,

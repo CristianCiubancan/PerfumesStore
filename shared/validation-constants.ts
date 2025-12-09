@@ -1,13 +1,11 @@
 /**
  * Shared Validation Constants
  *
- * This file contains validation constants that are shared between client and server.
- * These values MUST be kept in sync to ensure consistent validation across the application.
- *
- * IMPORTANT: Any changes to these values must be reflected in both:
- * - /server/src/config/constants.ts (VALIDATION object)
- * - /client/lib/schemas/auth.ts (password and name validation)
- * - /server/src/schemas/auth.ts (password and name validation)
+ * Single source of truth for validation constants used by both client and server.
+ * Imported by:
+ * - /server/src/config/constants.ts
+ * - /client/lib/schemas/auth.ts
+ * - /server/src/schemas/auth.ts
  */
 
 export const VALIDATION_CONSTANTS = {

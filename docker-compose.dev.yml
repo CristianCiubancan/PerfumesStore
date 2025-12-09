@@ -19,6 +19,7 @@ services:
       - ./client:/app
       - /app/node_modules
       - client_next:/app/.next
+      - ./shared:/app/shared
     depends_on:
       - server
     healthcheck:

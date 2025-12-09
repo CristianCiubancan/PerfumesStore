@@ -1,15 +1,12 @@
 /**
  * Shared Types and Enums
  *
- * Type definitions and enum values that are shared between client and server.
+ * Single source of truth for type definitions and enum values.
  * These MUST match the Prisma schema definitions.
  *
- * IMPORTANT: These values are duplicated in:
- * - /client/types/index.ts (genderValues, concentrationValues)
- * - /server/src/services/product/filter-builder.ts (enum validators)
- * - Prisma schema enum definitions
- *
- * Any changes must be synchronized across all locations.
+ * Imported by:
+ * - /client/types/index.ts
+ * - /server/src/services/product/filter-builder.ts
  */
 
 // Gender enum values - must match Prisma schema

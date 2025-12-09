@@ -1,13 +1,10 @@
 /**
  * Shared Constants
  *
- * Constants that are used by both client and server and must remain synchronized.
- *
- * IMPORTANT: These values are duplicated in:
+ * Constants that are used by both client and server.
+ * These are the single source of truth - imported by:
  * - /server/src/config/constants.ts
  * - /client/lib/constants.ts
- *
- * Any changes here must be reflected in both locations.
  */
 
 export const SHARED_CONSTANTS = {

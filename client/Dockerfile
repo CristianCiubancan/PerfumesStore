@@ -9,6 +9,8 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+# Shared folder is copied via additional_contexts in docker-compose
+COPY --from=shared /. ./shared/
 
 # Build arguments for environment variables needed at build time
 ARG NEXT_PUBLIC_API_URL

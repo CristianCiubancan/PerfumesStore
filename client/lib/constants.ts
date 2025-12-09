@@ -4,6 +4,8 @@
  * Centralized configuration values for the frontend application.
  */
 
+import { SHARED_CONSTANTS } from '../shared/shared-constants'
+
 // Open Graph Image Dimensions (standard OG image size)
 export const OG_IMAGE = {
   WIDTH: 1200,
@@ -74,22 +76,16 @@ export const SEO = {
   DESCRIPTION_MAX_LENGTH: 100,
 } as const
 
-// Pagination
-// NOTE: DEFAULT_LIMIT is shared with server (/server/src/config/constants.ts)
-// and documented in /shared/shared-constants.ts - must be kept in sync
+// Pagination - extends shared constants with client-specific values
 export const PAGINATION = {
-  DEFAULT_LIMIT: 20, // Synchronized via /shared/shared-constants.ts
+  ...SHARED_CONSTANTS.PAGINATION,
   PRODUCTS_PER_PAGE: 12,
   ADMIN_DEFAULT_LIMIT: 25,
   PAGE_SIZE_OPTIONS: [10, 25, 50] as const,
 } as const
 
-// Stock Management
-// NOTE: LOW_STOCK_THRESHOLD is shared with server (/server/src/config/constants.ts)
-// and documented in /shared/shared-constants.ts - must be kept in sync
-export const STOCK = {
-  LOW_STOCK_THRESHOLD: 10, // Synchronized via /shared/shared-constants.ts
-} as const
+// Stock Management - re-exports shared constants
+export const STOCK = SHARED_CONSTANTS.STOCK
 
 // File Upload
 export const UPLOAD = {

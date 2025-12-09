@@ -74,3 +74,6 @@ tailwind.config.ts
 postcss.config.js
 next-env.d.ts
 tsconfig.tsbuildinfo
+
+# Shared folder (provided via Docker context/volume)
+shared

@@ -9,7 +9,9 @@
     "lint": "eslint",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "sync-shared": "cp -r ../shared/* ./shared/ 2>/dev/null || true",
+    "postinstall": "npm run sync-shared"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

@@ -1,29 +1,50 @@
 import { z } from 'zod'
+// Shared validation constants to ensure sync between client and server
+import { VALIDATION_CONSTANTS } from '../../shared/validation-constants'
 
 // Password complexity validation
-// Requires: min 8 chars, uppercase, lowercase, number, special character
+// Requires: min 12 chars, uppercase, lowercase, number, special character
 const passwordSchema = z
   .string()
-  .min(8, 'Password must be at least 8 characters')
-  .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
-  .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
-  .regex(/[0-9]/, 'Password must contain at least one number')
-  .regex(/[^A-Za-z0-9]/, 'Password must contain at least one special character')
+  .min(
+    VALIDATION_CONSTANTS.PASSWORD_MIN_LENGTH,
+    VALIDATION_CONSTANTS.PASSWORD_ERROR_MESSAGES.MIN_LENGTH
+  )
+  .regex(
+    VALIDATION_CONSTANTS.PASSWORD_RULES.UPPERCASE,
+    VALIDATION_CONSTANTS.PASSWORD_ERROR_MESSAGES.UPPERCASE
+  )
+  .regex(
+    VALIDATION_CONSTANTS.PASSWORD_RULES.LOWERCASE,
+    VALIDATION_CONSTANTS.PASSWORD_ERROR_MESSAGES.LOWERCASE
+  )
+  .regex(
+    VALIDATION_CONSTANTS.PASSWORD_RULES.NUMBER,
+    VALIDATION_CONSTANTS.PASSWORD_ERROR_MESSAGES.NUMBER
+  )
+  .regex(
+    VALIDATION_CONSTANTS.PASSWORD_RULES.SPECIAL_CHAR,
+    VALIDATION_CONSTANTS.PASSWORD_ERROR_MESSAGES.SPECIAL_CHAR
+  )
 
 export const loginSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
   password: z.string().min(1, 'Password is required'),
 })
 
-export const registerSchema = z.object({
-  name: z.string().min(2, 'Name must be at least 2 characters'),
-  email: z.string().email('Please enter a valid email address'),
-  password: passwordSchema,
-  confirmPassword: z.string(),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: 'Passwords do not match',
-  path: ['confirmPassword'],
-})
+export const registerSchema = z
+  .object({
+    name: z
+      .string()
+      .min(VALIDATION_CONSTANTS.NAME_MIN_LENGTH, VALIDATION_CONSTANTS.NAME_ERROR_MESSAGE),
+    email: z.string().email('Please enter a valid email address'),
+    password: passwordSchema,
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: 'Passwords do not match',
+    path: ['confirmPassword'],
+  })
 
 export type LoginFormData = z.infer<typeof loginSchema>
 export type RegisterFormData = z.infer<typeof registerSchema>

@@ -1,5 +1,18 @@
 'use client'
 
+// TODO: REFACTORING OPPORTUNITY (Code Quality)
+// This component has grown to 377+ lines with multiple responsibilities:
+// - State management for filters, pagination, sorting
+// - Product CRUD operations
+// - Bulk selection and actions
+// - URL sync logic
+// Consider splitting into:
+// 1. useProductsManager hook (data fetching, state, mutations)
+// 2. useProductFilters hook (filter state and URL sync)
+// 3. useProductSelection hook (bulk selection logic)
+// 4. Smaller sub-components for each section
+// This would improve maintainability and testability.
+
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 import { toast } from 'sonner'

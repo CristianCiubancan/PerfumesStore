@@ -19,7 +19,7 @@ export interface ListPromotionsResult {
   }
 }
 
-export async function createPromotion(data: CreatePromotionInput) {
+export async function createPromotion(data: CreatePromotionInput): Promise<Awaited<ReturnType<typeof prisma.promotion.create>>> {
   return prisma.promotion.create({
     data: {
       name: data.name,
@@ -69,9 +69,15 @@ export async function deletePromotion(id: number) {
 }
 
 export async function getPromotion(id: number) {
-  return prisma.promotion.findUnique({
+  const promotion = await prisma.promotion.findUnique({
     where: { id },
   })
+
+  if (!promotion) {
+    throw new AppError('Promotion not found', 404, 'PROMOTION_NOT_FOUND')
+  }
+
+  return promotion
 }
 
 export async function listPromotions(params: ListPromotionsParams = {}): Promise<ListPromotionsResult> {
@@ -102,7 +108,7 @@ export async function listPromotions(params: ListPromotionsParams = {}): Promise
 }
 
 // Get the currently active promotion (based on server time)
-export async function getActivePromotion() {
+export async function getActivePromotion(): Promise<Awaited<ReturnType<typeof prisma.promotion.findFirst>>> {
   const now = new Date()
 
   return prisma.promotion.findFirst({
@@ -116,6 +122,6 @@ export async function getActivePromotion() {
 }
 
 // Get server time for consistent countdown across all clients
-export async function getServerTime() {
+export async function getServerTime(): Promise<Date> {
   return new Date()
 }

@@ -4,7 +4,7 @@ import { authenticate, authorize } from '../middleware/auth'
 import { csrfProtection } from '../middleware/csrf'
 import { asyncHandler } from '../lib/asyncHandler'
 import { validate } from '../middleware/validate'
-import { listSubscribersSchema } from '../schemas/newsletter'
+import { listSubscribersSchema, subscriberIdSchema } from '../schemas/newsletter'
 import { sensitiveRateLimiter } from '../middleware/rateLimit'
 
 const router = Router()
@@ -25,6 +25,7 @@ router.get(
 router.post(
   '/:id/unsubscribe',
   csrfProtection,
+  validate(subscriberIdSchema),
   asyncHandler(newsletterController.unsubscribe)
 )
 
@@ -32,6 +33,7 @@ router.post(
 router.delete(
   '/:id',
   csrfProtection,
+  validate(subscriberIdSchema),
   asyncHandler(newsletterController.deleteSubscriber)
 )
 

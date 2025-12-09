@@ -56,7 +56,11 @@ export function QuantitySelector({
   const iconSize = size === 'sm' ? 'h-3 w-3' : 'h-4 w-4'
 
   return (
-    <div className={cn('flex items-center gap-1', className)}>
+    <div className={cn('flex items-center gap-1', className)} role="group" aria-label={t('quantity')}>
+      {/* FE-006: Live region for screen reader announcements */}
+      <span className="sr-only" aria-live="polite" aria-atomic="true">
+        {t('currentQuantity', { count: value })}
+      </span>
       <Button
         type="button"
         variant="outline"

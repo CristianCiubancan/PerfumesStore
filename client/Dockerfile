@@ -13,8 +13,10 @@ COPY . .
 # Build arguments for environment variables needed at build time
 ARG NEXT_PUBLIC_API_URL
 ARG NEXT_PUBLIC_SITE_URL
+ARG NEXT_PUBLIC_SITE_NAME
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
+ENV NEXT_PUBLIC_SITE_NAME=$NEXT_PUBLIC_SITE_NAME
 
 # Build the application
 RUN npm run build
@@ -24,6 +26,9 @@ FROM node:20-alpine AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
+
+# Install wget for health checks
+RUN apk add --no-cache wget
 
 # Create non-root user for security
 RUN addgroup --system --gid 1001 nodejs && \

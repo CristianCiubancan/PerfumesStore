@@ -29,9 +29,9 @@ export async function authenticate(req: Request, _res: Response, next: NextFunct
 
     req.user = payload
     next()
-  } catch (error) {
-    if (error instanceof AppError) {
-      return next(error)
+  } catch (err: unknown) {
+    if (err instanceof AppError) {
+      return next(err)
     }
     return next(new AppError('Invalid or expired token', 401, 'INVALID_TOKEN'))
   }

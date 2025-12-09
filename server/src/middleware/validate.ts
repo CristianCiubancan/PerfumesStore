@@ -11,12 +11,12 @@ export function validate(schema: ZodSchema) {
         params: req.params,
       })
       next()
-    } catch (error) {
-      if (error instanceof ZodError) {
-        const messages = error.issues.map((issue: ZodIssue) => issue.message).join(', ')
+    } catch (err: unknown) {
+      if (err instanceof ZodError) {
+        const messages = err.issues.map((issue: ZodIssue) => issue.message).join(', ')
         return next(new AppError(messages, 400, 'VALIDATION_ERROR'))
       }
-      return next(error)
+      return next(err)
     }
   }
 }

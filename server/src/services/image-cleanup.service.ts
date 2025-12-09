@@ -13,13 +13,13 @@ export async function cleanupOrphanedImages(): Promise<number> {
   let files: string[]
   try {
     files = await fs.promises.readdir(uploadConfig.PRODUCTS_DIR)
-  } catch (error) {
-    const nodeError = error as NodeJS.ErrnoException
+  } catch (err: unknown) {
+    const nodeError = err as NodeJS.ErrnoException
     if (nodeError.code === 'ENOENT') {
       // Directory doesn't exist, nothing to clean
       return 0
     }
-    throw error
+    throw err
   }
 
   // Filter out non-image files (like .gitkeep)
@@ -72,10 +72,10 @@ export async function cleanupOrphanedImages(): Promise<number> {
       await fs.promises.unlink(filePath)
       deletedCount++
       logger.debug(`Deleted orphaned image: ${filename}`, 'ImageCleanup')
-    } catch (error) {
-      const nodeError = error as NodeJS.ErrnoException
+    } catch (err: unknown) {
+      const nodeError = err as NodeJS.ErrnoException
       if (nodeError.code !== 'ENOENT') {
-        logger.error(`Failed to delete orphaned image: ${filename}`, 'ImageCleanup', error)
+        logger.error(`Failed to delete orphaned image: ${filename}`, 'ImageCleanup', err)
       }
     }
   }

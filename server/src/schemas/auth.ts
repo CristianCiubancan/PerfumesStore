@@ -1,21 +1,40 @@
 import { z } from 'zod'
 import { VALIDATION } from '../config/constants'
+// Shared validation constants to ensure sync between client and server
+import { VALIDATION_CONSTANTS } from '../../../shared/validation-constants'
 
 // Password complexity validation
-// Requires: min 8 chars, uppercase, lowercase, number, special character
+// Requires: min 12 chars, uppercase, lowercase, number, special character
 const passwordSchema = z
   .string()
-  .min(VALIDATION.PASSWORD_MIN_LENGTH, `Password must be at least ${VALIDATION.PASSWORD_MIN_LENGTH} characters`)
-  .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
-  .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
-  .regex(/[0-9]/, 'Password must contain at least one number')
-  .regex(/[^A-Za-z0-9]/, 'Password must contain at least one special character')
+  .min(
+    VALIDATION_CONSTANTS.PASSWORD_MIN_LENGTH,
+    VALIDATION_CONSTANTS.PASSWORD_ERROR_MESSAGES.MIN_LENGTH
+  )
+  .regex(
+    VALIDATION_CONSTANTS.PASSWORD_RULES.UPPERCASE,
+    VALIDATION_CONSTANTS.PASSWORD_ERROR_MESSAGES.UPPERCASE
+  )
+  .regex(
+    VALIDATION_CONSTANTS.PASSWORD_RULES.LOWERCASE,
+    VALIDATION_CONSTANTS.PASSWORD_ERROR_MESSAGES.LOWERCASE
+  )
+  .regex(
+    VALIDATION_CONSTANTS.PASSWORD_RULES.NUMBER,
+    VALIDATION_CONSTANTS.PASSWORD_ERROR_MESSAGES.NUMBER
+  )
+  .regex(
+    VALIDATION_CONSTANTS.PASSWORD_RULES.SPECIAL_CHAR,
+    VALIDATION_CONSTANTS.PASSWORD_ERROR_MESSAGES.SPECIAL_CHAR
+  )
 
 export const registerSchema = z.object({
   body: z.object({
     email: z.string().email('Invalid email address'),
     password: passwordSchema,
-    name: z.string().min(VALIDATION.NAME_MIN_LENGTH, `Name must be at least ${VALIDATION.NAME_MIN_LENGTH} characters`),
+    name: z
+      .string()
+      .min(VALIDATION_CONSTANTS.NAME_MIN_LENGTH, VALIDATION_CONSTANTS.NAME_ERROR_MESSAGE),
   }),
 })
 

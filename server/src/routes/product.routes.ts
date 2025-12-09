@@ -8,6 +8,7 @@ import {
   createProductSchema,
   updateProductSchema,
   getProductSchema,
+  getProductBySlugSchema,
   listProductsSchema,
   bulkDeleteSchema,
   listBrandsSchema,
@@ -42,6 +43,7 @@ router.get(
 // Get product by SEO-friendly slug (primary public endpoint)
 router.get(
   '/by-slug/:slug',
+  validate(getProductBySlugSchema),
   asyncHandler(productController.getProductBySlug)
 )
 

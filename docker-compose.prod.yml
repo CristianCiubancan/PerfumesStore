@@ -28,7 +28,26 @@ services:
     depends_on:
       server:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
     restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      - perfumes-prod-network
+    labels:
+      - "com.perfumesstore.service=client"
+      - "com.perfumesstore.environment=production"
+      - "com.perfumesstore.description=Next.js frontend application"
+      - "com.perfumesstore.port=3000"
+      - "com.perfumesstore.version=1.0"
     deploy:
       resources:
         limits:
@@ -42,6 +61,8 @@ services:
     build:
       context: ./server
       dockerfile: Dockerfile
+      additional_contexts:
+        - shared=./shared
       args:
         - PLATFORM=${PLATFORM:-linux}
     ports:
@@ -67,6 +88,19 @@ services:
       retries: 3
       start_period: 40s
     restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      - perfumes-prod-network
+    labels:
+      - "com.perfumesstore.service=server"
+      - "com.perfumesstore.environment=production"
+      - "com.perfumesstore.description=Express.js API backend"
+      - "com.perfumesstore.port=4000"
+      - "com.perfumesstore.version=1.0"
     deploy:
       resources:
         limits:
@@ -92,6 +126,19 @@ services:
       timeout: 5s
       retries: 5
     restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      - perfumes-prod-network
+    labels:
+      - "com.perfumesstore.service=database"
+      - "com.perfumesstore.environment=production"
+      - "com.perfumesstore.description=PostgreSQL database"
+      - "com.perfumesstore.port=5432"
+      - "com.perfumesstore.version=16"
     deploy:
       resources:
         limits:
@@ -105,6 +152,10 @@ volumes:
   postgres_data:
 
 networks:
-  default:
-    name: perfumes-prod-network
+  perfumes-prod-network:
     driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.30.0.0/16
+          gateway: 172.30.0.1

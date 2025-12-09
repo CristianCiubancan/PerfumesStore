@@ -48,11 +48,9 @@ export function validateEnv() {
     )
 
     if (missing.length > 0) {
-      if (process.env.NODE_ENV === 'development') {
-        console.warn(
-          `Warning: Missing recommended environment variables: ${missing.join(', ')}`
-        )
-      }
+      throw new Error(
+        `Missing required environment variables in production: ${missing.join(', ')}`
+      )
     }
   }
 }

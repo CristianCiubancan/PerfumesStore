@@ -1,21 +1,13 @@
 import { Prisma, Gender, Concentration } from '@prisma/client'
 import { AppError } from '../../middleware/errorHandler'
 import { STOCK } from '../../config/constants'
+// Shared type guards for enum validation - synchronized with client
+import { isValidGender, isValidConcentration } from '../../../../shared/shared-types'
 
-// Enum validators
-function isValidGender(value: string): value is Gender {
-  return ['Men', 'Women', 'Unisex'].includes(value)
-}
-
-function isValidConcentration(value: string): value is Concentration {
-  return [
-    'Eau_de_Cologne',
-    'Eau_de_Toilette',
-    'Eau_de_Parfum',
-    'Parfum',
-    'Extrait_de_Parfum',
-  ].includes(value)
-}
+// NOTE: These type guards are retained for defensive programming in the service layer.
+// Primary validation is handled by Zod schemas in /schemas/product.ts (listProductsSchema)
+// which validates query parameters before they reach this service.
+// These guards provide an additional safety layer for internal service calls.
 
 export interface ProductFilterParams {
   brand?: string

@@ -16,6 +16,7 @@ interface TextFormFieldProps<T extends FieldValues> {
   label: string
   placeholder?: string
   disabled?: boolean
+  type?: 'text' | 'email' | 'password' | 'number' | 'tel' | 'url'
 }
 
 export function TextFormField<T extends FieldValues>({
@@ -24,6 +25,7 @@ export function TextFormField<T extends FieldValues>({
   label,
   placeholder,
   disabled,
+  type = 'text',
 }: TextFormFieldProps<T>) {
   return (
     <FormField
@@ -33,7 +35,7 @@ export function TextFormField<T extends FieldValues>({
         <FormItem>
           <FormLabel>{label}</FormLabel>
           <FormControl>
-            <Input placeholder={placeholder} disabled={disabled} {...field} />
+            <Input type={type} placeholder={placeholder} disabled={disabled} {...field} />
           </FormControl>
           <FormMessage />
         </FormItem>

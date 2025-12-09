@@ -14,21 +14,16 @@ import { prisma } from '../lib/prisma'
 const router = Router()
 
 // Health check with database connectivity verification
+// NOTE: Health check intentionally returns unwrapped JSON (not { data: ... })
+// This is standard for monitoring tools (Kubernetes, Docker, etc.) which expect
+// a simple, consistent format without nested data structures.
 router.get('/health', healthRateLimiter, asyncHandler(async (req, res) => {
-  try {
-    await prisma.$queryRaw`SELECT 1`
-    res.json({
-      status: 'ok',
-      timestamp: new Date().toISOString(),
-      database: 'connected'
-    })
-  } catch {
-    res.status(503).json({
-      status: 'degraded',
-      timestamp: new Date().toISOString(),
-      database: 'disconnected'
-    })
-  }
+  await prisma.$queryRaw`SELECT 1`
+  res.json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    database: 'connected'
+  })
 }))
 
 // Auth routes have their own stricter rate limiting

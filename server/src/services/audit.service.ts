@@ -9,6 +9,7 @@ export type AuditAction =
   | 'DELETE'
   | 'BULK_DELETE'
   | 'LOGIN'
+  | 'LOGIN_FAILED'
   | 'LOGOUT'
   | 'PASSWORD_CHANGE'
 
@@ -54,9 +55,9 @@ export async function logAuditAction(input: AuditLogInput): Promise<void> {
       `Audit: ${input.action} on ${input.entityType}${input.entityId ? ` #${input.entityId}` : ''} by user #${input.userId}`,
       'AuditService'
     )
-  } catch (error) {
+  } catch (err: unknown) {
     // Log the error but don't throw - audit logging should not break the main operation
-    logger.error('Failed to create audit log', 'AuditService', error instanceof Error ? error : undefined)
+    logger.error('Failed to create audit log', 'AuditService', err instanceof Error ? err : undefined)
   }
 }
 
@@ -71,9 +72,12 @@ interface ListAuditLogsParams {
   endDate?: Date
 }
 
+// Maximum safe page number to prevent integer overflow (1 million pages)
+const MAX_PAGE = 1000000
+
 export async function listAuditLogs(params: ListAuditLogsParams = {}) {
   const {
-    page = 1,
+    page: rawPage = 1,
     limit: rawLimit = 50,
     userId,
     action,
@@ -82,6 +86,9 @@ export async function listAuditLogs(params: ListAuditLogsParams = {}) {
     startDate,
     endDate,
   } = params
+
+  // Clamp page to valid range to prevent integer overflow
+  const page = Math.min(Math.max(1, rawPage), MAX_PAGE)
 
   // Clamp limit to valid range for defense-in-depth
   const limit = Math.min(Math.max(1, rawLimit), PAGINATION.MAX_LIMIT)

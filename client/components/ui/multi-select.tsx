@@ -4,7 +4,7 @@ import * as React from 'react'
 import { ChevronDown, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
+// Badge import removed - using Button for keyboard accessibility (FE-002)
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -66,16 +66,19 @@ export function MultiSelect({
               selected.map((value) => {
                 const option = options.find((o) => o.value === value)
                 return (
-                  <Badge
+                  <Button
                     key={value}
+                    type="button"
                     variant="secondary"
-                    className="text-xs cursor-pointer hover:bg-secondary/80"
+                    size="sm"
+                    className="text-xs h-6 px-2 gap-1"
                     onPointerDown={handleBadgePointerDown}
                     onClick={() => removeOption(value)}
+                    aria-label={`Remove ${option?.label || value}`}
                   >
                     {option?.label || value}
-                    <X className="ml-1 h-3 w-3" />
-                  </Badge>
+                    <X className="h-3 w-3" aria-hidden="true" />
+                  </Button>
                 )
               })
             )}

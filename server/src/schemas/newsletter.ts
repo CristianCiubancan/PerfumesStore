@@ -25,4 +25,10 @@ export const listSubscribersSchema = z.object({
     .optional(),
 })
 
+export const subscriberIdSchema = z.object({
+  params: z.object({
+    id: z.string().uuid('Invalid subscriber ID format'),
+  }),
+})
+
 export type ListSubscribersQuery = z.infer<typeof listSubscribersSchema>['query']

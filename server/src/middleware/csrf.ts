@@ -17,6 +17,24 @@ export function generateCsrfToken(): string {
 
 /**
  * Set CSRF token cookie (readable by JavaScript for double-submit pattern)
+ *
+ * SECURITY NOTE: httpOnly is intentionally set to false for the double-submit cookie pattern.
+ *
+ * Why httpOnly: false?
+ * - The CSRF token must be readable by JavaScript so the client can include it in request headers
+ * - The double-submit pattern requires the client to read the cookie and send its value in a custom header
+ * - This provides CSRF protection because an attacker cannot read cookies from a different origin
+ *
+ * Security Considerations:
+ * - The token is cryptographically random (32 bytes) making it unpredictable
+ * - sameSite: 'strict' prevents the cookie from being sent in cross-site requests
+ * - secure: true in production ensures the cookie is only sent over HTTPS
+ * - The token itself doesn't grant access; it only proves the request originated from our domain
+ *
+ * Alternative Approaches (Future Enhancement):
+ * - Consider implementing Content Security Policy (CSP) with nonce-based protection
+ * - CSP nonces would provide additional defense-in-depth alongside CSRF tokens
+ * - Nonce-based CSP would help prevent XSS attacks that could read the CSRF token
  */
 export function setCsrfCookie(res: Response, token: string): void {
   res.cookie(CSRF_COOKIE_NAME, token, {

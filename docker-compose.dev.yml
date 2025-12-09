@@ -21,6 +21,20 @@ services:
       - client_next:/app/.next
     depends_on:
       - server
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: on-failure
+    networks:
+      - perfumes-dev-network
+    labels:
+      - "com.perfumesstore.service=client"
+      - "com.perfumesstore.environment=development"
+      - "com.perfumesstore.description=Next.js frontend application"
+      - "com.perfumesstore.port=3000"
     deploy:
       resources:
         limits:
@@ -52,6 +66,7 @@ services:
       - ./server:/app
       - /app/node_modules
       - ./server/uploads:/app/uploads
+      - ./shared:/shared
     depends_on:
       postgres:
         condition: service_healthy
@@ -61,6 +76,14 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+    restart: on-failure
+    networks:
+      - perfumes-dev-network
+    labels:
+      - "com.perfumesstore.service=server"
+      - "com.perfumesstore.environment=development"
+      - "com.perfumesstore.description=Express.js API backend"
+      - "com.perfumesstore.port=4000"
     deploy:
       resources:
         limits:
@@ -85,6 +108,13 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    networks:
+      - perfumes-dev-network
+    labels:
+      - "com.perfumesstore.service=database"
+      - "com.perfumesstore.environment=development"
+      - "com.perfumesstore.description=PostgreSQL database"
+      - "com.perfumesstore.port=5432"
     deploy:
       resources:
         limits:
@@ -99,6 +129,10 @@ volumes:
   client_next:
 
 networks:
-  default:
-    name: perfumes-dev-network
+  perfumes-dev-network:
     driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.20.0.0/16
+          gateway: 172.20.0.1

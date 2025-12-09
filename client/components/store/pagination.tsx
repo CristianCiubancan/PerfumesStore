@@ -85,7 +85,9 @@ export function Pagination({
             variant={currentPage === page ? 'default' : 'outline'}
             size="icon"
             onClick={() => onPageChange(page)}
-            aria-label={t('goToPage', { page })}
+            aria-label={currentPage === page
+              ? t('currentPage', { page, totalPages })
+              : t('goToPage', { page })}
             aria-current={currentPage === page ? 'page' : undefined}
           >
             {page}

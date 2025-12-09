@@ -87,10 +87,15 @@ function FormItem({ className, ...props }: React.ComponentProps<"div">) {
   )
 }
 
+interface FormLabelProps extends React.ComponentProps<typeof LabelPrimitive.Root> {
+  required?: boolean
+}
+
 function FormLabel({
   className,
+  required,
   ...props
-}: React.ComponentProps<typeof LabelPrimitive.Root>) {
+}: FormLabelProps) {
   const { error, formItemId } = useFormField()
 
   return (
@@ -99,6 +104,7 @@ function FormLabel({
       data-error={!!error}
       className={cn("data-[error=true]:text-destructive", className)}
       htmlFor={formItemId}
+      aria-required={required}
       {...props}
     />
   )
@@ -147,6 +153,8 @@ function FormMessage({ className, ...props }: React.ComponentProps<"p">) {
     <p
       data-slot="form-message"
       id={formMessageId}
+      role="alert"
+      aria-live="polite"
       className={cn("text-destructive text-sm", className)}
       {...props}
     >

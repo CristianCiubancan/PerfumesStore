@@ -47,8 +47,12 @@ app.use(express.json({ limit: '50kb' }))
 app.use(cookieParser())
 app.use(morgan(config.NODE_ENV === 'production' ? 'combined' : 'dev'))
 
-// Serve uploaded files statically
-app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')))
+// Serve uploaded files statically with security headers
+app.use('/uploads', (req, res, next) => {
+  // Prevent MIME type sniffing to protect against content-type attacks
+  res.setHeader('X-Content-Type-Options', 'nosniff')
+  next()
+}, express.static(path.join(process.cwd(), 'uploads')))
 
 app.use('/api', routes)
 app.use(notFoundHandler)

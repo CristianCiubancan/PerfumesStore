@@ -69,8 +69,9 @@ export function ProductDetailClient({ slug }: Props) {
 
   if (isLoading) {
     return (
-      <div className="flex-1 flex items-center justify-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      <div className="flex-1 flex items-center justify-center py-12" role="status" aria-live="polite">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" aria-hidden="true" />
+        <span className="sr-only">{t('common.loading')}</span>
       </div>
     )
   }
@@ -97,7 +98,21 @@ export function ProductDetailClient({ slug }: Props) {
 
   const rating = parseFloat(product.rating)
   const imageUrl = product.imageUrl ? getFullImageUrl(product.imageUrl) : null
-  const isLocalImage = imageUrl?.includes('localhost:4000')
+  // FE-017: Use URL parsing instead of string matching
+  const isLocalImage = (() => {
+    if (!imageUrl) return false
+    try {
+      const url = new URL(imageUrl)
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL
+      if (apiUrl) {
+        const apiUrlParsed = new URL(apiUrl)
+        return url.hostname === apiUrlParsed.hostname
+      }
+      return url.hostname === 'localhost'
+    } catch {
+      return false
+    }
+  })()
   const isOutOfStock = product.stock === 0
 
   return (
@@ -145,13 +160,18 @@ export function ProductDetailClient({ slug }: Props) {
               <h1 className="text-3xl font-bold mt-1">{product.name}</h1>
             </div>
 
-            {/* Rating */}
+            {/* Rating - FE-008: Added semantic markup for accessibility */}
             {rating > 0 && (
               <div className="flex items-center gap-2 mb-4">
-                <div className="flex">
+                <div
+                  className="flex"
+                  role="img"
+                  aria-label={t('productDetail.rating', { rating: rating.toFixed(1), max: 5 })}
+                >
                   {[1, 2, 3, 4, 5].map((star) => (
                     <Star
                       key={star}
+                      aria-hidden="true"
                       className={`h-5 w-5 ${
                         star <= rating
                           ? 'fill-yellow-400 text-yellow-400'
@@ -160,7 +180,7 @@ export function ProductDetailClient({ slug }: Props) {
                     />
                   ))}
                 </div>
-                <span className="font-medium">{rating.toFixed(1)}</span>
+                <span className="font-medium" aria-hidden="true">{rating.toFixed(1)}</span>
               </div>
             )}
 

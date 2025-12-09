@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter } from '@/i18n/routing'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
@@ -57,12 +57,12 @@ export function RegisterClient() {
       setAuth(response.user)
       toast.success(t('success'))
       router.push('/')
-    } catch (error) {
+    } catch (err: unknown) {
       // Clear password fields on error for security
       form.setValue('password', '')
       form.setValue('confirmPassword', '')
-      if (error instanceof ApiError) {
-        toast.error(error.message)
+      if (err instanceof ApiError) {
+        toast.error(err.message)
       } else {
         toast.error(t('unexpectedError'))
       }

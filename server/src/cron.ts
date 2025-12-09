@@ -5,40 +5,40 @@ import { cleanupOrphanedImages } from './services/image-cleanup.service'
 import { EXCHANGE_RATE, AUTH, UPLOADS } from './config/constants'
 import { logger } from './lib/logger'
 
-export async function initExchangeRates() {
+export async function initExchangeRates(): Promise<void> {
   try {
     await updateExchangeRates()
     logger.info('Initial fetch completed', 'ExchangeRate')
-  } catch (error) {
-    logger.error('Initial fetch failed', 'ExchangeRate', error)
+  } catch (err: unknown) {
+    logger.error('Initial fetch failed', 'ExchangeRate', err)
   }
 }
 
-export async function initTokenCleanup() {
+export async function initTokenCleanup(): Promise<void> {
   try {
     const count = await cleanupExpiredTokens()
     logger.info(`Initial cleanup completed, removed ${count} tokens`, 'Auth')
-  } catch (error) {
-    logger.error('Initial token cleanup failed', 'Auth', error)
+  } catch (err: unknown) {
+    logger.error('Initial token cleanup failed', 'Auth', err)
   }
 }
 
-export async function initImageCleanup() {
+export async function initImageCleanup(): Promise<void> {
   try {
     const count = await cleanupOrphanedImages()
     logger.info(`Initial cleanup completed, removed ${count} orphaned images`, 'ImageCleanup')
-  } catch (error) {
-    logger.error('Initial image cleanup failed', 'ImageCleanup', error)
+  } catch (err: unknown) {
+    logger.error('Initial image cleanup failed', 'ImageCleanup', err)
   }
 }
 
-export function registerCronJobs() {
+export function registerCronJobs(): void {
   // Update exchange rates
   cron.schedule(EXCHANGE_RATE.CRON_SCHEDULE, async () => {
     try {
       await updateExchangeRates()
-    } catch (error) {
-      logger.error('Scheduled fetch failed', 'ExchangeRate', error)
+    } catch (err: unknown) {
+      logger.error('Scheduled fetch failed', 'ExchangeRate', err)
     }
   })
 
@@ -46,8 +46,8 @@ export function registerCronJobs() {
   cron.schedule(AUTH.TOKEN_CLEANUP_CRON_SCHEDULE, async () => {
     try {
       await cleanupExpiredTokens()
-    } catch (error) {
-      logger.error('Token cleanup failed', 'Auth', error)
+    } catch (err: unknown) {
+      logger.error('Token cleanup failed', 'Auth', err)
     }
   })
 
@@ -55,8 +55,8 @@ export function registerCronJobs() {
   cron.schedule(UPLOADS.IMAGE_CLEANUP_CRON_SCHEDULE, async () => {
     try {
       await cleanupOrphanedImages()
-    } catch (error) {
-      logger.error('Image cleanup failed', 'ImageCleanup', error)
+    } catch (err: unknown) {
+      logger.error('Image cleanup failed', 'ImageCleanup', err)
     }
   })
 

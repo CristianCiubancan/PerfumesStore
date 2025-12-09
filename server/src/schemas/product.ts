@@ -82,6 +82,12 @@ export const getProductSchema = z.object({
   }),
 })
 
+export const getProductBySlugSchema = z.object({
+  params: z.object({
+    slug: z.string().regex(/^[a-z0-9-]+$/, 'Invalid slug format').max(200),
+  }),
+})
+
 const MatchModeEnum = z.enum(['any', 'all'])
 
 export const listProductsSchema = z.object({
@@ -117,6 +123,7 @@ export const listProductsSchema = z.object({
     occasionMatchMode: MatchModeEnum.optional(),
     minRating: z.string().regex(/^\d+(\.\d+)?$/).optional(),
     maxRating: z.string().regex(/^\d+(\.\d+)?$/).optional(),
+    stockStatus: z.enum(['all', 'in_stock', 'low_stock', 'out_of_stock']).optional(),
   }).optional(),
 })
 

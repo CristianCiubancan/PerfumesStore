@@ -24,8 +24,21 @@ export const ProductCard = memo(function ProductCard({ product, priority = false
   const rating = parseFloat(product.rating)
 
   const imageUrl = product.imageUrl ? getFullImageUrl(product.imageUrl) : null
-  // Check if image is from our backend - skip Next.js optimization for these
-  const isLocalImage = imageUrl?.includes('localhost:4000')
+  // FE-017: Use URL parsing instead of string matching to check if local backend image
+  const isLocalImage = (() => {
+    if (!imageUrl) return false
+    try {
+      const url = new URL(imageUrl)
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL
+      if (apiUrl) {
+        const apiUrlParsed = new URL(apiUrl)
+        return url.hostname === apiUrlParsed.hostname
+      }
+      return url.hostname === 'localhost'
+    } catch {
+      return false
+    }
+  })()
 
   return (
     <Card className="group overflow-hidden transition-all hover:shadow-lg">

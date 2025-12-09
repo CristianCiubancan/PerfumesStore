@@ -1,3 +1,18 @@
+// Shared types and enums - synchronized with server
+import {
+  GENDER_VALUES,
+  CONCENTRATION_VALUES,
+  CONCENTRATION_LABELS,
+  type Gender,
+  type Concentration,
+} from '../shared/shared-types'
+
+// Re-export for backward compatibility
+export const genderValues = GENDER_VALUES
+export const concentrationValues = CONCENTRATION_VALUES
+export const concentrationLabels = CONCENTRATION_LABELS
+export type { Gender, Concentration }
+
 export interface User {
   id: number
   email: string
@@ -13,29 +28,6 @@ export interface AuthResponse {
 export interface ApiError {
   message: string
   code?: string
-}
-
-// Single source of truth for enum values - must match Prisma schema
-export const genderValues = ['Men', 'Women', 'Unisex'] as const
-export const concentrationValues = [
-  'Eau_de_Cologne',
-  'Eau_de_Toilette',
-  'Eau_de_Parfum',
-  'Parfum',
-  'Extrait_de_Parfum',
-] as const
-
-// Derived types from constant arrays
-export type Gender = (typeof genderValues)[number]
-export type Concentration = (typeof concentrationValues)[number]
-
-// Display labels for concentrations
-export const concentrationLabels: Record<Concentration, string> = {
-  Eau_de_Cologne: 'Eau de Cologne',
-  Eau_de_Toilette: 'Eau de Toilette',
-  Eau_de_Parfum: 'Eau de Parfum',
-  Parfum: 'Parfum',
-  Extrait_de_Parfum: 'Extrait de Parfum',
 }
 
 // Lookup table types

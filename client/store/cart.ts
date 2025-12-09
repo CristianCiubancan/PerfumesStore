@@ -13,6 +13,8 @@ interface CartState {
   removeItem: (productId: number) => void
   updateQuantity: (productId: number, quantity: number) => { success: boolean; message?: string }
   clearCart: () => void
+  // FE-004: Validate stock levels against current product data
+  validateStock: (products: Product[]) => { updated: number; removed: number }
 
   // Selectors
   getTotalItems: () => number
@@ -99,6 +101,42 @@ export const useCartStore = create<CartState>()(
       },
 
       clearCart: () => set({ items: [] }),
+
+      // FE-004: Validate cart items against current product stock
+      validateStock: (products: Product[]) => {
+        const { items } = get()
+        let updated = 0
+        let removed = 0
+
+        const validatedItems = items.reduce<CartItem[]>((acc, item) => {
+          const product = products.find(p => p.id === item.productId)
+
+          if (!product || product.stock === 0) {
+            // Product no longer exists or is out of stock
+            removed++
+            return acc
+          }
+
+          if (item.quantity > product.stock) {
+            // Reduce quantity to available stock
+            updated++
+            acc.push({ ...item, quantity: product.stock, stock: product.stock })
+          } else if (item.stock !== product.stock) {
+            // Update stored stock value
+            acc.push({ ...item, stock: product.stock })
+          } else {
+            acc.push(item)
+          }
+
+          return acc
+        }, [])
+
+        if (updated > 0 || removed > 0) {
+          set({ items: validatedItems })
+        }
+
+        return { updated, removed }
+      },
 
       getTotalItems: () => {
         return get().items.reduce((sum, item) => sum + item.quantity, 0)

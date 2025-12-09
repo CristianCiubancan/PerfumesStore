@@ -23,18 +23,29 @@ export function CartPageContent() {
     // Mark as hydrated first, then fetch async
     queueMicrotask(() => setIsHydrated(true))
 
+    // FE-011: AbortController for cleanup
+    const abortController = new AbortController()
+
     // Fetch active promotion
     promotionsApi.getActive()
       .then((data) => {
-        setPromotion(data.promotion)
+        if (!abortController.signal.aborted) {
+          setPromotion(data.promotion)
+        }
       })
       .catch((error) => {
+        // Don't log if aborted
+        if (abortController.signal.aborted) return
         // Promotion fetch failed - cart will work without discount
         // This is a graceful degradation, not a critical failure
         if (process.env.NODE_ENV === 'development') {
           console.error('Failed to fetch active promotion:', error)
         }
       })
+
+    return () => {
+      abortController.abort()
+    }
   }, [])
 
   const handleRemoveItem = (productId: number) => {

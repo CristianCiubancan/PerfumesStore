@@ -24,7 +24,12 @@ export function Providers({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const hydrateAuth = async () => {
-      // Skip profile fetch on auth pages - user is not logged in
+      // FE-012: Auth hydration with path-based detection
+      // This approach checks URL paths rather than route metadata because:
+      // 1. This runs before Next.js page components mount (no access to metadata)
+      // 2. Auth pages don't need profile fetching - reduces unnecessary API calls
+      // 3. Simple path matching is reliable and easy to maintain
+      // Future enhancement: Could use Next.js middleware for server-side detection
       const authPaths = ['/login', '/register']
       const isOnAuthPage = authPaths.some((path) => window.location.pathname.endsWith(path))
       if (isOnAuthPage) {

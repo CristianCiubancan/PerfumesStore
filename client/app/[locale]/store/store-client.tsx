@@ -1,5 +1,19 @@
 'use client'
 
+// TODO: REFACTORING OPPORTUNITY (Code Quality)
+// This component has grown to 346+ lines with multiple responsibilities:
+// - Product fetching and filtering
+// - Currency conversion logic
+// - Pagination state management
+// - Filter state synchronization
+// - Mobile/desktop filter UI
+// Consider splitting into:
+// 1. useStoreProducts hook (data fetching, filtering, pagination)
+// 2. useCurrencyConversion hook (price conversion logic)
+// 3. Separate FilterSheet component (mobile filters)
+// 4. Extract currency conversion utilities to lib/currency-helpers.ts
+// This would improve maintainability and make the component easier to test.
+
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { useTranslations } from 'next-intl'
 import { Filter, Loader2 } from 'lucide-react'
@@ -20,6 +34,16 @@ import { useFilterParams, FilterValues } from '@/hooks/use-filter-params'
 import { useFilterOptions } from '@/hooks/use-filter-options'
 import { useCurrencyStore } from '@/store/currency'
 import { PAGINATION, TIMING } from '@/lib/constants'
+
+// UI Layout Constants
+const UI_DIMENSIONS = {
+  DESKTOP_BREAKPOINT: 1024, // Matches Tailwind's lg breakpoint
+  CONTENT_MAX_WIDTH: 1280, // Maximum content width in pixels
+  MIN_SIDE_PADDING: 16, // Minimum padding on sides
+  SIDEBAR_WIDTH: 288, // 18rem in pixels (from Tailwind w-72)
+  SIDEBAR_GAP: 32, // 2rem in pixels (gap-8)
+  SCROLL_TOP: 0, // Scroll position for top of page
+} as const
 
 // Convert price from selected currency to RON for API filtering
 // This reverses the conversion done in formatPrice/convertPrice
@@ -124,7 +148,7 @@ export function StorePageClient() {
         totalPages: response.pagination.totalPages,
         total: response.pagination.total,
       })
-    } catch (err) {
+    } catch (err: unknown) {
       // Don't set error state for aborted requests
       if (err instanceof Error && err.name === 'AbortError') {
         return
@@ -169,10 +193,10 @@ export function StorePageClient() {
     setPage(newPage)
     // On desktop, scroll the products container; on mobile, scroll the page
     const productsContainer = document.getElementById('products-scroll-container')
-    if (productsContainer && window.innerWidth >= 1024) {
-      productsContainer.scrollTo({ top: 0, behavior: 'smooth' })
+    if (productsContainer && window.innerWidth >= UI_DIMENSIONS.DESKTOP_BREAKPOINT) {
+      productsContainer.scrollTo({ top: UI_DIMENSIONS.SCROLL_TOP, behavior: 'smooth' })
     } else {
-      window.scrollTo({ top: 0, behavior: 'smooth' })
+      window.scrollTo({ top: UI_DIMENSIONS.SCROLL_TOP, behavior: 'smooth' })
     }
   }
 
@@ -188,14 +212,15 @@ export function StorePageClient() {
 
   // Calculate side padding for centering content (1280px max) with 16px minimum
   // This is computed in JS to avoid CSS calc/max compatibility issues
-  const [sidePadding, setSidePadding] = useState(16)
+  const [sidePadding, setSidePadding] = useState<number>(UI_DIMENSIONS.MIN_SIDE_PADDING)
 
   useEffect(() => {
     const updatePadding = () => {
       const viewportWidth = window.innerWidth
-      const contentMax = 1280
-      const minPadding = 16
-      const calculatedPadding = Math.max(minPadding, (viewportWidth - contentMax) / 2)
+      const calculatedPadding = Math.max(
+        UI_DIMENSIONS.MIN_SIDE_PADDING,
+        (viewportWidth - UI_DIMENSIONS.CONTENT_MAX_WIDTH) / 2
+      )
       setSidePadding(calculatedPadding)
     }
 
@@ -203,6 +228,19 @@ export function StorePageClient() {
     window.addEventListener('resize', updatePadding)
     return () => window.removeEventListener('resize', updatePadding)
   }, [])
+
+  // FE-020: Memoize style objects to prevent recreation on each render
+  const asideStyle = useMemo(
+    () => ({
+      width: sidePadding + UI_DIMENSIONS.SIDEBAR_WIDTH + UI_DIMENSIONS.SIDEBAR_GAP,
+      paddingLeft: sidePadding,
+    }),
+    [sidePadding]
+  )
+
+  const productsPanelStyle = useMemo(() => ({
+    paddingRight: sidePadding
+  }), [sidePadding])
 
   // Shared content components for mobile and desktop
   const PageHeader = (
@@ -304,10 +342,7 @@ export function StorePageClient() {
         {/* Left Panel - Sidebar with dynamic left padding for centering */}
         <aside
           className="flex-shrink-0 overflow-y-auto"
-          style={{
-            width: sidePadding + 288 + 32, // padding + sidebar (18rem) + gap (2rem)
-            paddingLeft: sidePadding
-          }}
+          style={asideStyle}
         >
           <div className="w-72 pt-8 pb-6">
             {FilterSidebar}
@@ -318,7 +353,7 @@ export function StorePageClient() {
         <div
           id="products-scroll-container"
           className="flex-1 overflow-y-auto"
-          style={{ paddingRight: sidePadding }}
+          style={productsPanelStyle}
         >
           <div style={{ maxWidth: 960 }} className='pl-4'>
             {PageHeader}

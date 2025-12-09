@@ -9,6 +9,8 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+# Shared folder is copied via additional_contexts in docker-compose
+COPY --from=shared /. ../shared/
 
 # Generate Prisma client
 RUN npx prisma generate
@@ -25,6 +27,9 @@ ARG PLATFORM=linux
 
 ENV NODE_ENV=production
 
+# Install wget for health checks and postgresql-client for migrations/backup
+RUN apk add --no-cache wget postgresql-client
+
 # Install only production dependencies
 COPY package*.json ./
 RUN npm ci --omit=dev
@@ -33,8 +38,10 @@ RUN npm ci --omit=dev
 COPY prisma ./prisma
 RUN npx prisma generate
 
-# Copy built application
-COPY --from=builder /app/dist ./dist
+# Copy built application (TypeScript outputs to dist/app/src due to shared folder structure)
+COPY --from=builder /app/dist/app/src ./dist
+# Copy shared folder compiled output for runtime imports (../../../shared from dist/schemas/)
+COPY --from=builder /app/dist/shared /shared
 
 # Copy uploads directory (will be overwritten by volume mount)
 RUN mkdir -p uploads

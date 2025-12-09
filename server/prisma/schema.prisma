@@ -8,16 +8,18 @@ datasource db {
 }
 
 model User {
-  id            Int            @id @default(autoincrement())
-  email         String         @unique
-  passwordHash  String
-  name          String
-  role          Role           @default(USER)
-  tokenVersion  Int            @default(0) // Incremented to invalidate all tokens
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-  refreshTokens RefreshToken[]
-  auditLogs     AuditLog[]
+  id                   Int            @id @default(autoincrement())
+  email                String         @unique
+  passwordHash         String
+  name                 String
+  role                 Role           @default(USER)
+  tokenVersion         Int            @default(0) // Incremented to invalidate all tokens
+  failedLoginAttempts  Int            @default(0) // Track failed login attempts
+  lockedUntil          DateTime?      // Account locked until this time (null = not locked)
+  createdAt            DateTime       @default(now())
+  updatedAt            DateTime       @updatedAt
+  refreshTokens        RefreshToken[]
+  auditLogs            AuditLog[]
 }
 
 // Refresh token storage for revocation support

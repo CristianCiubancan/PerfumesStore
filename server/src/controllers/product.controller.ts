@@ -2,6 +2,7 @@ import { Request, Response } from 'express'
 import * as productService from '../services/product.service'
 import { createAuditLog } from '../lib/auditLogger'
 import { parseIdParam, parseIntParam, parseFloatParam, parseIdArrayParam, parseBooleanParam } from '../lib/parseParams'
+import { AppError } from '../middleware/errorHandler'
 
 export async function createProduct(req: Request, res: Response): Promise<void> {
   const product = await productService.createProduct(req.body)
@@ -125,6 +126,11 @@ export async function listProducts(req: Request, res: Response): Promise<void> {
 export async function bulkDeleteProducts(req: Request, res: Response): Promise<void> {
   const { ids } = req.body
   const result = await productService.bulkDeleteProducts(ids)
+
+  // Return 404 if no products were deleted
+  if (result.deletedCount === 0) {
+    throw new AppError('No products found with the provided IDs', 404, 'NO_PRODUCTS_DELETED')
+  }
 
   // Audit log for bulk delete
   createAuditLog(req, {

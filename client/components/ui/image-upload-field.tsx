@@ -151,7 +151,11 @@ export function ImageUploadField({ value, onChange, disabled }: ImageUploadField
       {previewUrl && !previewError && (
         <div className="relative inline-block">
           <div className="relative w-32 h-32 rounded-lg overflow-hidden border bg-muted">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
+            {/* FE-018: Native img is intentional here because:
+                1. Preview images may be blob URLs or data URLs from file input
+                2. Next.js Image doesn't support blob/data URLs well
+                3. onError handler needs native img behavior for error states
+                eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={previewUrl}
               alt="Preview"

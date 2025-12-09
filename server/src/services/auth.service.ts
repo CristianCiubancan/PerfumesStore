@@ -18,6 +18,10 @@ interface TokenContext {
   ipAddress?: string
 }
 
+// Account lockout configuration
+const MAX_FAILED_ATTEMPTS = 5
+const LOCKOUT_DURATION_MINUTES = 15
+
 /**
  * Store a refresh token in the database for revocation support
  */
@@ -118,6 +122,59 @@ export async function cleanupExpiredTokens(): Promise<number> {
   return result.count
 }
 
+/**
+ * Check if user account is locked
+ */
+function isAccountLocked(user: { lockedUntil: Date | null }): boolean {
+  if (!user.lockedUntil) return false
+  return new Date() < user.lockedUntil
+}
+
+/**
+ * Reset failed login attempts after successful login
+ */
+async function resetFailedLoginAttempts(userId: number): Promise<void> {
+  await prisma.user.update({
+    where: { id: userId },
+    data: {
+      failedLoginAttempts: 0,
+      lockedUntil: null,
+    },
+  })
+}
+
+/**
+ * Increment failed login attempts and lock account if threshold exceeded
+ */
+async function handleFailedLogin(userId: number): Promise<void> {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { failedLoginAttempts: true },
+  })
+
+  if (!user) return
+
+  const newAttempts = user.failedLoginAttempts + 1
+  const shouldLock = newAttempts >= MAX_FAILED_ATTEMPTS
+
+  await prisma.user.update({
+    where: { id: userId },
+    data: {
+      failedLoginAttempts: newAttempts,
+      lockedUntil: shouldLock
+        ? new Date(Date.now() + LOCKOUT_DURATION_MINUTES * 60 * 1000)
+        : undefined,
+    },
+  })
+
+  if (shouldLock) {
+    logger.warn(
+      `User ${userId} account locked after ${MAX_FAILED_ATTEMPTS} failed login attempts`,
+      'AuthService'
+    )
+  }
+}
+
 export async function register(input: RegisterInput, context?: TokenContext) {
   const existingUser = await prisma.user.findUnique({
     where: { email: input.email },
@@ -180,11 +237,27 @@ export async function login(input: LoginInput, context?: TokenContext) {
     throw new AppError('Invalid email or password', 401, 'INVALID_CREDENTIALS')
   }
 
+  // Check if account is locked
+  if (isAccountLocked(user)) {
+    const lockExpiry = user.lockedUntil!
+    const minutesRemaining = Math.ceil((lockExpiry.getTime() - Date.now()) / 60000)
+    throw new AppError(
+      `Account is locked due to too many failed login attempts. Try again in ${minutesRemaining} minute(s).`,
+      401,
+      'ACCOUNT_LOCKED'
+    )
+  }
+
   const isValidPassword = await bcrypt.compare(input.password, user.passwordHash)
 
   if (!isValidPassword) {
+    // Increment failed login attempts
+    await handleFailedLogin(user.id)
     throw new AppError('Invalid email or password', 401, 'INVALID_CREDENTIALS')
   }
+
+  // Reset failed login attempts on successful login
+  await resetFailedLoginAttempts(user.id)
 
   const payload: TokenPayload = {
     userId: user.id,
@@ -257,18 +330,9 @@ export async function refreshTokens(refreshToken: string | undefined, context?: 
   let payload
   try {
     payload = verifyRefreshToken(refreshToken)
-  } catch (error) {
-    logger.warn('Refresh token JWT verification failed', 'AuthService', error instanceof Error ? error : undefined)
+  } catch (err: unknown) {
+    logger.warn('Refresh token JWT verification failed', 'AuthService', err instanceof Error ? err : undefined)
     throw new AppError('Invalid or expired refresh token', 401, 'INVALID_REFRESH_TOKEN')
-  }
-
-  // Then verify token exists in database and is not revoked
-  const existingToken = await findValidRefreshToken(refreshToken)
-  if (!existingToken) {
-    // Token reuse detected - potential theft! Revoke all user tokens
-    logger.warn(`Refresh token reuse detected for user ${payload.userId}`, 'AuthService')
-    await revokeAllUserTokens(payload.userId)
-    throw new AppError('Token has been revoked. Please login again.', 401, 'TOKEN_REVOKED')
   }
 
   // Fetch fresh user data to get current tokenVersion
@@ -304,12 +368,29 @@ export async function refreshTokens(refreshToken: string | undefined, context?: 
   const newAccessToken = generateAccessToken(newPayload)
   const { token: newRefreshToken } = generateRefreshToken(newPayload)
 
-  // Use transaction to atomically revoke old token and create new one
-  // This ensures we don't have a state where old token is revoked but new one isn't created
-  const tokenHash = hashToken(newRefreshToken)
+  // Use transaction to atomically verify token validity, revoke old token, and create new one
+  // This prevents race condition where token could be revoked between check and transaction
+  const tokenHash = hashToken(refreshToken)
+  const newTokenHash = hashToken(newRefreshToken)
   const expiresAt = getRefreshTokenExpiry()
 
   await prisma.$transaction(async (tx) => {
+    // Verify token exists in database and is not revoked (inside transaction to prevent race condition)
+    const existingToken = await tx.refreshToken.findFirst({
+      where: {
+        tokenHash,
+        revokedAt: null,
+        expiresAt: { gt: new Date() },
+      },
+    })
+
+    if (!existingToken) {
+      // Token reuse detected - potential theft! Revoke all user tokens
+      logger.warn(`Refresh token reuse detected for user ${payload.userId}`, 'AuthService')
+      await revokeAllUserTokens(payload.userId)
+      throw new AppError('Token has been revoked. Please login again.', 401, 'TOKEN_REVOKED')
+    }
+
     // Revoke old token
     await tx.refreshToken.update({
       where: { id: existingToken.id },
@@ -320,7 +401,7 @@ export async function refreshTokens(refreshToken: string | undefined, context?: 
     await tx.refreshToken.create({
       data: {
         userId: user.id,
-        tokenHash,
+        tokenHash: newTokenHash,
         expiresAt,
         userAgent: context?.userAgent,
         ipAddress: context?.ipAddress,

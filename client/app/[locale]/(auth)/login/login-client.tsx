@@ -55,8 +55,12 @@ export function LoginClient() {
       const params = new URLSearchParams(window.location.search)
       const returnTo = params.get('returnTo')
 
-      // Only allow relative URLs to prevent open redirect attacks
-      let redirectTo = returnTo?.startsWith('/') ? returnTo : '/'
+      // SECURITY: Only allow relative URLs to prevent open redirect attacks
+      // Also prevent protocol-relative URLs (starting with //) which could redirect to external sites
+      let redirectTo = '/'
+      if (returnTo && returnTo.startsWith('/') && !returnTo.startsWith('//')) {
+        redirectTo = returnTo
+      }
 
       // Strip locale prefix if present (next-intl router adds it automatically)
       const localePattern = new RegExp(`^/(${locales.join('|')})(/.*)?$`)
@@ -66,11 +70,11 @@ export function LoginClient() {
       }
 
       router.push(redirectTo)
-    } catch (error) {
+    } catch (err: unknown) {
       // Clear password field on error for security
       form.setValue('password', '')
-      if (error instanceof ApiError) {
-        toast.error(error.message)
+      if (err instanceof ApiError) {
+        toast.error(err.message)
       } else {
         toast.error(t('unexpectedError'))
       }

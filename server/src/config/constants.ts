@@ -12,7 +12,7 @@ export const AUTH = {
   ACCESS_TOKEN_COOKIE_MAX_AGE_MS: 15 * 60 * 1000, // 15 minutes in milliseconds
   REFRESH_TOKEN_COOKIE_MAX_AGE_MS: 7 * 24 * 60 * 60 * 1000, // 7 days in milliseconds
   TOKEN_CLEANUP_CRON_SCHEDULE: '*/10 * * * *', // Every 10 minutes
-  BCRYPT_SALT_ROUNDS: 10,
+  BCRYPT_SALT_ROUNDS: 12,
 } as const
 
 // File Uploads
@@ -28,15 +28,19 @@ export const IMAGE = {
 } as const
 
 // Pagination
+// NOTE: DEFAULT_LIMIT is shared with client (/client/lib/constants.ts)
+// and documented in /shared/shared-constants.ts - must be kept in sync
 export const PAGINATION = {
-  DEFAULT_LIMIT: 20,
+  DEFAULT_LIMIT: 20, // Synchronized via /shared/shared-constants.ts
   MAX_LIMIT: 100,
   SITEMAP_LIMIT: 1000,
 } as const
 
 // Stock Management
+// NOTE: LOW_STOCK_THRESHOLD is shared with client (/client/lib/constants.ts)
+// and documented in /shared/shared-constants.ts - must be kept in sync
 export const STOCK = {
-  LOW_STOCK_THRESHOLD: 10,
+  LOW_STOCK_THRESHOLD: 10, // Synchronized via /shared/shared-constants.ts
 } as const
 
 // Exchange Rates
@@ -52,9 +56,12 @@ export const CACHE = {
 } as const
 
 // Validation Rules
+// NOTE: PASSWORD_MIN_LENGTH and NAME_MIN_LENGTH are defined in /shared/validation-constants.ts
+// and used by both client and server auth schemas for consistency.
+// These constants here are kept for reference and non-auth validation.
 export const VALIDATION = {
-  PASSWORD_MIN_LENGTH: 8,
-  NAME_MIN_LENGTH: 2,
+  PASSWORD_MIN_LENGTH: 12, // Synchronized via /shared/validation-constants.ts
+  NAME_MIN_LENGTH: 2, // Synchronized via /shared/validation-constants.ts
   PRODUCT_MIN_LAUNCH_YEAR: 1800,
   DISCOUNT_MIN_PERCENT: 1,
   DISCOUNT_MAX_PERCENT: 99,

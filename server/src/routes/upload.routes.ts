@@ -4,6 +4,8 @@ import { authenticate, authorize } from '../middleware/auth'
 import { csrfProtection } from '../middleware/csrf'
 import { sensitiveRateLimiter } from '../middleware/rateLimit'
 import { asyncHandler } from '../lib/asyncHandler'
+import { validate } from '../middleware/validate'
+import { deleteImageSchema } from '../schemas/upload'
 
 const router = Router()
 
@@ -21,6 +23,8 @@ router.delete(
   authenticate,
   authorize('ADMIN'),
   csrfProtection,
+  sensitiveRateLimiter,
+  validate(deleteImageSchema),
   asyncHandler(deleteImage)
 )
 

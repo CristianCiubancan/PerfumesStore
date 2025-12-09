@@ -77,6 +77,17 @@ export async function deleteImage(req: Request, res: Response): Promise<void> {
     throw new AppError('Filename is required', 400, 'FILENAME_REQUIRED')
   }
 
+  // SECURITY: Validate filename to prevent path traversal attacks
+  // Only allow alphanumeric characters, dots, underscores, and hyphens
+  const SAFE_FILENAME_PATTERN = /^[a-zA-Z0-9._-]+$/
+  if (!SAFE_FILENAME_PATTERN.test(filename)) {
+    throw new AppError(
+      'Invalid filename. Only alphanumeric characters, dots, underscores, and hyphens are allowed.',
+      400,
+      'INVALID_FILENAME'
+    )
+  }
+
   const sanitizedFilename = path.basename(filename)
   const filePath = path.join(uploadConfig.PRODUCTS_DIR, sanitizedFilename)
 

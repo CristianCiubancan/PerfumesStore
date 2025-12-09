@@ -24,7 +24,10 @@ import { Link, useRouter } from '@/i18n/routing'
 export function Header() {
   const t = useTranslations('nav')
   const router = useRouter()
-  const { isAuthenticated, user, clearAuth } = useAuthStore()
+  // FE-003: Use individual selectors to prevent unnecessary re-renders
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
+  const user = useAuthStore((state) => state.user)
+  const clearAuth = useAuthStore((state) => state.clearAuth)
   const [open, setOpen] = useState(false)
 
   const handleLogout = async () => {
@@ -45,7 +48,7 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4 h-14 flex items-center justify-between">
-        <Link href="/">
+        <Link href="/" aria-label="Perfumes Store Home">
           <Image
             src="/images/perfume-logo.svg"
             alt="Perfumes Store"

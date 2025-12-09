@@ -3,30 +3,42 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { useTranslations } from 'next-intl'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import { Mail, ArrowRight, Check, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import { toast } from 'sonner'
 import { TIMING } from '@/lib/constants'
 import { newsletterApi } from '@/lib/api/newsletter'
 import { ApiError } from '@/lib/api/client'
 
+// FE-013: Zod schema for email validation
+const newsletterSchema = z.object({
+  email: z.string().email('Invalid email address'),
+})
+
+type NewsletterFormData = z.infer<typeof newsletterSchema>
+
 export function Newsletter() {
   const t = useTranslations('home')
-  const [email, setEmail] = useState('')
   const [status, setStatus] = useState<'idle' | 'loading' | 'success'>('idle')
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!email) return
+  const form = useForm<NewsletterFormData>({
+    resolver: zodResolver(newsletterSchema),
+    defaultValues: { email: '' },
+  })
 
+  const onSubmit = async (data: NewsletterFormData) => {
     setStatus('loading')
 
     try {
-      await newsletterApi.subscribe({ email })
+      await newsletterApi.subscribe({ email: data.email })
       setStatus('success')
       toast.success(t('newsletter.success'))
-      setEmail('')
+      form.reset()
 
       // Reset after showing success
       setTimeout(() => setStatus('idle'), TIMING.NEWSLETTER_RESET_MS)
@@ -61,31 +73,42 @@ export function Newsletter() {
             {t('newsletter.subtitle')}
           </p>
 
-          <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
-            <Input
-              type="email"
-              placeholder={t('newsletter.placeholder')}
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground placeholder:text-primary-foreground/50 focus-visible:ring-primary-foreground/30"
-              required
-            />
-            <Button
-              type="submit"
-              variant="secondary"
-              className="shrink-0"
-              disabled={status === 'loading' || status === 'success'}
-            >
-              {status === 'loading' && (
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              )}
-              {status === 'success' && <Check className="w-4 h-4 mr-2" />}
-              {status === 'idle' && <ArrowRight className="w-4 h-4 mr-2" />}
-              {status === 'success'
-                ? t('newsletter.subscribed')
-                : t('newsletter.cta')}
-            </Button>
-          </form>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem className="flex-1">
+                    <FormControl>
+                      <Input
+                        type="email"
+                        placeholder={t('newsletter.placeholder')}
+                        className="bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground placeholder:text-primary-foreground/50 focus-visible:ring-primary-foreground/30"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage className="text-primary-foreground/80" />
+                  </FormItem>
+                )}
+              />
+              <Button
+                type="submit"
+                variant="secondary"
+                className="shrink-0"
+                disabled={status === 'loading' || status === 'success'}
+              >
+                {status === 'loading' && (
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                )}
+                {status === 'success' && <Check className="w-4 h-4 mr-2" />}
+                {status === 'idle' && <ArrowRight className="w-4 h-4 mr-2" />}
+                {status === 'success'
+                  ? t('newsletter.subscribed')
+                  : t('newsletter.cta')}
+              </Button>
+            </form>
+          </Form>
 
           <p className="text-xs text-primary-foreground/60 mt-4">
             {t('newsletter.privacy')}

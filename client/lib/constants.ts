@@ -75,16 +75,20 @@ export const SEO = {
 } as const
 
 // Pagination
+// NOTE: DEFAULT_LIMIT is shared with server (/server/src/config/constants.ts)
+// and documented in /shared/shared-constants.ts - must be kept in sync
 export const PAGINATION = {
-  DEFAULT_LIMIT: 20,
+  DEFAULT_LIMIT: 20, // Synchronized via /shared/shared-constants.ts
   PRODUCTS_PER_PAGE: 12,
   ADMIN_DEFAULT_LIMIT: 25,
   PAGE_SIZE_OPTIONS: [10, 25, 50] as const,
 } as const
 
 // Stock Management
+// NOTE: LOW_STOCK_THRESHOLD is shared with server (/server/src/config/constants.ts)
+// and documented in /shared/shared-constants.ts - must be kept in sync
 export const STOCK = {
-  LOW_STOCK_THRESHOLD: 10,
+  LOW_STOCK_THRESHOLD: 10, // Synchronized via /shared/shared-constants.ts
 } as const
 
 // File Upload

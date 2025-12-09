@@ -178,6 +178,7 @@ export type AuditAction =
   | 'DELETE'
   | 'BULK_DELETE'
   | 'LOGIN'
+  | 'LOGIN_FAILED'
   | 'LOGOUT'
   | 'PASSWORD_CHANGE'
 

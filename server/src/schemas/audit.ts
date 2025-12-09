@@ -7,6 +7,7 @@ const AuditActionEnum = z.enum([
   'DELETE',
   'BULK_DELETE',
   'LOGIN',
+  'LOGIN_FAILED',
   'LOGOUT',
   'PASSWORD_CHANGE',
 ])

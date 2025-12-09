@@ -29,6 +29,7 @@ import * as productService from '../product.service'
 describe('ProductService', () => {
   const mockProduct = {
     id: 1,
+    slug: 'test-perfume-test-brand-100ml',
     name: 'Test Perfume',
     brand: 'Test Brand',
     concentration: 'Eau_de_Parfum',

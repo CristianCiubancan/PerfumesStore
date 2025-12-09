@@ -32,7 +32,10 @@
     "confirm": "Confirmă",
     "optional": "opțional",
     "pagination": "Paginare",
+    "currentPage": "Pagina {page} din {totalPages}",
     "goToPage": "Mergi la pagina {page}",
+    "quantity": "Cantitate",
+    "currentQuantity": "Cantitate curentă: {count}",
     "upload": {
       "clickOrDrag": "Click pentru încărcare sau trage și plasează",
       "allowedFormats": "PNG, JPG, WebP sau GIF (max {maxSize}MB)",

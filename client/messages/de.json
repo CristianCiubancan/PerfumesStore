@@ -32,7 +32,10 @@
     "confirm": "Bestätigen",
     "optional": "optional",
     "pagination": "Seitennummerierung",
+    "currentPage": "Seite {page} von {totalPages}",
     "goToPage": "Gehe zu Seite {page}",
+    "quantity": "Menge",
+    "currentQuantity": "Aktuelle Menge: {count}",
     "upload": {
       "clickOrDrag": "Klicken zum Hochladen oder per Drag & Drop",
       "allowedFormats": "PNG, JPG, WebP oder GIF (max {maxSize}MB)",

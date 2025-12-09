@@ -32,7 +32,10 @@
     "confirm": "Confirmar",
     "optional": "opcional",
     "pagination": "Paginación",
+    "currentPage": "Página {page} de {totalPages}",
     "goToPage": "Ir a página {page}",
+    "quantity": "Cantidad",
+    "currentQuantity": "Cantidad actual: {count}",
     "upload": {
       "clickOrDrag": "Haz clic para subir o arrastra y suelta",
       "allowedFormats": "PNG, JPG, WebP o GIF (máx {maxSize}MB)",

@@ -270,7 +270,7 @@ export function StorePageClient() {
             <SheetHeader>
               <SheetTitle>{t('store.filters.title')}</SheetTitle>
             </SheetHeader>
-            <div className="mt-6">{FilterSidebar}</div>
+            <div className="mt-6 pb-6">{FilterSidebar}</div>
           </SheetContent>
         </Sheet>
       </div>

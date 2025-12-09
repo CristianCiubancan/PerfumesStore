@@ -16,7 +16,7 @@
 
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { useTranslations } from 'next-intl'
-import { Filter, Loader2 } from 'lucide-react'
+import { Filter } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Sheet,
@@ -26,6 +26,7 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet'
 import { ProductCard } from '@/components/store/product-card'
+import { ProductCardSkeleton } from '@/components/store/product-card-skeleton'
 import { ProductFilters } from '@/components/store/product-filters'
 import { Pagination } from '@/components/store/pagination'
 import { productsApi } from '@/lib/api/products'
@@ -210,37 +211,19 @@ export function StorePageClient() {
     />
   )
 
-  // Calculate side padding for centering content (1280px max) with 16px minimum
-  // This is computed in JS to avoid CSS calc/max compatibility issues
-  const [sidePadding, setSidePadding] = useState<number>(UI_DIMENSIONS.MIN_SIDE_PADDING)
+  // CSS-based side padding for centering content (1280px max) with 16px minimum
+  // Using CSS max() avoids layout shift that occurred with JS-based calculation
+  const sidePaddingCSS = `max(${UI_DIMENSIONS.MIN_SIDE_PADDING}px, calc((100vw - ${UI_DIMENSIONS.CONTENT_MAX_WIDTH}px) / 2))`
 
-  useEffect(() => {
-    const updatePadding = () => {
-      const viewportWidth = window.innerWidth
-      const calculatedPadding = Math.max(
-        UI_DIMENSIONS.MIN_SIDE_PADDING,
-        (viewportWidth - UI_DIMENSIONS.CONTENT_MAX_WIDTH) / 2
-      )
-      setSidePadding(calculatedPadding)
-    }
+  // Aside needs width = sidePadding + sidebarWidth + gap
+  const asideStyle = {
+    width: `calc(${sidePaddingCSS} + ${UI_DIMENSIONS.SIDEBAR_WIDTH}px + ${UI_DIMENSIONS.SIDEBAR_GAP}px)`,
+    paddingLeft: sidePaddingCSS,
+  }
 
-    updatePadding()
-    window.addEventListener('resize', updatePadding)
-    return () => window.removeEventListener('resize', updatePadding)
-  }, [])
-
-  // FE-020: Memoize style objects to prevent recreation on each render
-  const asideStyle = useMemo(
-    () => ({
-      width: sidePadding + UI_DIMENSIONS.SIDEBAR_WIDTH + UI_DIMENSIONS.SIDEBAR_GAP,
-      paddingLeft: sidePadding,
-    }),
-    [sidePadding]
-  )
-
-  const productsPanelStyle = useMemo(() => ({
-    paddingRight: sidePadding
-  }), [sidePadding])
+  const productsPanelStyle = {
+    paddingRight: sidePaddingCSS,
+  }
 
   // Shared content components for mobile and desktop
   const PageHeader = (
@@ -289,10 +272,12 @@ export function StorePageClient() {
         </div>
       )}
 
-      {/* Loading State */}
+      {/* Loading State - Skeleton grid to prevent layout shift */}
       {isLoading && (
-        <div className="flex items-center justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {Array.from({ length: 9 }).map((_, i) => (
+            <ProductCardSkeleton key={i} />
+          ))}
         </div>
       )}
 
@@ -336,39 +321,28 @@ export function StorePageClient() {
   )
 
   return (
-    <>
-      {/* Desktop Layout - Two panel full-width design */}
-      <div className="hidden lg:flex lg:h-[calc(100vh-3.5rem-1px)]">
-        {/* Left Panel - Sidebar with dynamic left padding for centering */}
-        <aside
-          className="flex-shrink-0 overflow-y-auto"
-          style={asideStyle}
-        >
-          <div className="w-72 pt-8 pb-6">
-            {FilterSidebar}
-          </div>
-        </aside>
-
-        {/* Right Panel - Title + Products with dynamic right padding for centering */}
-        <div
-          id="products-scroll-container"
-          className="flex-1 overflow-y-auto"
-          style={productsPanelStyle}
-        >
-          <div style={{ maxWidth: 960 }} className='pl-4'>
-            {PageHeader}
-            {ProductsContent}
-          </div>
+    <div className="fixed inset-0 top-14 overflow-hidden flex flex-col lg:flex-row bg-background">
+      {/* Sidebar - Desktop only */}
+      <aside
+        className="hidden lg:block flex-shrink-0 overflow-y-auto"
+        style={asideStyle}
+      >
+        <div className="w-72 pt-8 pb-6">
+          {FilterSidebar}
         </div>
-      </div>
+      </aside>
 
-      {/* Mobile Layout - Standard stacked layout */}
-      <div className="lg:hidden flex-1">
-        <div className="container mx-auto px-4">
+      {/* Main Content - Scrollable */}
+      <div
+        id="products-scroll-container"
+        className="flex-1 overflow-y-auto px-4 lg:px-0"
+        style={productsPanelStyle}
+      >
+        <div className="lg:pl-4" style={{ maxWidth: 960 }}>
           {PageHeader}
           {ProductsContent}
         </div>
       </div>
-    </>
+    </div>
   )
 }

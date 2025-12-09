@@ -29,6 +29,16 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 
+# Runtime environment variables for SSR
+# These are set via docker-compose environment section
+# Build-time values are baked in, but runtime can override for SSR
+ARG NEXT_PUBLIC_API_URL
+ARG NEXT_PUBLIC_SITE_URL
+ARG NEXT_PUBLIC_SITE_NAME
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
+ENV NEXT_PUBLIC_SITE_NAME=$NEXT_PUBLIC_SITE_NAME
+
 # Install wget for health checks
 RUN apk add --no-cache wget
 

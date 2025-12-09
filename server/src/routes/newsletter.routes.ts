@@ -21,15 +21,48 @@ const subscribeSchema = z.object({
 // In-memory cache for idempotency keys (in production, use Redis)
 const idempotencyCache = new Map<string, { email: string; timestamp: number }>()
 const IDEMPOTENCY_TTL = 24 * 60 * 60 * 1000 // 24 hours
+const MAX_CACHE_SIZE = 10000 // Maximum number of idempotency keys to store
+
+// LRU eviction: Remove oldest entries when cache exceeds MAX_CACHE_SIZE
+function evictOldestEntries() {
+  if (idempotencyCache.size > MAX_CACHE_SIZE) {
+    const entriesToRemove = idempotencyCache.size - MAX_CACHE_SIZE
+    const sortedEntries = Array.from(idempotencyCache.entries()).sort(
+      (a, b) => a[1].timestamp - b[1].timestamp
+    )
+
+    for (let i = 0; i < entriesToRemove; i++) {
+      idempotencyCache.delete(sortedEntries[i][0])
+    }
+
+    logger.info(
+      `Evicted ${entriesToRemove} oldest idempotency cache entries (LRU)`,
+      'Newsletter'
+    )
+  }
+}
 
 // Clean up expired idempotency keys periodically
 setInterval(() => {
   const now = Date.now()
+  let expiredCount = 0
+
   for (const [key, value] of idempotencyCache.entries()) {
     if (now - value.timestamp > IDEMPOTENCY_TTL) {
       idempotencyCache.delete(key)
+      expiredCount++
     }
   }
+
+  if (expiredCount > 0) {
+    logger.info(
+      `Cleaned up ${expiredCount} expired idempotency cache entries`,
+      'Newsletter'
+    )
+  }
+
+  // Also check if cache size exceeds limit after cleanup
+  evictOldestEntries()
 }, 60 * 60 * 1000) // Run every hour
 
 router.post(
@@ -46,9 +79,12 @@ router.post(
       const cached = idempotencyCache.get(idempotencyKey)
       if (cached) {
         if (cached.email !== email) {
-          // Same key used for different email - this is an error
+          // Same key used for different email - this is an error (standardized format)
           res.status(400).json({
-            error: 'Idempotency key already used with different email',
+            error: {
+              message: 'Idempotency key already used with different email',
+              code: 'IDEMPOTENCY_KEY_MISMATCH',
+            },
           })
           return
         }
@@ -72,6 +108,9 @@ router.post(
         email: subscriber.email,
         timestamp: Date.now(),
       })
+
+      // Check if we need to evict old entries
+      evictOldestEntries()
     }
 
     logger.info('Newsletter subscription received', 'Newsletter')

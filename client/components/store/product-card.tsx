@@ -71,8 +71,8 @@ export const ProductCard = memo(function ProductCard({ product, priority = false
         <Link href={`/product/${product.slug}`}>
           <div className="mb-2 flex items-start justify-between gap-2">
             <div className="min-w-0 flex-1">
-              <p className="truncate text-xs text-muted-foreground" title={product.brand}>{product.brand}</p>
-              <h3 className="truncate font-medium" title={product.name}>
+              <p className="truncate text-xs text-muted-foreground" aria-label={product.brand}>{product.brand}</p>
+              <h3 className="truncate font-medium" aria-label={product.name}>
                 {product.name}
               </h3>
             </div>

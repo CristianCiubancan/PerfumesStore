@@ -76,6 +76,8 @@ export function Pagination({
           <span
             key={`ellipsis-${index}`}
             className="px-2 text-muted-foreground"
+            role="presentation"
+            aria-label={t('ellipsis')}
           >
             ...
           </span>

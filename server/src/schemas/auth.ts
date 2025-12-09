@@ -2,9 +2,15 @@ import { z } from 'zod'
 // Shared validation constants to ensure sync between client and server
 import { VALIDATION_CONSTANTS } from '../../../shared/validation-constants'
 
-// Password complexity validation
+// SEC-006: Reusable password schemas for consistency
+
+// Basic password schema for login (any non-empty password accepted)
+// This allows users who registered before password policy updates to still login
+const loginPasswordSchema = z.string().min(1, 'Password is required')
+
+// Strong password schema for new passwords (registration and password changes)
 // Requires: min 12 chars, uppercase, lowercase, number, special character
-const passwordSchema = z
+const strongPasswordSchema = z
   .string()
   .min(
     VALIDATION_CONSTANTS.PASSWORD_MIN_LENGTH,
@@ -30,7 +36,7 @@ const passwordSchema = z
 export const registerSchema = z.object({
   body: z.object({
     email: z.string().email('Invalid email address'),
-    password: passwordSchema,
+    password: strongPasswordSchema,
     name: z
       .string()
       .min(VALIDATION_CONSTANTS.NAME_MIN_LENGTH, VALIDATION_CONSTANTS.NAME_ERROR_MESSAGE),
@@ -40,14 +46,14 @@ export const registerSchema = z.object({
 export const loginSchema = z.object({
   body: z.object({
     email: z.string().email('Invalid email address'),
-    password: z.string().min(1, 'Password is required'),
+    password: loginPasswordSchema,
   }),
 })
 
 export const changePasswordSchema = z.object({
   body: z.object({
-    currentPassword: z.string().min(1, 'Current password is required'),
-    newPassword: passwordSchema,
+    currentPassword: loginPasswordSchema,
+    newPassword: strongPasswordSchema,
   }),
 })
 

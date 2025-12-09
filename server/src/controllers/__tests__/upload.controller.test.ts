@@ -1,4 +1,5 @@
 import { Request, Response } from 'express'
+import { Readable } from 'stream'
 import * as uploadController from '../upload.controller'
 import { AppError } from '../../middleware/errorHandler'
 
@@ -83,7 +84,7 @@ describe('UploadController', () => {
         destination: '',
         filename: '',
         path: '',
-        stream: null as any,
+        stream: null as unknown as Readable,
       }
 
       await uploadController.uploadImage(req as Request, res as Response)

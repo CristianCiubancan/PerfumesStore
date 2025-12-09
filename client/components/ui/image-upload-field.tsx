@@ -158,7 +158,7 @@ export function ImageUploadField({ value, onChange, disabled }: ImageUploadField
                 eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={previewUrl}
-              alt="Preview"
+              alt="Product image preview"
               className="w-full h-full object-cover"
               onError={() => setPreviewError(true)}
             />

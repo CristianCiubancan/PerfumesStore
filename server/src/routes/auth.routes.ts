@@ -2,16 +2,24 @@ import { Router } from 'express'
 import * as authController from '../controllers/auth.controller'
 import { validate } from '../middleware/validate'
 import { authenticate } from '../middleware/auth'
-import { csrfProtection } from '../middleware/csrf'
+import { csrfProtection, generateCsrfToken, setCsrfCookie } from '../middleware/csrf'
 import { authRateLimiter } from '../middleware/rateLimit'
 import { registerSchema, loginSchema, changePasswordSchema } from '../schemas/auth'
 import { asyncHandler } from '../lib/asyncHandler'
 
 const router = Router()
 
-// Public auth routes (no CSRF - these SET the CSRF token)
-router.post('/register', authRateLimiter, validate(registerSchema), asyncHandler(authController.register))
-router.post('/login', authRateLimiter, validate(loginSchema), asyncHandler(authController.login))
+// CSRF token endpoint - allows clients to obtain a CSRF token before login/register
+router.get('/csrf', (req, res) => {
+  const token = generateCsrfToken()
+  setCsrfCookie(res, token)
+  res.json({ data: { message: 'CSRF token set' } })
+})
+
+// Auth routes with CSRF protection
+// Client must first call GET /auth/csrf to obtain a CSRF token
+router.post('/register', authRateLimiter, csrfProtection, validate(registerSchema), asyncHandler(authController.register))
+router.post('/login', authRateLimiter, csrfProtection, validate(loginSchema), asyncHandler(authController.login))
 
 // Refresh token - rate limited and CSRF protected (uses existing token)
 router.post('/refresh', authRateLimiter, csrfProtection, asyncHandler(authController.refresh))

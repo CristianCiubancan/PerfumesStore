@@ -34,6 +34,7 @@
     "pagination": "Pagination",
     "currentPage": "Page {page} sur {totalPages}",
     "goToPage": "Aller à la page {page}",
+    "ellipsis": "Plus de pages disponibles",
     "quantity": "Quantité",
     "currentQuantity": "Quantité actuelle : {count}",
     "upload": {

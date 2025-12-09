@@ -34,6 +34,7 @@
     "pagination": "Paginare",
     "currentPage": "Pagina {page} din {totalPages}",
     "goToPage": "Mergi la pagina {page}",
+    "ellipsis": "Mai multe pagini disponibile",
     "quantity": "Cantitate",
     "currentQuantity": "Cantitate curentă: {count}",
     "upload": {

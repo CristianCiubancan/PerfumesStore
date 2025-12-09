@@ -27,7 +27,7 @@ export const listSubscribersSchema = z.object({
 
 export const subscriberIdSchema = z.object({
   params: z.object({
-    id: z.string().uuid('Invalid subscriber ID format'),
+    id: z.string().regex(/^\d+$/, 'Invalid subscriber ID - must be numeric'),
   }),
 })
 

@@ -18,6 +18,7 @@ if [ -n "$DATABASE_URL" ]; then
   DB_HOST=$(echo $DATABASE_URL | sed -n 's/.*@\([^:]*\):.*/\1/p')
   DB_PORT=$(echo $DATABASE_URL | sed -n 's/.*:\([0-9]*\)\/.*/\1/p')
   DB_NAME=$(echo $DATABASE_URL | sed -n 's/.*\/\([^?]*\).*/\1/p')
+  DB_PASS=$(echo $DATABASE_URL | sed -n 's/.*:\([^@]*\)@.*/\1/p')
 
   echo "Database: $DB_NAME"
   echo "Host: $DB_HOST:$DB_PORT"
@@ -25,7 +26,12 @@ if [ -n "$DATABASE_URL" ]; then
 
   # Check if database is accessible
   echo "Checking database connectivity..."
-  export PGPASSWORD=$(echo $DATABASE_URL | sed -n 's/.*:\([^@]*\)@.*/\1/p')
+
+  # Create .pgpass file for secure password handling
+  # Format: hostname:port:database:username:password
+  PGPASS_FILE="$HOME/.pgpass"
+  echo "$DB_HOST:$DB_PORT:$DB_NAME:$DB_USER:$DB_PASS" > "$PGPASS_FILE"
+  chmod 600 "$PGPASS_FILE"
 
   # Wait for database to be ready (max 30 seconds)
   RETRY_COUNT=0
@@ -38,6 +44,7 @@ if [ -n "$DATABASE_URL" ]; then
 
   if [ $RETRY_COUNT -eq $MAX_RETRIES ]; then
     echo "Error: Database is not accessible after $MAX_RETRIES attempts"
+    rm -f "$PGPASS_FILE"
     exit 1
   fi
 
@@ -46,7 +53,7 @@ if [ -n "$DATABASE_URL" ]; then
 
   # Create pre-migration backup
   echo "Creating pre-migration backup..."
-  if pg_dump -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" "$DB_NAME" > "$BACKUP_FILE" 2>/dev/null; then
+  if pg_dump -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" "$DB_NAME" > "$BACKUP_FILE" 2>&1; then
     BACKUP_SIZE=$(du -h "$BACKUP_FILE" | cut -f1)
     echo "Pre-migration backup created: $BACKUP_FILE ($BACKUP_SIZE)"
     echo ""
@@ -54,12 +61,21 @@ if [ -n "$DATABASE_URL" ]; then
     echo "  cat $BACKUP_FILE | psql -h $DB_HOST -p $DB_PORT -U $DB_USER $DB_NAME"
     echo ""
   else
-    echo "Warning: Could not create pre-migration backup"
-    echo "This might be the first run (empty database)"
-    echo ""
+    # Check if backup file was created but is empty (first run scenario)
+    if [ -f "$BACKUP_FILE" ] && [ ! -s "$BACKUP_FILE" ]; then
+      echo "Warning: Could not create pre-migration backup"
+      echo "This might be the first run (empty database)"
+      echo ""
+    else
+      echo "Error: Failed to create pre-migration backup"
+      echo "pg_dump exited with an error. Check database connectivity and permissions."
+      rm -f "$PGPASS_FILE"
+      exit 1
+    fi
   fi
 
-  unset PGPASSWORD
+  # Clean up .pgpass after backup (will recreate if needed)
+  rm -f "$PGPASS_FILE"
 fi
 
 # Run database migrations

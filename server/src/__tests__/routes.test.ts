@@ -2,6 +2,19 @@ import request from 'supertest'
 import app from './app'
 import { prisma } from '../lib/prisma'
 
+// Helper function to get CSRF token
+async function getCsrfToken() {
+  const response = await request(app).get('/api/auth/csrf')
+  const setCookieHeader = response.headers['set-cookie']
+  const cookies = Array.isArray(setCookieHeader) ? setCookieHeader : [setCookieHeader]
+  const csrfCookie = cookies.find((cookie: string) =>
+    cookie.startsWith('csrf-token=')
+  )
+  if (!csrfCookie) return null
+  const token = csrfCookie.split(';')[0].split('=')[1]
+  return { token, cookie: csrfCookie }
+}
+
 describe('API Routes Integration Tests', () => {
   describe('GET /api/health', () => {
     it('should return health status when database is connected', async () => {
@@ -36,8 +49,11 @@ describe('API Routes Integration Tests', () => {
 
   describe('POST /api/auth/register', () => {
     it('should return validation error for missing fields', async () => {
+      const csrf = await getCsrfToken()
       const response = await request(app)
         .post('/api/auth/register')
+        .set('Cookie', csrf!.cookie)
+        .set('x-csrf-token', csrf!.token)
         .send({ email: 'invalid' })
 
       expect(response.status).toBe(400)
@@ -45,8 +61,11 @@ describe('API Routes Integration Tests', () => {
     })
 
     it('should return validation error for weak password', async () => {
+      const csrf = await getCsrfToken()
       const response = await request(app)
         .post('/api/auth/register')
+        .set('Cookie', csrf!.cookie)
+        .set('x-csrf-token', csrf!.token)
         .send({
           email: 'test@example.com',
           password: 'weak',
@@ -60,8 +79,11 @@ describe('API Routes Integration Tests', () => {
 
   describe('POST /api/auth/login', () => {
     it('should return validation error for missing password', async () => {
+      const csrf = await getCsrfToken()
       const response = await request(app)
         .post('/api/auth/login')
+        .set('Cookie', csrf!.cookie)
+        .set('x-csrf-token', csrf!.token)
         .send({ email: 'test@example.com' })
 
       expect(response.status).toBe(400)
@@ -69,8 +91,11 @@ describe('API Routes Integration Tests', () => {
     })
 
     it('should return validation error for invalid email', async () => {
+      const csrf = await getCsrfToken()
       const response = await request(app)
         .post('/api/auth/login')
+        .set('Cookie', csrf!.cookie)
+        .set('x-csrf-token', csrf!.token)
         .send({
           email: 'invalid-email',
           password: 'password123',

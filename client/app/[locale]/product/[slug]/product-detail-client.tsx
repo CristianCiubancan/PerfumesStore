@@ -230,10 +230,7 @@ export function ProductDetailClient({ slug }: Props) {
                     onChange={setQuantity}
                   />
                 </div>
-                <div className="flex-1">
-                  <label className="text-sm font-medium mb-2 block invisible">
-                    {t('productDetail.quantity')}
-                  </label>
+                <div className="flex-1 self-end">
                   <AddToCartButton
                     product={product}
                     quantity={quantity}

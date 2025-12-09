@@ -22,7 +22,21 @@ export function CartItemRow({ item, onRemove, onQuantityChange, discountPercent 
   const formatPrice = useFormattedPrice()
 
   const imageUrl = item.imageUrl ? getFullImageUrl(item.imageUrl) : null
-  const isLocalImage = imageUrl?.includes('localhost:4000')
+  // Use URL parsing instead of string matching
+  const isLocalImage = (() => {
+    if (!imageUrl) return false
+    try {
+      const url = new URL(imageUrl)
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL
+      if (apiUrl) {
+        const apiUrlParsed = new URL(apiUrl)
+        return url.hostname === apiUrlParsed.hostname
+      }
+      return url.hostname === 'localhost'
+    } catch {
+      return false
+    }
+  })()
   const originalLineTotal = calculateLineTotal(item.priceRON, item.quantity)
   const discountAmount = discountPercent ? originalLineTotal * (discountPercent / 100) : 0
   const finalLineTotal = originalLineTotal - discountAmount

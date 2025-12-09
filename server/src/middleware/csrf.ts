@@ -98,16 +98,17 @@ function timingSafeEqual(a: string, b: string): boolean {
   const bufA = Buffer.from(a)
   const bufB = Buffer.from(b)
 
-  // Pad shorter buffer to match lengths (constant-time length comparison)
-  const maxLen = Math.max(bufA.length, bufB.length)
-  const paddedA = Buffer.alloc(maxLen)
-  const paddedB = Buffer.alloc(maxLen)
+  // Pad both buffers to same length to prevent length-based timing leaks
+  const maxLen = Math.max(bufA.length, bufB.length, 64)
+  const paddedA = Buffer.alloc(maxLen, 0)
+  const paddedB = Buffer.alloc(maxLen, 0)
   bufA.copy(paddedA)
   bufB.copy(paddedB)
 
-  // Both length check and content check in constant time
-  const lengthMatch = bufA.length === bufB.length
-  const contentMatch = crypto.timingSafeEqual(paddedA, paddedB)
+  // Constant-time comparison, then verify actual lengths match
+  const contentEqual = crypto.timingSafeEqual(paddedA, paddedB)
+  const lengthEqual = bufA.length === bufB.length
 
-  return lengthMatch && contentMatch
+  // Both conditions checked, but timing only leaks from timingSafeEqual
+  return contentEqual && lengthEqual
 }

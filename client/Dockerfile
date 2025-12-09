@@ -27,6 +27,13 @@ RUN npm run build
 FROM node:20-alpine AS runner
 WORKDIR /app
 
+# Labels for image metadata
+LABEL maintainer="PerfumesStore Team"
+LABEL version="1.0.0"
+LABEL description="Next.js frontend application for PerfumesStore"
+LABEL org.opencontainers.image.source="https://github.com/your-org/perfumesstore"
+LABEL org.opencontainers.image.title="PerfumesStore Client"
+
 ENV NODE_ENV=production
 
 # Runtime environment variables for SSR
@@ -39,8 +46,8 @@ ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
 ENV NEXT_PUBLIC_SITE_NAME=$NEXT_PUBLIC_SITE_NAME
 
-# Install wget for health checks
-RUN apk add --no-cache wget
+# Install curl for health checks
+RUN apk add --no-cache curl
 
 # Create non-root user for security
 RUN addgroup --system --gid 1001 nodejs && \

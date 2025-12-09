@@ -22,13 +22,20 @@ RUN npm run build
 FROM node:20-alpine AS runner
 WORKDIR /app
 
+# Labels for image metadata
+LABEL maintainer="PerfumesStore Team"
+LABEL version="1.0.0"
+LABEL description="Express.js API backend for PerfumesStore application"
+LABEL org.opencontainers.image.source="https://github.com/your-org/perfumesstore"
+LABEL org.opencontainers.image.title="PerfumesStore API Server"
+
 # Platform argument for handling OS-specific issues (windows, linux, darwin)
 ARG PLATFORM=linux
 
 ENV NODE_ENV=production
 
-# Install wget for health checks and postgresql-client for migrations/backup
-RUN apk add --no-cache wget postgresql-client
+# Install curl for health checks and postgresql-client for migrations/backup
+RUN apk add --no-cache curl postgresql-client
 
 # Install only production dependencies
 COPY package*.json ./

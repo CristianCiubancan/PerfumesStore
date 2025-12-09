@@ -75,6 +75,12 @@ export function AddToCartButton({
   }
 
   if (variant === 'icon') {
+    const srOnlyText = isAdding
+      ? t('addToCart.adding')
+      : justAdded
+      ? t('addToCart.added')
+      : t('addToCart.add')
+
     return (
       <Button
         variant={inCart ? 'secondary' : 'default'}
@@ -90,7 +96,7 @@ export function AddToCartButton({
         ) : (
           <ShoppingCart className="h-4 w-4" />
         )}
-        <span className="sr-only">{t('addToCart.add')}</span>
+        <span className="sr-only">{srOnlyText}</span>
       </Button>
     )
   }

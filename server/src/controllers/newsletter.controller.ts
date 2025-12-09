@@ -4,6 +4,7 @@ import { createAuditLog } from '../lib/auditLogger'
 import { parseIdParam } from '../lib/parseParams'
 
 export async function listSubscribers(req: Request, res: Response): Promise<void> {
+  // Use validated query parameters from Zod middleware
   const page = req.query.page ? parseInt(req.query.page as string, 10) : 1
   const limit = req.query.limit ? parseInt(req.query.limit as string, 10) : 20
   const isActive = req.query.isActive !== undefined
@@ -16,6 +17,7 @@ export async function listSubscribers(req: Request, res: Response): Promise<void
 }
 
 export async function unsubscribe(req: Request, res: Response): Promise<void> {
+  // Use validated params from Zod middleware (already validated as numeric string)
   const id = parseIdParam(req.params.id)
 
   // Service returns both old and new values (single fetch, no N+1)
@@ -34,6 +36,7 @@ export async function unsubscribe(req: Request, res: Response): Promise<void> {
 }
 
 export async function deleteSubscriber(req: Request, res: Response): Promise<void> {
+  // Use validated params from Zod middleware (already validated as numeric string)
   const id = parseIdParam(req.params.id)
 
   // Service returns deleted subscriber for audit (single fetch, no N+1)

@@ -27,6 +27,33 @@ export function getCsrfToken(): string | null {
   return null
 }
 
+// Track in-flight CSRF fetch to prevent duplicate requests
+let csrfFetchPromise: Promise<void> | null = null
+
+/**
+ * Ensure a CSRF token exists. If not, fetch one from the server.
+ * Multiple concurrent calls will share the same fetch request.
+ */
+async function ensureCsrfToken(): Promise<void> {
+  if (typeof document === 'undefined') return
+  if (getCsrfToken()) return
+
+  if (!csrfFetchPromise) {
+    csrfFetchPromise = fetch(`${API_URL}/api/auth/csrf`, {
+      method: 'GET',
+      credentials: 'include',
+    })
+      .then(() => {
+        // Cookie is set by the server response
+      })
+      .finally(() => {
+        csrfFetchPromise = null
+      })
+  }
+
+  await csrfFetchPromise
+}
+
 let refreshPromise: Promise<boolean> | null = null
 
 async function refreshToken(): Promise<boolean> {
@@ -108,6 +135,11 @@ export async function apiClient<T>(
   const { body, ...restOptions } = options
   const method = restOptions.method?.toUpperCase() || 'GET'
   const needsCsrf = ['POST', 'PUT', 'PATCH', 'DELETE'].includes(method)
+
+  // Ensure CSRF token exists before state-changing requests
+  if (needsCsrf) {
+    await ensureCsrfToken()
+  }
 
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',

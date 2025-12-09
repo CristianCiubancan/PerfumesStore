@@ -1,5 +1,4 @@
 import { z } from 'zod'
-import { VALIDATION } from '../config/constants'
 // Shared validation constants to ensure sync between client and server
 import { VALIDATION_CONSTANTS } from '../../../shared/validation-constants'
 

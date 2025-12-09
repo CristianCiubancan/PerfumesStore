@@ -226,16 +226,12 @@ describe('UploadController', () => {
       ).rejects.toThrow('Permission denied')
     })
 
-    it('should sanitize filename to prevent path traversal', async () => {
-      const fs = require('fs')
-      fs.promises.unlink.mockResolvedValue(undefined)
-
+    it('should reject filename with path traversal characters', async () => {
       req.params = { filename: '../../../etc/passwd' }
 
-      await uploadController.deleteImage(req as Request, res as Response)
-
-      // path.basename should strip the path traversal
-      expect(fs.promises.unlink).toHaveBeenCalledWith('/tmp/uploads/products/passwd')
+      await expect(
+        uploadController.deleteImage(req as Request, res as Response)
+      ).rejects.toThrow('Invalid filename')
     })
   })
 })

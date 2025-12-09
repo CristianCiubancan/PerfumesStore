@@ -90,7 +90,7 @@ async function revokeAllUserTokens(userId: number): Promise<void> {
  * Verify a refresh token exists in DB and is not revoked.
  * Returns the token record if valid, null otherwise.
  */
-async function findValidRefreshToken(token: string) {
+async function _findValidRefreshToken(token: string) {
   const tokenHash = hashToken(token)
 
   return prisma.refreshToken.findFirst({

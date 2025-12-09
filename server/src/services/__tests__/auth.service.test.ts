@@ -58,7 +58,7 @@ describe('AuthService', () => {
       expect(result.user.email).toBe(input.email)
       expect(result.accessToken).toBe('mock-access-token')
       expect(result.refreshToken).toBe('mock-refresh-token')
-      expect(bcrypt.hash).toHaveBeenCalledWith('Password123!', 10)
+      expect(bcrypt.hash).toHaveBeenCalledWith('Password123!', 12)
     })
 
     it('should throw error if email already exists', async () => {
@@ -246,6 +246,7 @@ describe('AuthService', () => {
       ;(prisma.$transaction as jest.Mock).mockImplementation(async (fn) => {
         const tx = {
           refreshToken: {
+            findFirst: jest.fn().mockResolvedValue({ id: 'token-id' }),
             update: jest.fn().mockResolvedValue({}),
             create: jest.fn().mockResolvedValue({}),
           },

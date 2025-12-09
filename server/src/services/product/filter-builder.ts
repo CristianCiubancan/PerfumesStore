@@ -1,4 +1,4 @@
-import { Prisma, Gender, Concentration } from '@prisma/client'
+import { Prisma } from '@prisma/client'
 import { AppError } from '../../middleware/errorHandler'
 import { STOCK } from '../../config/constants'
 // Shared type guards for enum validation - synchronized with client

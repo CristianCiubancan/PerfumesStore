@@ -155,12 +155,10 @@ describe('PromotionService', () => {
       expect(result?.name).toBe('Summer Sale')
     })
 
-    it('should return null if promotion not found', async () => {
+    it('should throw error if promotion not found', async () => {
       ;(prisma.promotion.findUnique as jest.Mock).mockResolvedValue(null)
 
-      const result = await promotionService.getPromotion(999)
-
-      expect(result).toBeNull()
+      await expect(promotionService.getPromotion(999)).rejects.toThrow('Promotion not found')
     })
   })
 

@@ -45,8 +45,8 @@ describe('registerSchema', () => {
   const validData = {
     name: 'John Doe',
     email: 'john@example.com',
-    password: 'Test123!@#',
-    confirmPassword: 'Test123!@#',
+    password: 'TestPassword1!',
+    confirmPassword: 'TestPassword1!',
   }
 
   it('validates valid registration data', () => {
@@ -120,11 +120,12 @@ describe('registerSchema', () => {
   it('rejects mismatched passwords', () => {
     const result = registerSchema.safeParse({
       ...validData,
-      confirmPassword: 'Different123!@#',
+      confirmPassword: 'DifferentPass1!',
     })
     expect(result.success).toBe(false)
     if (!result.success) {
-      expect(result.error.issues[0].path).toContain('confirmPassword')
+      // Zod refine validation puts the error on the path specified in the refine
+      expect(result.error.issues.some(issue => issue.path.includes('confirmPassword'))).toBe(true)
     }
   })
 })

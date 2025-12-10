@@ -29,6 +29,7 @@ import { ProductCard } from '@/components/store/product-card'
 import { ProductCardSkeleton } from '@/components/store/product-card-skeleton'
 import { ProductFilters } from '@/components/store/product-filters'
 import { Pagination } from '@/components/store/pagination'
+import { ScrollToTopButton } from '@/components/ui/scroll-to-top-button'
 import { productsApi } from '@/lib/api/products'
 import { Product } from '@/types'
 import { useFilterParams, FilterValues } from '@/hooks/use-filter-params'
@@ -358,6 +359,9 @@ export function StorePageClient() {
           {ProductsContent}
         </div>
       </div>
+
+      {/* Scroll to Top Button */}
+      <ScrollToTopButton scrollContainerId="products-scroll-container" />
     </div>
   )
 }

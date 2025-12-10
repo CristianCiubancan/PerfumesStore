@@ -18,6 +18,7 @@ import {
   BrandsShowcaseSkeleton,
   NewsletterSkeleton,
 } from '@/components/home/loading-skeletons'
+import { ScrollToTopButton } from '@/components/ui/scroll-to-top-button'
 
 // Lazy load below-fold components for better initial page performance
 const BestSellers = dynamic(
@@ -129,6 +130,9 @@ export function HomePage() {
 
       {/* Newsletter Signup */}
       <Newsletter />
+
+      {/* Scroll to Top Button */}
+      <ScrollToTopButton />
     </div>
   )
 }

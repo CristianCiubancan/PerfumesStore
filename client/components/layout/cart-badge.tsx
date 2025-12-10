@@ -16,9 +16,11 @@ export function CartBadge() {
   const [isAnimating, setIsAnimating] = useState(false)
   const countRef = useRef(count)
 
-  // Hydrate count on client side
+  // Hydrate count on client side and sync ref
   useEffect(() => {
-    setCount(getTotalItems())
+    const initialCount = getTotalItems()
+    setCount(initialCount)
+    countRef.current = initialCount
   }, [getTotalItems])
 
   // Subscribe to cart changes - only subscribe once on mount

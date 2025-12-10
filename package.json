@@ -42,7 +42,8 @@
     "docker:dev": "docker-compose -f docker-compose.dev.yml up --build",
     "docker:prod": "docker-compose -f docker-compose.prod.yml up --build",
     "docker:down": "docker-compose down",
-    "install:all": "npm install && cd client && npm install && cd ../server && npm install"
+    "install:all": "npm install && cd client && npm install && cd ../server && npm install",
+    "stripe:webhook": "./scripts/stripe-webhook.sh"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"

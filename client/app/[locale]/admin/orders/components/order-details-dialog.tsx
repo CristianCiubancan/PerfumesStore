@@ -25,6 +25,7 @@ function formatEUR(price: number): string {
   return `€${price.toFixed(2)}`
 }
 import Image from 'next/image'
+import { getFullImageUrl } from '@/lib/api/upload'
 
 interface OrderDetailsDialogProps {
   order: AdminOrder | null
@@ -117,33 +118,37 @@ export function OrderDetailsDialog({
           <div>
             <h4 className="font-medium mb-3">{t('admin.orders.orderDetails.items')}</h4>
             <div className="space-y-3">
-              {order.items.map((item) => (
-                <div key={item.id} className="flex gap-3">
-                  <div className="relative w-16 h-16 flex-shrink-0 bg-muted rounded-md overflow-hidden">
-                    {item.imageUrl ? (
-                      <Image
-                        src={item.imageUrl}
-                        alt={item.productName}
-                        fill
-                        className="object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-muted-foreground text-xs">
-                        No image
-                      </div>
-                    )}
+              {order.items.map((item) => {
+                const fullImageUrl = item.imageUrl ? getFullImageUrl(item.imageUrl) : null
+                return (
+                  <div key={item.id} className="flex gap-3">
+                    <div className="relative w-16 h-16 flex-shrink-0 bg-muted rounded-md overflow-hidden">
+                      {fullImageUrl ? (
+                        <Image
+                          src={fullImageUrl}
+                          alt={item.productName}
+                          fill
+                          className="object-cover"
+                          unoptimized
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-muted-foreground text-xs">
+                          No image
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium truncate">{item.productName}</p>
+                      <p className="text-sm text-muted-foreground">{item.productBrand}</p>
+                      <p className="text-sm text-muted-foreground">{item.volumeMl}ml</p>
+                    </div>
+                    <div className="text-right text-sm">
+                      <p>{item.quantity} x {formatRON(parseFloat(item.unitPriceRON))}</p>
+                      <p className="font-medium">{formatRON(parseFloat(item.totalPriceRON))}</p>
+                    </div>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium truncate">{item.productName}</p>
-                    <p className="text-sm text-muted-foreground">{item.productBrand}</p>
-                    <p className="text-sm text-muted-foreground">{item.volumeMl}ml</p>
-                  </div>
-                  <div className="text-right text-sm">
-                    <p>{item.quantity} x {formatRON(parseFloat(item.unitPriceRON))}</p>
-                    <p className="font-medium">{formatRON(parseFloat(item.totalPriceRON))}</p>
-                  </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           </div>
 

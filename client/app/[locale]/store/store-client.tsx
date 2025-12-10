@@ -138,13 +138,11 @@ export function StorePageClient() {
   // Track if this is the initial load (don't scroll on first load)
   const isInitialLoadRef = useRef(true)
 
-  // Scroll to top of products - on desktop scroll the container, on mobile scroll the page
+  // Scroll to top of products container (fixed layout means container scrolls, not window)
   const scrollToTop = useCallback(() => {
     const productsContainer = document.getElementById('products-scroll-container')
-    if (productsContainer && window.innerWidth >= UI_DIMENSIONS.DESKTOP_BREAKPOINT) {
+    if (productsContainer) {
       productsContainer.scrollTo({ top: UI_DIMENSIONS.SCROLL_TOP, behavior: 'smooth' })
-    } else {
-      window.scrollTo({ top: UI_DIMENSIONS.SCROLL_TOP, behavior: 'smooth' })
     }
   }, [])
 

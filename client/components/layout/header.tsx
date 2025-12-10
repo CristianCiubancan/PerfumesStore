@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useTranslations } from 'next-intl'
 import Image from 'next/image'
-import { Menu, Home, LogIn, UserPlus, LogOut, User, Settings, ShoppingBag, ShoppingCart } from 'lucide-react'
+import { Menu, Home, LogIn, UserPlus, LogOut, User, Settings, ShoppingBag, ShoppingCart, Package } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Sheet,
@@ -42,7 +42,7 @@ export function Header() {
 
   const handleNavigation = (path: string) => {
     setOpen(false)
-    router.push(path as '/' | '/store' | '/cart' | '/login' | '/register' | '/admin')
+    router.push(path as '/' | '/store' | '/cart' | '/login' | '/register' | '/admin' | '/orders')
   }
 
   return (
@@ -117,6 +117,15 @@ export function Header() {
                         </div>
                       </div>
                     </div>
+
+                    <Button
+                      variant="ghost"
+                      className="justify-start gap-3 h-12"
+                      onClick={() => handleNavigation('/orders')}
+                    >
+                      <Package className="h-5 w-5" />
+                      {t('myOrders')}
+                    </Button>
 
                     {user?.role === 'ADMIN' && (
                       <Button

@@ -55,6 +55,7 @@
     "menu": "Menu",
     "signIn": "Sign In",
     "signOut": "Sign Out",
+    "myOrders": "My Orders",
     "signUp": "Sign Up",
     "createAccount": "Create Account",
     "adminDashboard": "Admin Dashboard",
@@ -494,7 +495,8 @@
         "USER": "User",
         "SETTINGS": "Settings",
         "FILE": "File",
-        "NEWSLETTER_SUBSCRIBER": "Newsletter Subscriber"
+        "NEWSLETTER_SUBSCRIBER": "Newsletter Subscriber",
+        "ORDER": "Order"
       },
       "detailsDialog": {
         "title": "Audit Log Details",
@@ -506,6 +508,57 @@
         "userAgent": "User Agent",
         "oldValue": "Previous Value",
         "newValue": "New Value"
+      }
+    },
+    "orders": {
+      "title": "Orders",
+      "description": "{total, plural, =0 {No orders} =1 {1 order total} other {# orders total}}",
+      "failedToLoad": "Failed to load orders",
+      "searchPlaceholder": "Search by order number, customer name, or email...",
+      "noOrders": "No orders yet",
+      "noOrdersDescription": "Orders will appear here once customers start placing them",
+      "noMatchingOrders": "No orders match your current filters",
+      "viewDetails": "View Details",
+      "updateStatus": "Update Status",
+      "totalOrders": "{count, plural, =0 {No orders} =1 {1 order} other {# orders}}",
+      "pageInfo": "Page {current} of {total}",
+      "statusUpdateSuccess": "Order status updated successfully",
+      "statusUpdateError": "Failed to update order status",
+      "filters": {
+        "status": "Status",
+        "allStatuses": "All statuses",
+        "clear": "Clear filters"
+      },
+      "table": {
+        "orderNumber": "Order #",
+        "customer": "Customer",
+        "date": "Date",
+        "total": "Total",
+        "status": "Status",
+        "actions": "Actions"
+      },
+      "orderDetails": {
+        "title": "Order Details",
+        "customer": "Customer",
+        "shippingAddress": "Shipping Address",
+        "items": "Order Items",
+        "summary": "Order Summary",
+        "subtotal": "Subtotal",
+        "discount": "Discount ({percent}%)",
+        "total": "Total",
+        "paidInEUR": "Paid in EUR",
+        "createdAt": "Created",
+        "paidAt": "Paid",
+        "registeredUser": "Registered user (ID: {id})",
+        "guestOrder": "Guest checkout"
+      },
+      "updateStatusDialog": {
+        "title": "Update Order Status",
+        "description": "Update the status for order {orderNumber}. Current status: {currentStatus}",
+        "selectStatus": "Select new status...",
+        "confirm": "Update Status",
+        "cancelWarning": "Cancelling this order will restore the reserved stock to inventory.",
+        "refundWarning": "Marking as refunded will restore the reserved stock to inventory."
       }
     },
     "newsletter": {
@@ -782,5 +835,105 @@
     "perfumer": "Perfumer",
     "launchYear": "Launch Year",
     "rating": "Rating: {rating} out of {max}"
+  },
+  "checkout": {
+    "title": "Checkout",
+    "backToCart": "Back to Cart",
+    "shipping": {
+      "title": "Shipping Address",
+      "name": "Full Name",
+      "namePlaceholder": "John Doe",
+      "email": "Email Address",
+      "emailPlaceholder": "you@example.com",
+      "phone": "Phone Number (optional)",
+      "phonePlaceholder": "+40 123 456 789",
+      "addressLine1": "Address Line 1",
+      "addressLine1Placeholder": "Street address, P.O. box",
+      "addressLine2": "Address Line 2 (optional)",
+      "addressLine2Placeholder": "Apartment, suite, unit, building",
+      "city": "City",
+      "cityPlaceholder": "Bucharest",
+      "state": "State/Region (optional)",
+      "statePlaceholder": "County or region",
+      "postalCode": "Postal Code",
+      "postalCodePlaceholder": "010101",
+      "country": "Country",
+      "countryPlaceholder": "Select country"
+    },
+    "summary": {
+      "title": "Order Summary",
+      "subtotal": "Subtotal",
+      "discount": "Discount ({percent}%)",
+      "total": "Total",
+      "paymentNote": "You will be redirected to Stripe to complete payment securely"
+    },
+    "proceedToPayment": "Proceed to Payment",
+    "processing": "Processing...",
+    "errors": {
+      "emailRequired": "Email is required for guest checkout",
+      "checkoutFailed": "Checkout failed. Please try again."
+    }
+  },
+  "orderSuccess": {
+    "title": "Order Confirmed!",
+    "thankYou": "Thank you for your order",
+    "orderNumber": "Order Number",
+    "subtotal": "Subtotal",
+    "discount": "Discount ({percent}%)",
+    "total": "Total",
+    "paidInEUR": "Paid: EUR {amount}",
+    "shippingAddress": "Shipping Address",
+    "emailSent": "A confirmation email has been sent to {email}",
+    "continueShopping": "Continue Shopping",
+    "viewOrders": "View My Orders",
+    "error": {
+      "title": "Error Loading Order",
+      "notFound": "Order not found"
+    }
+  },
+  "orders": {
+    "title": "My Orders",
+    "empty": {
+      "title": "No orders yet",
+      "description": "Start shopping to see your orders here",
+      "startShopping": "Start Shopping"
+    },
+    "status": {
+      "PENDING": "Pending",
+      "PAID": "Paid",
+      "PROCESSING": "Processing",
+      "SHIPPED": "Shipped",
+      "DELIVERED": "Delivered",
+      "CANCELLED": "Cancelled",
+      "REFUNDED": "Refunded"
+    },
+    "orderDate": "Order Date",
+    "items": "{count, plural, =1 {1 item} other {# items}}",
+    "pagination": {
+      "previous": "Previous",
+      "next": "Next",
+      "page": "Page {current} of {total}"
+    }
+  },
+  "orderDetail": {
+    "title": "Order Details",
+    "orderNumber": "Order #{number}",
+    "placedOn": "Placed on",
+    "backToOrders": "Back to Orders",
+    "orderItems": "Order Items",
+    "each": "each",
+    "shippingAddress": "Shipping Address",
+    "summary": {
+      "title": "Payment Summary",
+      "subtotal": "Subtotal",
+      "discount": "Discount",
+      "total": "Total",
+      "paidInEUR": "Paid: EUR {amount}",
+      "paidAt": "Paid on"
+    },
+    "error": {
+      "title": "Error Loading Order",
+      "notFound": "Order not found"
+    }
   }
 }

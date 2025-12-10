@@ -55,6 +55,7 @@
     "menu": "Menú",
     "signIn": "Iniciar Sesión",
     "signOut": "Cerrar Sesión",
+    "myOrders": "Mis Pedidos",
     "signUp": "Registrarse",
     "createAccount": "Crear Cuenta",
     "adminDashboard": "Panel de Admin",
@@ -494,7 +495,8 @@
         "USER": "Usuario",
         "SETTINGS": "Configuración",
         "FILE": "Archivo",
-        "NEWSLETTER_SUBSCRIBER": "Suscriptor de Newsletter"
+        "NEWSLETTER_SUBSCRIBER": "Suscriptor de Newsletter",
+        "ORDER": "Pedido"
       },
       "detailsDialog": {
         "title": "Detalles del Registro",
@@ -506,6 +508,57 @@
         "userAgent": "Agente de Usuario",
         "oldValue": "Valor Anterior",
         "newValue": "Nuevo Valor"
+      }
+    },
+    "orders": {
+      "title": "Pedidos",
+      "description": "{total, plural, =0 {Sin pedidos} =1 {1 pedido en total} other {# pedidos en total}}",
+      "failedToLoad": "Error al cargar los pedidos",
+      "searchPlaceholder": "Buscar por número de pedido, nombre del cliente o email...",
+      "noOrders": "Aún no hay pedidos",
+      "noOrdersDescription": "Los pedidos aparecerán aquí una vez que los clientes comiencen a realizarlos",
+      "noMatchingOrders": "Ningún pedido coincide con los filtros actuales",
+      "viewDetails": "Ver Detalles",
+      "updateStatus": "Actualizar Estado",
+      "totalOrders": "{count, plural, =0 {Sin pedidos} =1 {1 pedido} other {# pedidos}}",
+      "pageInfo": "Página {current} de {total}",
+      "statusUpdateSuccess": "Estado del pedido actualizado exitosamente",
+      "statusUpdateError": "Error al actualizar el estado del pedido",
+      "filters": {
+        "status": "Estado",
+        "allStatuses": "Todos los estados",
+        "clear": "Limpiar filtros"
+      },
+      "table": {
+        "orderNumber": "Nº Pedido",
+        "customer": "Cliente",
+        "date": "Fecha",
+        "total": "Total",
+        "status": "Estado",
+        "actions": "Acciones"
+      },
+      "orderDetails": {
+        "title": "Detalles del Pedido",
+        "customer": "Cliente",
+        "shippingAddress": "Dirección de Envío",
+        "items": "Artículos del Pedido",
+        "summary": "Resumen del Pedido",
+        "subtotal": "Subtotal",
+        "discount": "Descuento ({percent}%)",
+        "total": "Total",
+        "paidInEUR": "Pagado en EUR",
+        "createdAt": "Creado",
+        "paidAt": "Pagado",
+        "registeredUser": "Usuario registrado (ID: {id})",
+        "guestOrder": "Compra como invitado"
+      },
+      "updateStatusDialog": {
+        "title": "Actualizar Estado del Pedido",
+        "description": "Actualizar el estado del pedido {orderNumber}. Estado actual: {currentStatus}",
+        "selectStatus": "Seleccionar nuevo estado...",
+        "confirm": "Actualizar Estado",
+        "cancelWarning": "Cancelar este pedido restaurará el stock reservado al inventario.",
+        "refundWarning": "Marcar como reembolsado restaurará el stock reservado al inventario."
       }
     },
     "newsletter": {
@@ -782,5 +835,105 @@
     "perfumer": "Perfumista",
     "launchYear": "Año de Lanzamiento",
     "rating": "Calificación: {rating} de {max}"
+  },
+  "checkout": {
+    "title": "Finalizar Compra",
+    "backToCart": "Volver al Carrito",
+    "shipping": {
+      "title": "Dirección de Envío",
+      "name": "Nombre Completo",
+      "namePlaceholder": "Juan García",
+      "email": "Correo Electrónico",
+      "emailPlaceholder": "tu@ejemplo.com",
+      "phone": "Número de Teléfono (opcional)",
+      "phonePlaceholder": "+40 123 456 789",
+      "addressLine1": "Dirección Línea 1",
+      "addressLine1Placeholder": "Dirección postal, apartado de correos",
+      "addressLine2": "Dirección Línea 2 (opcional)",
+      "addressLine2Placeholder": "Apartamento, suite, unidad, edificio",
+      "city": "Ciudad",
+      "cityPlaceholder": "Bucarest",
+      "state": "Estado/Región (opcional)",
+      "statePlaceholder": "Provincia o región",
+      "postalCode": "Código Postal",
+      "postalCodePlaceholder": "010101",
+      "country": "País",
+      "countryPlaceholder": "Seleccionar país"
+    },
+    "summary": {
+      "title": "Resumen del Pedido",
+      "subtotal": "Subtotal",
+      "discount": "Descuento ({percent}%)",
+      "total": "Total",
+      "paymentNote": "Será redirigido a Stripe para completar el pago de forma segura"
+    },
+    "proceedToPayment": "Proceder al Pago",
+    "processing": "Procesando...",
+    "errors": {
+      "emailRequired": "El correo electrónico es obligatorio para compra como invitado",
+      "checkoutFailed": "Falló la finalización de compra. Por favor, inténtalo de nuevo."
+    }
+  },
+  "orderSuccess": {
+    "title": "¡Pedido Confirmado!",
+    "thankYou": "Gracias por tu pedido",
+    "orderNumber": "Número de Pedido",
+    "subtotal": "Subtotal",
+    "discount": "Descuento ({percent}%)",
+    "total": "Total",
+    "paidInEUR": "Pagado: EUR {amount}",
+    "shippingAddress": "Dirección de Envío",
+    "emailSent": "Se ha enviado un correo de confirmación a {email}",
+    "continueShopping": "Seguir Comprando",
+    "viewOrders": "Ver Mis Pedidos",
+    "error": {
+      "title": "Error al Cargar el Pedido",
+      "notFound": "Pedido no encontrado"
+    }
+  },
+  "orders": {
+    "title": "Mis Pedidos",
+    "empty": {
+      "title": "Aún no hay pedidos",
+      "description": "Comienza a comprar para ver tus pedidos aquí",
+      "startShopping": "Comenzar a Comprar"
+    },
+    "status": {
+      "PENDING": "Pendiente",
+      "PAID": "Pagado",
+      "PROCESSING": "Procesando",
+      "SHIPPED": "Enviado",
+      "DELIVERED": "Entregado",
+      "CANCELLED": "Cancelado",
+      "REFUNDED": "Reembolsado"
+    },
+    "orderDate": "Fecha del Pedido",
+    "items": "{count, plural, =1 {1 artículo} other {# artículos}}",
+    "pagination": {
+      "previous": "Anterior",
+      "next": "Siguiente",
+      "page": "Página {current} de {total}"
+    }
+  },
+  "orderDetail": {
+    "title": "Detalles del Pedido",
+    "orderNumber": "Pedido #{number}",
+    "placedOn": "Realizado el",
+    "backToOrders": "Volver a Pedidos",
+    "orderItems": "Artículos del Pedido",
+    "each": "cada uno",
+    "shippingAddress": "Dirección de Envío",
+    "summary": {
+      "title": "Resumen del Pago",
+      "subtotal": "Subtotal",
+      "discount": "Descuento",
+      "total": "Total",
+      "paidInEUR": "Pagado: EUR {amount}",
+      "paidAt": "Pagado el"
+    },
+    "error": {
+      "title": "Error al Cargar el Pedido",
+      "notFound": "Pedido no encontrado"
+    }
   }
 }

@@ -4,6 +4,7 @@ import {
   parseIdParam,
   parseIdArrayParam,
   parseDateParam,
+  parseBooleanParam,
 } from '../parseParams'
 
 describe('parseParams utilities', () => {
@@ -171,6 +172,55 @@ describe('parseParams utilities', () => {
       const isoDate = '2024-03-15'
       const result = parseDateParam(isoDate)
       expect(result).toBeInstanceOf(Date)
+    })
+  })
+
+  describe('parseBooleanParam', () => {
+    it('should return undefined for undefined', () => {
+      expect(parseBooleanParam(undefined)).toBeUndefined()
+    })
+
+    it('should return undefined for null', () => {
+      expect(parseBooleanParam(null)).toBeUndefined()
+    })
+
+    it('should return undefined for empty string', () => {
+      expect(parseBooleanParam('')).toBeUndefined()
+    })
+
+    it('should return true for "true"', () => {
+      expect(parseBooleanParam('true')).toBe(true)
+    })
+
+    it('should return true for "TRUE" (case insensitive)', () => {
+      expect(parseBooleanParam('TRUE')).toBe(true)
+    })
+
+    it('should return true for "1"', () => {
+      expect(parseBooleanParam('1')).toBe(true)
+    })
+
+    it('should return false for "false"', () => {
+      expect(parseBooleanParam('false')).toBe(false)
+    })
+
+    it('should return false for "FALSE" (case insensitive)', () => {
+      expect(parseBooleanParam('FALSE')).toBe(false)
+    })
+
+    it('should return false for "0"', () => {
+      expect(parseBooleanParam('0')).toBe(false)
+    })
+
+    it('should return undefined for invalid boolean string', () => {
+      expect(parseBooleanParam('yes')).toBeUndefined()
+      expect(parseBooleanParam('no')).toBeUndefined()
+      expect(parseBooleanParam('invalid')).toBeUndefined()
+    })
+
+    it('should handle boolean values', () => {
+      expect(parseBooleanParam(true)).toBe(true)
+      expect(parseBooleanParam(false)).toBe(false)
     })
   })
 })

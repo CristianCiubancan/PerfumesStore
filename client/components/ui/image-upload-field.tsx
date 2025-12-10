@@ -154,8 +154,8 @@ export function ImageUploadField({ value, onChange, disabled }: ImageUploadField
             {/* FE-018: Native img is intentional here because:
                 1. Preview images may be blob URLs or data URLs from file input
                 2. Next.js Image doesn't support blob/data URLs well
-                3. onError handler needs native img behavior for error states
-                eslint-disable-next-line @next/next/no-img-element */}
+                3. onError handler needs native img behavior for error states */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={previewUrl}
               alt="Product image preview"

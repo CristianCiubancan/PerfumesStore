@@ -55,6 +55,7 @@
     "menu": "Menu",
     "signIn": "Connexion",
     "signOut": "Déconnexion",
+    "myOrders": "Mes Commandes",
     "signUp": "Inscription",
     "createAccount": "Créer un compte",
     "adminDashboard": "Tableau de bord Admin",
@@ -494,7 +495,8 @@
         "USER": "Utilisateur",
         "SETTINGS": "Paramètres",
         "FILE": "Fichier",
-        "NEWSLETTER_SUBSCRIBER": "Abonné Newsletter"
+        "NEWSLETTER_SUBSCRIBER": "Abonné Newsletter",
+        "ORDER": "Commande"
       },
       "detailsDialog": {
         "title": "Détails du Journal",
@@ -506,6 +508,57 @@
         "userAgent": "Agent Utilisateur",
         "oldValue": "Valeur Précédente",
         "newValue": "Nouvelle Valeur"
+      }
+    },
+    "orders": {
+      "title": "Commandes",
+      "description": "{total, plural, =0 {Aucune commande} =1 {1 commande au total} other {# commandes au total}}",
+      "failedToLoad": "Impossible de charger les commandes",
+      "searchPlaceholder": "Rechercher par numéro de commande, nom du client ou email...",
+      "noOrders": "Aucune commande pour le moment",
+      "noOrdersDescription": "Les commandes apparaîtront ici une fois que les clients les passeront",
+      "noMatchingOrders": "Aucune commande ne correspond aux filtres actuels",
+      "viewDetails": "Voir les détails",
+      "updateStatus": "Mettre à jour le statut",
+      "totalOrders": "{count, plural, =0 {Aucune commande} =1 {1 commande} other {# commandes}}",
+      "pageInfo": "Page {current} sur {total}",
+      "statusUpdateSuccess": "Statut de la commande mis à jour avec succès",
+      "statusUpdateError": "Impossible de mettre à jour le statut de la commande",
+      "filters": {
+        "status": "Statut",
+        "allStatuses": "Tous les statuts",
+        "clear": "Effacer les filtres"
+      },
+      "table": {
+        "orderNumber": "N° Commande",
+        "customer": "Client",
+        "date": "Date",
+        "total": "Total",
+        "status": "Statut",
+        "actions": "Actions"
+      },
+      "orderDetails": {
+        "title": "Détails de la Commande",
+        "customer": "Client",
+        "shippingAddress": "Adresse de Livraison",
+        "items": "Articles Commandés",
+        "summary": "Récapitulatif",
+        "subtotal": "Sous-total",
+        "discount": "Réduction ({percent}%)",
+        "total": "Total",
+        "paidInEUR": "Payé en EUR",
+        "createdAt": "Créée",
+        "paidAt": "Payée",
+        "registeredUser": "Utilisateur enregistré (ID : {id})",
+        "guestOrder": "Commande invité"
+      },
+      "updateStatusDialog": {
+        "title": "Mettre à Jour le Statut",
+        "description": "Mettre à jour le statut de la commande {orderNumber}. Statut actuel : {currentStatus}",
+        "selectStatus": "Sélectionner un nouveau statut...",
+        "confirm": "Mettre à jour",
+        "cancelWarning": "L'annulation de cette commande restaurera le stock réservé dans l'inventaire.",
+        "refundWarning": "Marquer comme remboursée restaurera le stock réservé dans l'inventaire."
       }
     },
     "newsletter": {
@@ -782,5 +835,105 @@
     "perfumer": "Parfumeur",
     "launchYear": "Année de Lancement",
     "rating": "Note : {rating} sur {max}"
+  },
+  "checkout": {
+    "title": "Paiement",
+    "backToCart": "Retour au Panier",
+    "shipping": {
+      "title": "Adresse de Livraison",
+      "name": "Nom Complet",
+      "namePlaceholder": "Jean Dupont",
+      "email": "Adresse E-mail",
+      "emailPlaceholder": "vous@exemple.com",
+      "phone": "Numéro de Téléphone (optionnel)",
+      "phonePlaceholder": "+40 123 456 789",
+      "addressLine1": "Adresse Ligne 1",
+      "addressLine1Placeholder": "Adresse postale, boîte postale",
+      "addressLine2": "Adresse Ligne 2 (optionnel)",
+      "addressLine2Placeholder": "Appartement, suite, unité, bâtiment",
+      "city": "Ville",
+      "cityPlaceholder": "Bucarest",
+      "state": "Région/État (optionnel)",
+      "statePlaceholder": "Département ou région",
+      "postalCode": "Code Postal",
+      "postalCodePlaceholder": "010101",
+      "country": "Pays",
+      "countryPlaceholder": "Sélectionner le pays"
+    },
+    "summary": {
+      "title": "Récapitulatif de Commande",
+      "subtotal": "Sous-total",
+      "discount": "Réduction ({percent}%)",
+      "total": "Total",
+      "paymentNote": "Vous serez redirigé vers Stripe pour effectuer le paiement en toute sécurité"
+    },
+    "proceedToPayment": "Procéder au Paiement",
+    "processing": "Traitement en cours...",
+    "errors": {
+      "emailRequired": "L'e-mail est requis pour le paiement en tant qu'invité",
+      "checkoutFailed": "Le paiement a échoué. Veuillez réessayer."
+    }
+  },
+  "orderSuccess": {
+    "title": "Commande Confirmée !",
+    "thankYou": "Merci pour votre commande",
+    "orderNumber": "Numéro de Commande",
+    "subtotal": "Sous-total",
+    "discount": "Réduction ({percent}%)",
+    "total": "Total",
+    "paidInEUR": "Payé : EUR {amount}",
+    "shippingAddress": "Adresse de Livraison",
+    "emailSent": "Un e-mail de confirmation a été envoyé à {email}",
+    "continueShopping": "Continuer mes Achats",
+    "viewOrders": "Voir mes Commandes",
+    "error": {
+      "title": "Erreur de Chargement de la Commande",
+      "notFound": "Commande non trouvée"
+    }
+  },
+  "orders": {
+    "title": "Mes Commandes",
+    "empty": {
+      "title": "Aucune commande pour le moment",
+      "description": "Commencez vos achats pour voir vos commandes ici",
+      "startShopping": "Commencer mes Achats"
+    },
+    "status": {
+      "PENDING": "En Attente",
+      "PAID": "Payée",
+      "PROCESSING": "En Traitement",
+      "SHIPPED": "Expédiée",
+      "DELIVERED": "Livrée",
+      "CANCELLED": "Annulée",
+      "REFUNDED": "Remboursée"
+    },
+    "orderDate": "Date de Commande",
+    "items": "{count, plural, =1 {1 article} other {# articles}}",
+    "pagination": {
+      "previous": "Précédent",
+      "next": "Suivant",
+      "page": "Page {current} sur {total}"
+    }
+  },
+  "orderDetail": {
+    "title": "Détails de la Commande",
+    "orderNumber": "Commande #{number}",
+    "placedOn": "Passée le",
+    "backToOrders": "Retour aux Commandes",
+    "orderItems": "Articles de la Commande",
+    "each": "chacun",
+    "shippingAddress": "Adresse de Livraison",
+    "summary": {
+      "title": "Récapitulatif du Paiement",
+      "subtotal": "Sous-total",
+      "discount": "Réduction",
+      "total": "Total",
+      "paidInEUR": "Payé : EUR {amount}",
+      "paidAt": "Payé le"
+    },
+    "error": {
+      "title": "Erreur de Chargement de la Commande",
+      "notFound": "Commande non trouvée"
+    }
   }
 }

@@ -41,8 +41,8 @@ export function ScrollToTopButton({
 
     if (!scrollElement) return
 
-    // Check initial position
-    checkScrollPosition()
+    // Check initial position asynchronously to avoid synchronous setState in effect
+    queueMicrotask(checkScrollPosition)
 
     scrollElement.addEventListener('scroll', checkScrollPosition, { passive: true })
 

@@ -7,6 +7,8 @@ import exchangeRateRoutes from './exchange-rate.routes'
 import auditRoutes from './audit.routes'
 import newsletterRoutes from './newsletter.routes'
 import newsletterAdminRoutes from './newsletter-admin.routes'
+import checkoutRoutes from './checkout.routes'
+import orderAdminRoutes from './order-admin.routes'
 import { apiRateLimiter, healthRateLimiter } from '../middleware/rateLimit'
 import { asyncHandler } from '../lib/asyncHandler'
 import { prisma } from '../lib/prisma'
@@ -46,5 +48,11 @@ router.use('/admin/newsletter', newsletterAdminRoutes)
 
 // Newsletter subscription (rate limited)
 router.use('/newsletter', newsletterRoutes)
+
+// Checkout and orders (has own rate limiting)
+router.use('/checkout', checkoutRoutes)
+
+// Admin orders management
+router.use('/admin/orders', orderAdminRoutes)
 
 export default router

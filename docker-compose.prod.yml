@@ -22,6 +22,7 @@ services:
         - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:?NEXT_PUBLIC_API_URL is required for production}
         - NEXT_PUBLIC_SITE_URL=${NEXT_PUBLIC_SITE_URL:?NEXT_PUBLIC_SITE_URL is required for production}
         - NEXT_PUBLIC_SITE_NAME=${NEXT_PUBLIC_SITE_NAME:-Perfumes Store}
+        - NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=${NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY}
     ports:
       - "${CLIENT_PORT:-3000}:3000"
     environment:
@@ -31,6 +32,7 @@ services:
       - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
       - NEXT_PUBLIC_SITE_URL=${NEXT_PUBLIC_SITE_URL}
       - NEXT_PUBLIC_SITE_NAME=${NEXT_PUBLIC_SITE_NAME:-Perfumes Store}
+      - NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=${NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY}
     depends_on:
       server:
         condition: service_healthy
@@ -82,6 +84,8 @@ services:
       - ADMIN_SEED_PASSWORD=${ADMIN_SEED_PASSWORD:-}
       - CLIENT_URL=${NEXT_PUBLIC_SITE_URL:?NEXT_PUBLIC_SITE_URL is required for production}
       - BACKEND_URL=${NEXT_PUBLIC_API_URL:?NEXT_PUBLIC_API_URL is required for production}
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET}
     volumes:
       - ./server/uploads:/app/uploads
     depends_on:

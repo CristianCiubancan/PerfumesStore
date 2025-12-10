@@ -20,6 +20,7 @@ model User {
   updatedAt            DateTime       @updatedAt
   refreshTokens        RefreshToken[]
   auditLogs            AuditLog[]
+  orders               Order[]
 }
 
 // Refresh token storage for revocation support
@@ -196,4 +197,89 @@ model NewsletterSubscriber {
 
   @@index([isActive])
   @@index([subscribedAt])
+}
+
+// Order status enum
+enum OrderStatus {
+  PENDING     // Created, awaiting payment
+  PAID        // Payment confirmed via webhook
+  PROCESSING  // Being prepared for shipment
+  SHIPPED     // Sent to carrier
+  DELIVERED   // Received by customer
+  CANCELLED   // Order cancelled
+  REFUNDED    // Full refund issued
+}
+
+// Orders for checkout
+model Order {
+  id                    Int           @id @default(autoincrement())
+  orderNumber           String        @unique  // Human-readable: ORD-YYYYMMDD-XXXX
+
+  // Customer (guest or user)
+  userId                Int?
+  user                  User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+  guestEmail            String?       // Required for guest checkout
+  customerName          String
+  customerPhone         String?
+
+  // Shipping address
+  shippingAddressLine1  String
+  shippingAddressLine2  String?
+  shippingCity          String
+  shippingState         String?       // County/Region
+  shippingPostalCode    String
+  shippingCountry       String        // ISO country code
+
+  // Amounts (stored in RON - base currency)
+  subtotalRON           Decimal       @db.Decimal(10, 2)  // Before discount
+  discountRON           Decimal       @db.Decimal(10, 2)  @default(0)
+  discountPercent       Int?          // Promotion discount applied
+  totalRON              Decimal       @db.Decimal(10, 2)  // Final amount in RON
+
+  // Stripe payment info
+  stripeSessionId       String?       @unique
+  stripePaymentIntentId String?
+  paidAmountEUR         Decimal?      @db.Decimal(10, 2)  // Amount charged in EUR
+  exchangeRateUsed      Decimal?      @db.Decimal(10, 4)  // BNR EUR rate at checkout
+  exchangeFeePercent    Decimal?      @db.Decimal(5, 2)   // Fee % from ExchangeRateSettings
+
+  status                OrderStatus   @default(PENDING)
+
+  // Timestamps
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+  paidAt                DateTime?
+
+  // Relations
+  items                 OrderItem[]
+
+  @@index([userId])
+  @@index([guestEmail])
+  @@index([status])
+  @@index([createdAt])
+  @@index([orderNumber])
+  @@index([stripeSessionId])
+}
+
+// Order line items
+model OrderItem {
+  id            Int       @id @default(autoincrement())
+  orderId       Int
+  order         Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  productId     Int
+  productName   String    // Snapshot at time of order
+  productBrand  String    // Snapshot
+  productSlug   String    // For linking back to product
+  volumeMl      Int
+  imageUrl      String?
+
+  quantity      Int
+  unitPriceRON  Decimal   @db.Decimal(10, 2)  // Price per unit at order time
+  totalPriceRON Decimal   @db.Decimal(10, 2)  // quantity * unitPrice
+
+  createdAt     DateTime  @default(now())
+
+  @@index([orderId])
+  @@index([productId])
 }

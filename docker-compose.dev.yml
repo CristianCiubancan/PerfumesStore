@@ -15,6 +15,7 @@ services:
       - API_URL=http://server:4000
       - NEXT_PUBLIC_SITE_URL=${NEXT_PUBLIC_SITE_URL:-http://localhost:3000}
       - NEXT_PUBLIC_SITE_NAME=${NEXT_PUBLIC_SITE_NAME:-Perfumes Store}
+      - NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=${NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY}
     volumes:
       - ./client:/app
       - /app/node_modules
@@ -62,6 +63,8 @@ services:
       - ADMIN_SEED_PASSWORD=${ADMIN_SEED_PASSWORD:-}
       - CLIENT_URL=http://localhost:${CLIENT_PORT:-3000}
       - BACKEND_URL=http://localhost:${SERVER_PORT:-4000}
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET}
       - CHOKIDAR_USEPOLLING=true
     volumes:
       - ./server:/app

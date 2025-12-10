@@ -50,3 +50,31 @@ export function authorize(...roles: string[]) {
     next()
   }
 }
+
+// Optional authentication - doesn't fail if no token, just sets req.user if valid
+export async function optionalAuthenticate(
+  req: Request,
+  _res: Response,
+  next: NextFunction
+) {
+  const token = req.cookies.accessToken
+
+  if (!token) {
+    // No token - continue as guest
+    return next()
+  }
+
+  try {
+    const payload = verifyAccessToken(token)
+
+    // Verify tokenVersion matches current user's version
+    const currentVersion = await getUserTokenVersion(payload.userId)
+    if (currentVersion !== null && payload.tokenVersion === currentVersion) {
+      req.user = payload
+    }
+  } catch {
+    // Invalid token - continue as guest (don't fail)
+  }
+
+  next()
+}

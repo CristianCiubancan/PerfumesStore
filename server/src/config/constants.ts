@@ -64,3 +64,12 @@ export const VALIDATION = {
   RATING_MIN: 0,
   RATING_MAX: 5,
 } as const
+
+// Order Management
+export const ORDER = {
+  // Time in minutes before a PENDING order is considered stale
+  // Stripe Checkout sessions expire after 30 min, we add buffer for webhook delivery
+  STALE_PENDING_TIMEOUT_MINUTES: 45,
+  // Run cleanup every 15 minutes
+  STALE_ORDER_CLEANUP_CRON_SCHEDULE: '*/15 * * * *',
+} as const

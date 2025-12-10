@@ -2,8 +2,9 @@
 
 import { useState } from 'react'
 import { useTranslations } from 'next-intl'
-import { Trash2, Tag, Sparkles } from 'lucide-react'
+import { Trash2, Tag, Sparkles, CreditCard } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { Link } from '@/i18n/routing'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   AlertDialog,
@@ -91,8 +92,11 @@ export function CartSummary({ totalItems, totalPrice, onClearCart, discountPerce
         </div>
       </CardContent>
       <CardFooter className="flex flex-col gap-2">
-        <Button className="w-full" size="lg" disabled>
-          {t('summary.checkout')}
+        <Button className="w-full" size="lg" asChild>
+          <Link href="/checkout">
+            <CreditCard className="mr-2 h-4 w-4" />
+            {t('summary.checkout')}
+          </Link>
         </Button>
         <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <AlertDialogTrigger asChild>

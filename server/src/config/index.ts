@@ -11,6 +11,9 @@ const envSchema = z.object({
   BACKEND_URL: z.string().url().default('http://localhost:4000'),
   // Comma-separated list of allowed external image hosts (e.g., "cdn.example.com,bucket.r2.cloudflarestorage.com")
   ALLOWED_IMAGE_HOSTS: z.string().default(''),
+  // Stripe configuration
+  STRIPE_SECRET_KEY: z.string().min(1),
+  STRIPE_WEBHOOK_SECRET: z.string().optional(), // Optional - needed for webhook signature verification
 })
 
 /**

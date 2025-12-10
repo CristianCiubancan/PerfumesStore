@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
-import { authenticate, authorize } from '../auth'
+import { authenticate, authorize, optionalAuthenticate } from '../auth'
 import { AppError } from '../errorHandler'
 import * as jwt from '../../lib/jwt'
 import * as authService from '../../services/auth.service'
@@ -217,5 +217,98 @@ describe('authorize middleware', () => {
     const error = (next as jest.Mock).mock.calls[0][0]
     expect(error).toBeInstanceOf(AppError)
     expect(error.statusCode).toBe(403)
+  })
+})
+
+describe('optionalAuthenticate middleware', () => {
+  let req: Partial<Request>
+  let res: Partial<Response>
+  let next: NextFunction
+
+  beforeEach(() => {
+    req = {
+      cookies: {},
+    }
+    res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    }
+    next = jest.fn()
+    jest.clearAllMocks()
+  })
+
+  it('should continue as guest when no token provided', async () => {
+    req.cookies = {}
+
+    await optionalAuthenticate(req as Request, res as Response, next)
+
+    expect(req.user).toBeUndefined()
+    expect(next).toHaveBeenCalledWith()
+  })
+
+  it('should set user when valid token with matching version', async () => {
+    const mockPayload = {
+      userId: 1,
+      email: 'test@example.com',
+      role: 'USER',
+      tokenVersion: 0,
+    }
+
+    req.cookies = { accessToken: 'valid-token' }
+    ;(jwt.verifyAccessToken as jest.Mock).mockReturnValue(mockPayload)
+    ;(authService.getUserTokenVersion as jest.Mock).mockResolvedValue(0)
+
+    await optionalAuthenticate(req as Request, res as Response, next)
+
+    expect(req.user).toEqual(mockPayload)
+    expect(next).toHaveBeenCalledWith()
+  })
+
+  it('should continue as guest when tokenVersion does not match', async () => {
+    const mockPayload = {
+      userId: 1,
+      email: 'test@example.com',
+      role: 'USER',
+      tokenVersion: 0,
+    }
+
+    req.cookies = { accessToken: 'valid-token' }
+    ;(jwt.verifyAccessToken as jest.Mock).mockReturnValue(mockPayload)
+    ;(authService.getUserTokenVersion as jest.Mock).mockResolvedValue(1) // Different version
+
+    await optionalAuthenticate(req as Request, res as Response, next)
+
+    expect(req.user).toBeUndefined()
+    expect(next).toHaveBeenCalledWith()
+  })
+
+  it('should continue as guest when user not found', async () => {
+    const mockPayload = {
+      userId: 1,
+      email: 'test@example.com',
+      role: 'USER',
+      tokenVersion: 0,
+    }
+
+    req.cookies = { accessToken: 'valid-token' }
+    ;(jwt.verifyAccessToken as jest.Mock).mockReturnValue(mockPayload)
+    ;(authService.getUserTokenVersion as jest.Mock).mockResolvedValue(null)
+
+    await optionalAuthenticate(req as Request, res as Response, next)
+
+    expect(req.user).toBeUndefined()
+    expect(next).toHaveBeenCalledWith()
+  })
+
+  it('should continue as guest when token is invalid', async () => {
+    req.cookies = { accessToken: 'invalid-token' }
+    ;(jwt.verifyAccessToken as jest.Mock).mockImplementation(() => {
+      throw new Error('Invalid token')
+    })
+
+    await optionalAuthenticate(req as Request, res as Response, next)
+
+    expect(req.user).toBeUndefined()
+    expect(next).toHaveBeenCalledWith()
   })
 })

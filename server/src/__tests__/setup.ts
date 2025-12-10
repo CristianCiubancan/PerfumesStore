@@ -11,6 +11,8 @@ process.env.JWT_SECRET = 'test-jwt-secret-at-least-32-chars-long'
 process.env.JWT_REFRESH_SECRET = 'test-jwt-refresh-secret-32-chars'
 process.env.CLIENT_URL = 'http://localhost:3000'
 process.env.BACKEND_URL = 'http://localhost:4000'
+process.env.STRIPE_SECRET_KEY = 'sk_test_mock_key'
+process.env.STRIPE_WEBHOOK_SECRET = 'whsec_test_mock_secret'
 
 // Mock Prisma Client
 jest.mock('../lib/prisma', () => ({
@@ -85,6 +87,20 @@ jest.mock('../lib/prisma', () => ({
       delete: jest.fn(),
       count: jest.fn(),
     },
+    order: {
+      findUnique: jest.fn(),
+      findFirst: jest.fn(),
+      findMany: jest.fn(),
+      create: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn(),
+      count: jest.fn(),
+    },
+    orderItem: {
+      findMany: jest.fn(),
+      create: jest.fn(),
+      createMany: jest.fn(),
+    },
     fragranceFamily: {
       findMany: jest.fn(),
     },
@@ -116,6 +132,15 @@ jest.mock('../lib/prisma', () => ({
             findUnique: jest.fn(),
             create: jest.fn(),
             update: jest.fn(),
+            updateMany: jest.fn(),
+          },
+          order: {
+            create: jest.fn(),
+            update: jest.fn(),
+            findUnique: jest.fn(),
+          },
+          orderItem: {
+            createMany: jest.fn(),
           },
         })
       }

@@ -2,7 +2,8 @@ import cron from 'node-cron'
 import { updateExchangeRates } from './services/exchange-rate.service'
 import { cleanupExpiredTokens } from './services/auth.service'
 import { cleanupOrphanedImages } from './services/image-cleanup.service'
-import { EXCHANGE_RATE, AUTH, UPLOADS } from './config/constants'
+import { cleanupStalePendingOrders } from './services/order.service'
+import { EXCHANGE_RATE, AUTH, UPLOADS, ORDER } from './config/constants'
 import { logger } from './lib/logger'
 
 export async function initExchangeRates(): Promise<void> {
@@ -32,6 +33,18 @@ export async function initImageCleanup(): Promise<void> {
   }
 }
 
+export async function initOrderCleanup(): Promise<void> {
+  try {
+    const result = await cleanupStalePendingOrders(ORDER.STALE_PENDING_TIMEOUT_MINUTES)
+    logger.info(
+      `Initial cleanup completed: ${result.cancelled} stale orders cancelled`,
+      'OrderCleanup'
+    )
+  } catch (err: unknown) {
+    logger.error('Initial order cleanup failed', 'OrderCleanup', err)
+  }
+}
+
 export function registerCronJobs(): void {
   // Update exchange rates
   cron.schedule(EXCHANGE_RATE.CRON_SCHEDULE, async () => {
@@ -57,6 +70,16 @@ export function registerCronJobs(): void {
       await cleanupOrphanedImages()
     } catch (err: unknown) {
       logger.error('Image cleanup failed', 'ImageCleanup', err)
+    }
+  })
+
+  // Clean up stale PENDING orders every 15 minutes
+  // This restores stock for orders where payment was never completed
+  cron.schedule(ORDER.STALE_ORDER_CLEANUP_CRON_SCHEDULE, async () => {
+    try {
+      await cleanupStalePendingOrders(ORDER.STALE_PENDING_TIMEOUT_MINUTES)
+    } catch (err: unknown) {
+      logger.error('Order cleanup failed', 'OrderCleanup', err)
     }
   })
 

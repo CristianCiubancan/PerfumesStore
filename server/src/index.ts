@@ -1,4 +1,4 @@
-import express from 'express'
+import express, { raw } from 'express'
 import cors from 'cors'
 import helmet from 'helmet'
 import cookieParser from 'cookie-parser'
@@ -9,11 +9,14 @@ import routes from './routes'
 import { errorHandler, notFoundHandler } from './middleware/errorHandler'
 import { logger } from './lib/logger'
 import { prisma } from './lib/prisma'
+import { handleWebhook } from './controllers/checkout.controller'
+import { asyncHandler } from './lib/asyncHandler'
 import {
   registerCronJobs,
   initExchangeRates,
   initTokenCleanup,
   initImageCleanup,
+  initOrderCleanup,
 } from './cron'
 
 const app = express()
@@ -46,6 +49,11 @@ app.use(cors({
   origin: config.CLIENT_URL,
   credentials: true,
 }))
+
+// Stripe webhook needs raw body BEFORE json parsing
+// Register before express.json() to preserve raw body for signature verification
+app.post('/api/checkout/webhook', raw({ type: 'application/json' }), asyncHandler(handleWebhook))
+
 app.use(express.json({ limit: '50kb' }))
 app.use(cookieParser())
 app.use(morgan(config.NODE_ENV === 'production' ? 'combined' : 'dev'))
@@ -67,6 +75,7 @@ const server = app.listen(config.PORT, () => {
   initExchangeRates()
   initTokenCleanup()
   initImageCleanup()
+  initOrderCleanup()
 })
 
 async function gracefulShutdown(signal: string) {

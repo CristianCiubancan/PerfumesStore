@@ -55,6 +55,7 @@
     "menu": "Meniu",
     "signIn": "Autentificare",
     "signOut": "Deconectare",
+    "myOrders": "Comenzile Mele",
     "signUp": "Înregistrare",
     "createAccount": "Creează Cont",
     "adminDashboard": "Panou Admin",
@@ -494,7 +495,8 @@
         "USER": "Utilizator",
         "SETTINGS": "Setări",
         "FILE": "Fișier",
-        "NEWSLETTER_SUBSCRIBER": "Abonat Newsletter"
+        "NEWSLETTER_SUBSCRIBER": "Abonat Newsletter",
+        "ORDER": "Comandă"
       },
       "detailsDialog": {
         "title": "Detalii Jurnal Audit",
@@ -506,6 +508,57 @@
         "userAgent": "Agent Utilizator",
         "oldValue": "Valoare Anterioară",
         "newValue": "Valoare Nouă"
+      }
+    },
+    "orders": {
+      "title": "Comenzi",
+      "description": "{total, plural, =0 {Nicio comandă} =1 {1 comandă în total} other {# comenzi în total}}",
+      "failedToLoad": "Nu s-au putut încărca comenzile",
+      "searchPlaceholder": "Caută după număr comandă, nume client sau email...",
+      "noOrders": "Nicio comandă încă",
+      "noOrdersDescription": "Comenzile vor apărea aici după ce clienții le plasează",
+      "noMatchingOrders": "Nicio comandă nu corespunde filtrelor curente",
+      "viewDetails": "Vezi Detalii",
+      "updateStatus": "Actualizează Status",
+      "totalOrders": "{count, plural, =0 {Nicio comandă} =1 {1 comandă} other {# comenzi}}",
+      "pageInfo": "Pagina {current} din {total}",
+      "statusUpdateSuccess": "Statusul comenzii a fost actualizat cu succes",
+      "statusUpdateError": "Nu s-a putut actualiza statusul comenzii",
+      "filters": {
+        "status": "Status",
+        "allStatuses": "Toate statusurile",
+        "clear": "Șterge filtrele"
+      },
+      "table": {
+        "orderNumber": "Nr. Comandă",
+        "customer": "Client",
+        "date": "Data",
+        "total": "Total",
+        "status": "Status",
+        "actions": "Acțiuni"
+      },
+      "orderDetails": {
+        "title": "Detalii Comandă",
+        "customer": "Client",
+        "shippingAddress": "Adresa de Livrare",
+        "items": "Produse Comandate",
+        "summary": "Sumar Comandă",
+        "subtotal": "Subtotal",
+        "discount": "Reducere ({percent}%)",
+        "total": "Total",
+        "paidInEUR": "Plătit în EUR",
+        "createdAt": "Creat",
+        "paidAt": "Plătit",
+        "registeredUser": "Utilizator înregistrat (ID: {id})",
+        "guestOrder": "Comandă guest"
+      },
+      "updateStatusDialog": {
+        "title": "Actualizează Statusul Comenzii",
+        "description": "Actualizează statusul pentru comanda {orderNumber}. Status curent: {currentStatus}",
+        "selectStatus": "Selectează noul status...",
+        "confirm": "Actualizează Status",
+        "cancelWarning": "Anularea acestei comenzi va restabili stocul rezervat în inventar.",
+        "refundWarning": "Marcarea ca rambursată va restabili stocul rezervat în inventar."
       }
     },
     "newsletter": {
@@ -782,5 +835,105 @@
     "perfumer": "Parfumier",
     "launchYear": "An Lansare",
     "rating": "Rating: {rating} din {max}"
+  },
+  "checkout": {
+    "title": "Finalizare Comandă",
+    "backToCart": "Înapoi la Coș",
+    "shipping": {
+      "title": "Adresa de Livrare",
+      "name": "Nume Complet",
+      "namePlaceholder": "Ion Popescu",
+      "email": "Adresă de Email",
+      "emailPlaceholder": "exemplu@email.com",
+      "phone": "Număr de Telefon (opțional)",
+      "phonePlaceholder": "+40 123 456 789",
+      "addressLine1": "Adresa Linia 1",
+      "addressLine1Placeholder": "Strada, numărul",
+      "addressLine2": "Adresa Linia 2 (opțional)",
+      "addressLine2Placeholder": "Apartament, bloc, scară",
+      "city": "Oraș",
+      "cityPlaceholder": "București",
+      "state": "Județ/Regiune (opțional)",
+      "statePlaceholder": "Județ",
+      "postalCode": "Cod Poștal",
+      "postalCodePlaceholder": "010101",
+      "country": "Țară",
+      "countryPlaceholder": "Selectează țara"
+    },
+    "summary": {
+      "title": "Sumar Comandă",
+      "subtotal": "Subtotal",
+      "discount": "Reducere ({percent}%)",
+      "total": "Total",
+      "paymentNote": "Vei fi redirecționat către Stripe pentru plată securizată"
+    },
+    "proceedToPayment": "Continuă la Plată",
+    "processing": "Se procesează...",
+    "errors": {
+      "emailRequired": "Email-ul este necesar pentru comenzi ca vizitator",
+      "checkoutFailed": "Finalizarea a eșuat. Te rugăm să încerci din nou."
+    }
+  },
+  "orderSuccess": {
+    "title": "Comandă Confirmată!",
+    "thankYou": "Îți mulțumim pentru comandă",
+    "orderNumber": "Număr Comandă",
+    "subtotal": "Subtotal",
+    "discount": "Reducere ({percent}%)",
+    "total": "Total",
+    "paidInEUR": "Plătit: EUR {amount}",
+    "shippingAddress": "Adresa de Livrare",
+    "emailSent": "Un email de confirmare a fost trimis la {email}",
+    "continueShopping": "Continuă Cumpărăturile",
+    "viewOrders": "Vezi Comenzile Mele",
+    "error": {
+      "title": "Eroare la Încărcare",
+      "notFound": "Comanda nu a fost găsită"
+    }
+  },
+  "orders": {
+    "title": "Comenzile Mele",
+    "empty": {
+      "title": "Nu ai comenzi încă",
+      "description": "Începe să cumperi pentru a vedea comenzile aici",
+      "startShopping": "Începe Cumpărăturile"
+    },
+    "status": {
+      "PENDING": "În Așteptare",
+      "PAID": "Plătită",
+      "PROCESSING": "În Procesare",
+      "SHIPPED": "Expediată",
+      "DELIVERED": "Livrată",
+      "CANCELLED": "Anulată",
+      "REFUNDED": "Rambursată"
+    },
+    "orderDate": "Data Comenzii",
+    "items": "{count, plural, =1 {1 produs} other {# produse}}",
+    "pagination": {
+      "previous": "Anterior",
+      "next": "Următor",
+      "page": "Pagina {current} din {total}"
+    }
+  },
+  "orderDetail": {
+    "title": "Detalii Comandă",
+    "orderNumber": "Comandă #{number}",
+    "placedOn": "Plasată pe",
+    "backToOrders": "Înapoi la Comenzi",
+    "orderItems": "Produse Comandate",
+    "each": "bucata",
+    "shippingAddress": "Adresa de Livrare",
+    "summary": {
+      "title": "Sumar Plată",
+      "subtotal": "Subtotal",
+      "discount": "Reducere",
+      "total": "Total",
+      "paidInEUR": "Plătit: EUR {amount}",
+      "paidAt": "Plătită pe"
+    },
+    "error": {
+      "title": "Eroare la Încărcare",
+      "notFound": "Comanda nu a fost găsită"
+    }
   }
 }

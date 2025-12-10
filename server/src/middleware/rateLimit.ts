@@ -75,3 +75,18 @@ export const newsletterRateLimiter = rateLimit({
   standardHeaders: 'draft-7',
   legacyHeaders: false,
 })
+
+// Checkout rate limiter
+// Prevents abuse of checkout session creation
+export const checkoutRateLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  limit: 5, // 5 checkout attempts per minute
+  message: {
+    error: {
+      message: 'Too many checkout attempts, please try again in a minute',
+      code: 'RATE_LIMIT_EXCEEDED',
+    },
+  },
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+})

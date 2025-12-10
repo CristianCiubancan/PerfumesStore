@@ -19,6 +19,7 @@ const AuditEntityTypeEnum = z.enum([
   'SETTINGS',
   'FILE',
   'NEWSLETTER_SUBSCRIBER',
+  'ORDER',
 ])
 
 export const listAuditLogsSchema = z.object({

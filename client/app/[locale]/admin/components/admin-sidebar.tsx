@@ -44,6 +44,7 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { href: '/admin/products', label: 'products', icon: Package },
+  { href: '/admin/orders', label: 'orders', icon: ShoppingCart },
   { href: '/admin/promotions', label: 'promotions', icon: Tag },
   { href: '/admin/newsletter', label: 'newsletter', icon: Mail },
   { href: '/admin/audit-logs', label: 'auditLogs', icon: FileText },
@@ -51,7 +52,6 @@ const navItems: NavItem[] = [
 ]
 
 const futureItems: NavItem[] = [
-  { href: '/admin/orders', label: 'orders', icon: ShoppingCart, disabled: true, comingSoon: true },
   { href: '/admin/customers', label: 'customers', icon: Users, disabled: true, comingSoon: true },
   { href: '/admin/analytics', label: 'analytics', icon: BarChart3, disabled: true, comingSoon: true },
 ]

@@ -20,6 +20,7 @@ export type AuditEntityType =
   | 'SETTINGS'
   | 'FILE'
   | 'NEWSLETTER_SUBSCRIBER'
+  | 'ORDER'
 
 export type AuditResult = 'SUCCESS' | 'FAILURE' | 'PARTIAL'
 

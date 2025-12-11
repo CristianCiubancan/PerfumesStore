@@ -84,10 +84,12 @@ export function csrfProtection(req: Request, _res: Response, next: NextFunction)
 
   // DEBUG: Log CSRF token details (remove after fixing)
   console.log('CSRF Debug:', {
-    cookieToken: cookieToken?.substring(0, 16) + '...',
-    headerToken: headerToken?.substring(0, 16) + '...',
+    cookieTokenFull: cookieToken,
+    headerTokenFull: headerToken,
+    cookieLen: cookieToken?.length,
+    headerLen: headerToken?.length,
     match: cookieToken === headerToken,
-    allCookies: Object.keys(req.cookies),
+    rawCookieHeader: req.headers.cookie,
   })
 
   // Both cookie and header must be present

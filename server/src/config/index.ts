@@ -9,6 +9,9 @@ const envSchema = z.object({
   JWT_REFRESH_SECRET: z.string().min(32),
   CLIENT_URL: z.string().url().default('http://localhost:3000'),
   BACKEND_URL: z.string().url().default('http://localhost:4000'),
+  // Cookie domain for cross-subdomain auth (e.g., ".example.com" for api.example.com + www.example.com)
+  // Leave empty for same-origin deployments (cookies will be host-only)
+  COOKIE_DOMAIN: z.string().optional(),
   // Comma-separated list of allowed external image hosts (e.g., "cdn.example.com,bucket.r2.cloudflarestorage.com")
   ALLOWED_IMAGE_HOSTS: z.string().default(''),
   // Stripe configuration

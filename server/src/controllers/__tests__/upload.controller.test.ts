@@ -1,5 +1,6 @@
 import { Request, Response } from 'express'
 import { Readable } from 'stream'
+import path from 'path'
 import * as uploadController from '../upload.controller'
 import { AppError } from '../../middleware/errorHandler'
 
@@ -174,7 +175,8 @@ describe('UploadController', () => {
 
       await uploadController.deleteImage(req as Request, res as Response)
 
-      expect(fs.promises.unlink).toHaveBeenCalledWith('/tmp/uploads/products/test-image.webp')
+      // Use path.join for cross-platform compatibility (Windows uses \, Unix uses /)
+      expect(fs.promises.unlink).toHaveBeenCalledWith(path.join('/tmp/uploads/products', 'test-image.webp'))
       expect(res.json).toHaveBeenCalledWith({
         data: { message: 'File deleted successfully' },
       })

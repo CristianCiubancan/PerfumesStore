@@ -35,7 +35,7 @@ describe('CSRF utilities', () => {
         'test-token',
         expect.objectContaining({
           httpOnly: false, // Must be readable by JS
-          sameSite: 'strict',
+          sameSite: 'lax', // Allows cross-origin requests while protecting against CSRF
           maxAge: 24 * 60 * 60 * 1000,
         })
       )
@@ -54,7 +54,7 @@ describe('CSRF utilities', () => {
         'csrf-token',
         expect.objectContaining({
           httpOnly: false,
-          sameSite: 'strict',
+          sameSite: 'lax',
         })
       )
     })

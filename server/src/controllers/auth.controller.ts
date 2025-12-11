@@ -2,7 +2,7 @@ import { Request, Response } from 'express'
 import * as authService from '../services/auth.service'
 import { RegisterInput, LoginInput, ChangePasswordInput } from '../schemas/auth'
 import { AUTH } from '../config/constants'
-import { isProduction } from '../config'
+import { config, isProduction } from '../config'
 import { generateCsrfToken, setCsrfCookie, clearCsrfCookie } from '../middleware/csrf'
 import { createAuditLog } from '../lib/auditLogger'
 import { AppError } from '../middleware/errorHandler'
@@ -34,21 +34,25 @@ function getTokenContext(req: Request) {
  *
  * Additional Security Measures:
  * - httpOnly: true prevents JavaScript access to tokens
- * - sameSite: 'strict' prevents CSRF attacks
+ * - sameSite: 'lax' provides CSRF protection while allowing cross-origin API calls
  * - Tokens are cryptographically signed and expire automatically
  */
 function setAuthCookies(res: Response, accessToken: string, refreshToken: string) {
   res.cookie('accessToken', accessToken, {
     httpOnly: true,
     secure: isProduction,
-    sameSite: 'strict',
+    // Use 'lax' to support cross-origin API requests when frontend/backend are on different origins
+    sameSite: 'lax',
     maxAge: AUTH.ACCESS_TOKEN_COOKIE_MAX_AGE_MS,
+    // Set domain for cross-subdomain cookies (e.g., ".example.com")
+    ...(config.COOKIE_DOMAIN && { domain: config.COOKIE_DOMAIN }),
   })
   res.cookie('refreshToken', refreshToken, {
     httpOnly: true,
     secure: isProduction,
-    sameSite: 'strict',
+    sameSite: 'lax',
     maxAge: AUTH.REFRESH_TOKEN_COOKIE_MAX_AGE_MS,
+    ...(config.COOKIE_DOMAIN && { domain: config.COOKIE_DOMAIN }),
   })
   // Set CSRF token for double-submit cookie pattern
   setCsrfCookie(res, generateCsrfToken())
@@ -58,12 +62,14 @@ function clearAuthCookies(res: Response) {
   res.clearCookie('accessToken', {
     httpOnly: true,
     secure: isProduction,
-    sameSite: 'strict',
+    sameSite: 'lax',
+    ...(config.COOKIE_DOMAIN && { domain: config.COOKIE_DOMAIN }),
   })
   res.clearCookie('refreshToken', {
     httpOnly: true,
     secure: isProduction,
-    sameSite: 'strict',
+    sameSite: 'lax',
+    ...(config.COOKIE_DOMAIN && { domain: config.COOKIE_DOMAIN }),
   })
   clearCsrfCookie(res)
 }

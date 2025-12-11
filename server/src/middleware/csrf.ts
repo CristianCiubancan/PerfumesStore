@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express'
 import crypto from 'crypto'
 import { AppError } from './errorHandler'
-import { isProduction } from '../config'
+import { config, isProduction } from '../config'
 
 const CSRF_COOKIE_NAME = 'csrf-token'
 // CSRF header name - use lowercase for consistency
@@ -40,8 +40,14 @@ export function setCsrfCookie(res: Response, token: string): void {
   res.cookie(CSRF_COOKIE_NAME, token, {
     httpOnly: false, // Must be readable by JS for double-submit pattern
     secure: isProduction,
-    sameSite: 'strict',
+    // Use 'lax' to allow cross-origin API requests while still protecting against CSRF
+    // 'strict' blocks cookies on all cross-origin requests, breaking auth flows when
+    // frontend and backend are on different origins
+    sameSite: 'lax',
     maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    // Set domain for cross-subdomain cookies (e.g., ".example.com")
+    // If COOKIE_DOMAIN is not set, cookie is host-only (same-origin only)
+    ...(config.COOKIE_DOMAIN && { domain: config.COOKIE_DOMAIN }),
   })
 }
 
@@ -52,7 +58,8 @@ export function clearCsrfCookie(res: Response): void {
   res.clearCookie(CSRF_COOKIE_NAME, {
     httpOnly: false,
     secure: isProduction,
-    sameSite: 'strict',
+    sameSite: 'lax',
+    ...(config.COOKIE_DOMAIN && { domain: config.COOKIE_DOMAIN }),
   })
 }
 

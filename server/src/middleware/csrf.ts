@@ -82,16 +82,6 @@ export function csrfProtection(req: Request, _res: Response, next: NextFunction)
   const cookieToken = req.cookies[CSRF_COOKIE_NAME]
   const headerToken = req.get(CSRF_HEADER_NAME)
 
-  // DEBUG: Log CSRF token details (remove after fixing)
-  console.log('CSRF Debug:', {
-    cookieTokenFull: cookieToken,
-    headerTokenFull: headerToken,
-    cookieLen: cookieToken?.length,
-    headerLen: headerToken?.length,
-    match: cookieToken === headerToken,
-    rawCookieHeader: req.headers.cookie,
-  })
-
   // Both cookie and header must be present
   if (!cookieToken || !headerToken) {
     return next(new AppError('CSRF token missing', 403, 'CSRF_TOKEN_MISSING'))

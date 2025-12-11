@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef, useCallback, useSyncExternalStore } from 'react'
 import { useTranslations } from 'next-intl'
 import { ShoppingCart } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -9,32 +9,38 @@ import { Link } from '@/i18n/routing'
 import { cn } from '@/lib/utils'
 import { TIMING } from '@/lib/constants'
 
+// Helper to get cart count from store
+const getCartCount = () => useCartStore.getState().getTotalItems()
+
 export function CartBadge() {
   const t = useTranslations('nav')
-  const getTotalItems = useCartStore((state) => state.getTotalItems)
-  const [count, setCount] = useState(0)
   const [isAnimating, setIsAnimating] = useState(false)
-  const countRef = useRef(count)
+  const countRef = useRef(0)
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  // Hydrate count on client side and sync ref
-  useEffect(() => {
-    const initialCount = getTotalItems()
-    setCount(initialCount)
-    countRef.current = initialCount
-  }, [getTotalItems])
-
-  // Subscribe to cart changes - only subscribe once on mount
-  useEffect(() => {
-    const unsubscribe = useCartStore.subscribe((state) => {
-      const newCount = state.getTotalItems()
+  // Subscription callback that handles both state sync and animation
+  const subscribe = useCallback((onStoreChange: () => void) => {
+    return useCartStore.subscribe(() => {
+      const newCount = getCartCount()
       if (newCount !== countRef.current) {
-        setIsAnimating(true)
-        setCount(newCount)
         countRef.current = newCount
-        setTimeout(() => setIsAnimating(false), TIMING.BADGE_ANIMATION_MS)
+        // Trigger animation in subscription callback (external state change)
+        setIsAnimating(true)
+        if (timerRef.current) clearTimeout(timerRef.current)
+        timerRef.current = setTimeout(() => setIsAnimating(false), TIMING.BADGE_ANIMATION_MS)
       }
+      onStoreChange()
     })
-    return unsubscribe
+  }, [])
+
+  // Use useSyncExternalStore for hydration-safe subscription
+  const count = useSyncExternalStore(subscribe, getCartCount, () => 0)
+
+  // Cleanup timer on unmount
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current)
+    }
   }, [])
 
   return (

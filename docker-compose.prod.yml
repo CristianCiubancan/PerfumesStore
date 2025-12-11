@@ -86,6 +86,7 @@ services:
       - BACKEND_URL=${NEXT_PUBLIC_API_URL:?NEXT_PUBLIC_API_URL is required for production}
       - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
       - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET}
+      - COOKIE_DOMAIN=${COOKIE_DOMAIN:-}
     volumes:
       - ./server/uploads:/app/uploads
     depends_on:

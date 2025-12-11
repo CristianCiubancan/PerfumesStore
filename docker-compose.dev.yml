@@ -65,6 +65,7 @@ services:
       - BACKEND_URL=http://localhost:${SERVER_PORT:-4000}
       - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
       - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET}
+      - COOKIE_DOMAIN=${COOKIE_DOMAIN:-}
       - CHOKIDAR_USEPOLLING=true
     volumes:
       - ./server:/app

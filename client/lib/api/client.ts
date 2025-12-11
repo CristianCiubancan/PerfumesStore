@@ -58,6 +58,9 @@ let refreshPromise: Promise<boolean> | null = null
 
 async function refreshToken(): Promise<boolean> {
   try {
+    // Ensure CSRF token exists before refresh request (it's a POST)
+    await ensureCsrfToken()
+
     const headers: Record<string, string> = {}
     const csrfToken = getCsrfToken()
     if (csrfToken) {

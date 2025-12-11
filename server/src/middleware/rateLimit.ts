@@ -15,6 +15,22 @@ export const authRateLimiter = rateLimit({
   legacyHeaders: false,
 })
 
+// Token refresh rate limiter - more permissive than auth since refresh happens automatically
+// Access tokens expire every 15 minutes, so users need regular refreshes
+// 20 per 15 minutes allows for normal usage plus some retry margin
+export const refreshRateLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  limit: 20, // 20 refresh attempts per window
+  message: {
+    error: {
+      message: 'Too many refresh attempts, please try again later',
+      code: 'RATE_LIMIT_EXCEEDED',
+    },
+  },
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+})
+
 // General API rate limiter for public endpoints
 // Permissive enough for e-commerce browsing (product listing, filtering, search)
 // 200 requests per minute should cover heavy browsing, filtering, and adding to cart

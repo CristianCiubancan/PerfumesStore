@@ -3,7 +3,7 @@ import * as authController from '../controllers/auth.controller'
 import { validate } from '../middleware/validate'
 import { authenticate } from '../middleware/auth'
 import { csrfProtection, generateCsrfToken, setCsrfCookie } from '../middleware/csrf'
-import { authRateLimiter } from '../middleware/rateLimit'
+import { authRateLimiter, refreshRateLimiter } from '../middleware/rateLimit'
 import { registerSchema, loginSchema, changePasswordSchema } from '../schemas/auth'
 import { asyncHandler } from '../lib/asyncHandler'
 
@@ -21,8 +21,8 @@ router.get('/csrf', (req, res) => {
 router.post('/register', authRateLimiter, csrfProtection, validate(registerSchema), asyncHandler(authController.register))
 router.post('/login', authRateLimiter, csrfProtection, validate(loginSchema), asyncHandler(authController.login))
 
-// Refresh token - rate limited and CSRF protected (uses existing token)
-router.post('/refresh', authRateLimiter, csrfProtection, asyncHandler(authController.refresh))
+// Refresh token - uses separate rate limiter (more permissive since refresh happens automatically)
+router.post('/refresh', refreshRateLimiter, csrfProtection, asyncHandler(authController.refresh))
 
 // Logout routes - rate limited to prevent abuse, CSRF protected for security
 router.post('/logout', authRateLimiter, csrfProtection, asyncHandler(authController.logout))

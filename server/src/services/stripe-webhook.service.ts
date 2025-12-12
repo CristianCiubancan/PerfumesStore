@@ -5,6 +5,7 @@ import { logger } from '../lib/logger'
 import { AppError } from '../middleware/errorHandler'
 import { sendOrderConfirmationEmail, normalizeLocale } from './email'
 import { prisma } from '../lib/prisma'
+import { withRetryResult } from '../lib/retry'
 import Stripe from 'stripe'
 
 export async function handleStripeWebhook(
@@ -76,11 +77,28 @@ async function processWebhookEvent(event: Stripe.Event): Promise<void> {
 
           if (customerEmail) {
             const locale = normalizeLocale(order.orderLocale)
-            sendOrderConfirmationEmail(order, customerEmail, locale).catch((err) => {
-              logger.error(
-                `Failed to send order confirmation email for ${order.orderNumber}: ${err instanceof Error ? err.message : 'Unknown error'}`,
-                'StripeWebhook'
-              )
+            // Send email with retry (fire and forget, but with resilience)
+            withRetryResult(
+              async () => {
+                const result = await sendOrderConfirmationEmail(order, customerEmail, locale)
+                if (!result.success) {
+                  throw new Error(result.error || 'Email send failed')
+                }
+                return result
+              },
+              {
+                maxAttempts: 3,
+                baseDelayMs: 2000,
+                maxDelayMs: 30000,
+                context: `OrderConfirmationEmail:${order.orderNumber}`,
+              }
+            ).then((result) => {
+              if (!result.success) {
+                logger.error(
+                  `Failed to send order confirmation email for ${order.orderNumber} after ${result.attempts} attempts: ${result.error}`,
+                  'StripeWebhook'
+                )
+              }
             })
           } else {
             logger.warn(

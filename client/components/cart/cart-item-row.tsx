@@ -54,6 +54,7 @@ export function CartItemRow({ item, onRemove, onQuantityChange, discountPercent 
               className="object-cover"
               sizes="96px"
               unoptimized={isLocalImage}
+              loading="lazy"
             />
           ) : (
             <div className="flex h-full w-full items-center justify-center text-muted-foreground">

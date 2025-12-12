@@ -96,11 +96,11 @@ async function gracefulShutdown(signal: string) {
     process.exit(0)
   })
 
-  // Force exit after 10 seconds
+  // Force exit after 30 seconds (allows time for long-running requests to complete)
   setTimeout(() => {
-    logger.error('Forcing shutdown', 'Server')
+    logger.error('Forcing shutdown after timeout', 'Server')
     process.exit(1)
-  }, 10000)
+  }, 30000)
 }
 
 process.on('SIGTERM', () => gracefulShutdown('SIGTERM'))

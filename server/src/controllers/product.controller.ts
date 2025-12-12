@@ -149,6 +149,50 @@ export async function getFilterOptions(_req: Request, res: Response): Promise<vo
   res.json({ data: options })
 }
 
+export async function getFilterCounts(req: Request, res: Response): Promise<void> {
+  const {
+    brand,
+    gender,
+    concentration,
+    minPrice,
+    maxPrice,
+    search,
+    fragranceFamilyId,
+    longevityId,
+    sillageId,
+    seasonIds,
+    seasonMatchMode,
+    occasionIds,
+    occasionMatchMode,
+    minRating,
+    maxRating,
+    stockStatus,
+  } = req.query
+
+  const counts = await productService.getFilterCounts({
+    brand: brand as string,
+    gender: gender as string,
+    concentration: concentration as string,
+    minPrice: parseFloatParam(minPrice),
+    maxPrice: parseFloatParam(maxPrice),
+    search: search as string,
+    fragranceFamilyId: parseIntParam(fragranceFamilyId),
+    longevityId: parseIntParam(longevityId),
+    sillageId: parseIntParam(sillageId),
+    seasonIds: parseIdArrayParam(seasonIds),
+    seasonMatchMode: (seasonMatchMode as 'any' | 'all') || 'any',
+    occasionIds: parseIdArrayParam(occasionIds),
+    occasionMatchMode: (occasionMatchMode as 'any' | 'all') || 'any',
+    minRating: parseFloatParam(minRating),
+    maxRating: parseFloatParam(maxRating),
+    stockStatus: stockStatus as 'all' | 'in_stock' | 'low_stock' | 'out_of_stock',
+  })
+
+  // Short cache - counts change with filter selections but are expensive to compute
+  res.set('Cache-Control', `public, max-age=${productService.FILTER_COUNTS_CACHE_SECONDS}`)
+  res.json({ data: counts })
+}
+
 export async function getBrands(req: Request, res: Response): Promise<void> {
   const { page, limit, inStockOnly } = req.query
 

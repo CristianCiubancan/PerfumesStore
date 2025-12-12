@@ -16,7 +16,7 @@ import {
 import { Separator } from '@/components/ui/separator'
 import { MultiSelect } from '@/components/ui/multi-select'
 import { MatchModeToggle } from '@/components/ui/match-mode-toggle'
-import { Gender, Concentration, FilterOptions } from '@/types'
+import { Gender, Concentration, FilterOptions, FilterCounts } from '@/types'
 import { useCurrencyStore, currencySymbols } from '@/store/currency'
 import { TIMING, RATING } from '@/lib/constants'
 import { FilterValues } from '@/hooks/use-filter-params'
@@ -28,6 +28,7 @@ interface ProductFiltersProps {
   onReset: () => void
   filterOptions: FilterOptions | null
   isLoadingOptions?: boolean
+  filterCounts: FilterCounts | null
 }
 
 const GENDERS: Gender[] = ['Men', 'Women', 'Unisex']
@@ -47,9 +48,131 @@ export function ProductFilters({
   onReset,
   filterOptions,
   isLoadingOptions,
+  filterCounts,
 }: ProductFiltersProps) {
   const t = useTranslations()
   const { currency } = useCurrencyStore()
+
+  // Memoized lookup maps for O(1) count retrieval instead of O(n) array searches
+  // Returns undefined if filterCounts not loaded yet, 0 if item not in response (no products match)
+  const genderCountMap = useMemo(() => {
+    if (!filterCounts) return null
+    return new Map(filterCounts.genders.map((g) => [g.value, g.count]))
+  }, [filterCounts])
+
+  const concentrationCountMap = useMemo(() => {
+    if (!filterCounts) return null
+    return new Map(filterCounts.concentrations.map((c) => [c.value, c.count]))
+  }, [filterCounts])
+
+  const fragranceFamilyCountMap = useMemo(() => {
+    if (!filterCounts) return null
+    return new Map(filterCounts.fragranceFamilies.map((f) => [f.id, f.count]))
+  }, [filterCounts])
+
+  const longevityCountMap = useMemo(() => {
+    if (!filterCounts) return null
+    return new Map(filterCounts.longevities.map((l) => [l.id, l.count]))
+  }, [filterCounts])
+
+  const sillageCountMap = useMemo(() => {
+    if (!filterCounts) return null
+    return new Map(filterCounts.sillages.map((s) => [s.id, s.count]))
+  }, [filterCounts])
+
+  const seasonCountMap = useMemo(() => {
+    if (!filterCounts) return null
+    return new Map(filterCounts.seasons.map((s) => [s.id, s.count]))
+  }, [filterCounts])
+
+  const occasionCountMap = useMemo(() => {
+    if (!filterCounts) return null
+    return new Map(filterCounts.occasions.map((o) => [o.id, o.count]))
+  }, [filterCounts])
+
+  // Helper functions using memoized maps - O(1) lookups
+  const getGenderCount = useCallback(
+    (gender: Gender): number | undefined =>
+      genderCountMap ? (genderCountMap.get(gender) ?? 0) : undefined,
+    [genderCountMap]
+  )
+
+  const getConcentrationCount = useCallback(
+    (concentration: Concentration): number | undefined =>
+      concentrationCountMap ? (concentrationCountMap.get(concentration) ?? 0) : undefined,
+    [concentrationCountMap]
+  )
+
+  const getFragranceFamilyCount = useCallback(
+    (id: number): number | undefined =>
+      fragranceFamilyCountMap ? (fragranceFamilyCountMap.get(id) ?? 0) : undefined,
+    [fragranceFamilyCountMap]
+  )
+
+  const getLongevityCount = useCallback(
+    (id: number): number | undefined =>
+      longevityCountMap ? (longevityCountMap.get(id) ?? 0) : undefined,
+    [longevityCountMap]
+  )
+
+  const getSillageCount = useCallback(
+    (id: number): number | undefined =>
+      sillageCountMap ? (sillageCountMap.get(id) ?? 0) : undefined,
+    [sillageCountMap]
+  )
+
+  const getSeasonCount = useCallback(
+    (id: number): number | undefined =>
+      seasonCountMap ? (seasonCountMap.get(id) ?? 0) : undefined,
+    [seasonCountMap]
+  )
+
+  const getOccasionCount = useCallback(
+    (id: number): number | undefined =>
+      occasionCountMap ? (occasionCountMap.get(id) ?? 0) : undefined,
+    [occasionCountMap]
+  )
+
+  // Check if an option should be disabled (count is 0 and not currently selected)
+  const isGenderDisabled = useCallback(
+    (gender: Gender): boolean => {
+      const count = genderCountMap?.get(gender) ?? undefined
+      return count === 0 && filters.gender !== gender
+    },
+    [genderCountMap, filters.gender]
+  )
+
+  const isConcentrationDisabled = useCallback(
+    (concentration: Concentration): boolean => {
+      const count = concentrationCountMap?.get(concentration) ?? undefined
+      return count === 0 && filters.concentration !== concentration
+    },
+    [concentrationCountMap, filters.concentration]
+  )
+
+  const isFragranceFamilyDisabled = useCallback(
+    (id: number): boolean => {
+      const count = fragranceFamilyCountMap?.get(id) ?? undefined
+      return count === 0 && filters.fragranceFamilyId !== id
+    },
+    [fragranceFamilyCountMap, filters.fragranceFamilyId]
+  )
+
+  const isLongevityDisabled = useCallback(
+    (id: number): boolean => {
+      const count = longevityCountMap?.get(id) ?? undefined
+      return count === 0 && filters.longevityId !== id
+    },
+    [longevityCountMap, filters.longevityId]
+  )
+
+  const isSillageDisabled = useCallback(
+    (id: number): boolean => {
+      const count = sillageCountMap?.get(id) ?? undefined
+      return count === 0 && filters.sillageId !== id
+    },
+    [sillageCountMap, filters.sillageId]
+  )
 
   // Extract debounced fields from filters
   const externalDebouncedFields = useMemo<DebouncedFields>(() => ({
@@ -159,11 +282,23 @@ export function ProductFilters({
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">{t('store.filters.allGenders')}</SelectItem>
-            {GENDERS.map((gender) => (
-              <SelectItem key={gender} value={gender}>
-                {t(`product.gender.${gender}`)}
-              </SelectItem>
-            ))}
+            {GENDERS.map((gender) => {
+              const count = getGenderCount(gender)
+              const disabled = isGenderDisabled(gender)
+              const label = count !== undefined
+                ? `${t(`product.gender.${gender}`)} (${count})`
+                : t(`product.gender.${gender}`)
+              return (
+                <SelectItem
+                  key={gender}
+                  value={gender}
+                  disabled={disabled}
+                  className={disabled ? 'opacity-50' : ''}
+                >
+                  {label}
+                </SelectItem>
+              )
+            })}
           </SelectContent>
         </Select>
       </div>
@@ -187,11 +322,23 @@ export function ProductFilters({
             <SelectItem value="all">
               {t('store.filters.allConcentrations')}
             </SelectItem>
-            {CONCENTRATIONS.map((conc) => (
-              <SelectItem key={conc} value={conc}>
-                {t(`product.concentration.${conc}`)}
-              </SelectItem>
-            ))}
+            {CONCENTRATIONS.map((conc) => {
+              const count = getConcentrationCount(conc)
+              const disabled = isConcentrationDisabled(conc)
+              const label = count !== undefined
+                ? `${t(`product.concentration.${conc}`)} (${count})`
+                : t(`product.concentration.${conc}`)
+              return (
+                <SelectItem
+                  key={conc}
+                  value={conc}
+                  disabled={disabled}
+                  className={disabled ? 'opacity-50' : ''}
+                >
+                  {label}
+                </SelectItem>
+              )
+            })}
           </SelectContent>
         </Select>
       </div>
@@ -213,11 +360,23 @@ export function ProductFilters({
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">{t('store.filters.allFragranceFamilies')}</SelectItem>
-            {filterOptions?.fragranceFamilies.map((family) => (
-              <SelectItem key={family.id} value={family.id.toString()}>
-                {t(`product.fragranceFamily.${family.name}`)}
-              </SelectItem>
-            ))}
+            {filterOptions?.fragranceFamilies.map((family) => {
+              const count = getFragranceFamilyCount(family.id)
+              const disabled = isFragranceFamilyDisabled(family.id)
+              const label = count !== undefined
+                ? `${t(`product.fragranceFamily.${family.name}`)} (${count})`
+                : t(`product.fragranceFamily.${family.name}`)
+              return (
+                <SelectItem
+                  key={family.id}
+                  value={family.id.toString()}
+                  disabled={disabled}
+                  className={disabled ? 'opacity-50' : ''}
+                >
+                  {label}
+                </SelectItem>
+              )
+            })}
           </SelectContent>
         </Select>
       </div>
@@ -236,14 +395,20 @@ export function ProductFilters({
           />
         </div>
         <MultiSelect
-          options={filterOptions?.seasons.map((s) => ({
-            value: s.id.toString(),
-            label: t(`product.season.${s.name}`),
-          })) || []}
+          options={filterOptions?.seasons.map((s) => {
+            const count = getSeasonCount(s.id)
+            return {
+              value: s.id.toString(),
+              label: t(`product.season.${s.name}`),
+              count,
+              disabled: count === 0 && !filters.seasonIds.includes(s.id),
+            }
+          }) || []}
           selected={filters.seasonIds.map(String)}
           onChange={(selected) => handleChange('seasonIds', selected.map((id) => parseInt(id, 10)))}
           placeholder={t('store.filters.selectSeasons')}
           disabled={isLoadingOptions || !filterOptions}
+          showCounts={!!filterCounts}
         />
       </div>
 
@@ -259,14 +424,20 @@ export function ProductFilters({
           />
         </div>
         <MultiSelect
-          options={filterOptions?.occasions.map((o) => ({
-            value: o.id.toString(),
-            label: t(`product.occasion.${o.name}`),
-          })) || []}
+          options={filterOptions?.occasions.map((o) => {
+            const count = getOccasionCount(o.id)
+            return {
+              value: o.id.toString(),
+              label: t(`product.occasion.${o.name}`),
+              count,
+              disabled: count === 0 && !filters.occasionIds.includes(o.id),
+            }
+          }) || []}
           selected={filters.occasionIds.map(String)}
           onChange={(selected) => handleChange('occasionIds', selected.map((id) => parseInt(id, 10)))}
           placeholder={t('store.filters.selectOccasions')}
           disabled={isLoadingOptions || !filterOptions}
+          showCounts={!!filterCounts}
         />
       </div>
 
@@ -321,11 +492,23 @@ export function ProductFilters({
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">{t('store.filters.allLongevities')}</SelectItem>
-            {filterOptions?.longevities.map((longevity) => (
-              <SelectItem key={longevity.id} value={longevity.id.toString()}>
-                {t(`product.longevity.${longevity.name}`)}
-              </SelectItem>
-            ))}
+            {filterOptions?.longevities.map((longevity) => {
+              const count = getLongevityCount(longevity.id)
+              const disabled = isLongevityDisabled(longevity.id)
+              const label = count !== undefined
+                ? `${t(`product.longevity.${longevity.name}`)} (${count})`
+                : t(`product.longevity.${longevity.name}`)
+              return (
+                <SelectItem
+                  key={longevity.id}
+                  value={longevity.id.toString()}
+                  disabled={disabled}
+                  className={disabled ? 'opacity-50' : ''}
+                >
+                  {label}
+                </SelectItem>
+              )
+            })}
           </SelectContent>
         </Select>
       </div>
@@ -345,11 +528,23 @@ export function ProductFilters({
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">{t('store.filters.allSillages')}</SelectItem>
-            {filterOptions?.sillages.map((sillage) => (
-              <SelectItem key={sillage.id} value={sillage.id.toString()}>
-                {t(`product.sillage.${sillage.name}`)}
-              </SelectItem>
-            ))}
+            {filterOptions?.sillages.map((sillage) => {
+              const count = getSillageCount(sillage.id)
+              const disabled = isSillageDisabled(sillage.id)
+              const label = count !== undefined
+                ? `${t(`product.sillage.${sillage.name}`)} (${count})`
+                : t(`product.sillage.${sillage.name}`)
+              return (
+                <SelectItem
+                  key={sillage.id}
+                  value={sillage.id.toString()}
+                  disabled={disabled}
+                  className={disabled ? 'opacity-50' : ''}
+                >
+                  {label}
+                </SelectItem>
+              )
+            })}
           </SelectContent>
         </Select>
       </div>

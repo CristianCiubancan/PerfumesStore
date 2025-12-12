@@ -66,6 +66,27 @@ export interface FilterOptions {
   occasions: Occasion[]
 }
 
+// Filter counts for dynamic filtering
+export interface EnumFilterCount {
+  value: string
+  count: number
+}
+
+export interface IdFilterCount {
+  id: number
+  count: number
+}
+
+export interface FilterCounts {
+  genders: EnumFilterCount[]
+  concentrations: EnumFilterCount[]
+  fragranceFamilies: IdFilterCount[]
+  longevities: IdFilterCount[]
+  sillages: IdFilterCount[]
+  seasons: IdFilterCount[]
+  occasions: IdFilterCount[]
+}
+
 export interface Product {
   id: number
   slug: string

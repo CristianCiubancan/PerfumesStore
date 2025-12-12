@@ -11,6 +11,17 @@ import {
   buildSortOrder,
   ProductFilterParams,
 } from './product/filter-builder'
+import {
+  getFilterCounts,
+  FilterCounts,
+  EnumFilterCount,
+  IdFilterCount,
+  FILTER_COUNTS_CACHE_SECONDS,
+} from './product/filter-count-builder'
+
+// Re-export filter counts types, function, and cache constant
+export { getFilterCounts, FILTER_COUNTS_CACHE_SECONDS }
+export type { FilterCounts, EnumFilterCount, IdFilterCount }
 import { invalidateProductCaches } from './product/cache-helper'
 import { productInclude, findProductOrThrow } from './product/common'
 

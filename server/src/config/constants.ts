@@ -50,6 +50,7 @@ export const EXCHANGE_RATE = {
 // Cache Durations
 export const CACHE = {
   EXCHANGE_RATE_REVALIDATE_SECONDS: 3600, // 1 hour
+  FILTER_COUNTS_MAX_AGE_SECONDS: 60, // 1 minute - counts change with filter selections
 } as const
 
 // Validation Rules - extends shared validation constants with server-specific values

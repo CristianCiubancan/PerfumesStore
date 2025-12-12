@@ -15,6 +15,8 @@ import {
 interface MultiSelectOption {
   value: string
   label: string
+  count?: number
+  disabled?: boolean
 }
 
 interface MultiSelectProps {
@@ -24,6 +26,8 @@ interface MultiSelectProps {
   placeholder?: string
   className?: string
   disabled?: boolean
+  /** Show counts next to option labels */
+  showCounts?: boolean
 }
 
 export function MultiSelect({
@@ -33,8 +37,12 @@ export function MultiSelect({
   placeholder = 'Select...',
   className,
   disabled = false,
+  showCounts = false,
 }: MultiSelectProps) {
-  const toggleOption = (value: string) => {
+  const toggleOption = (value: string, optionDisabled?: boolean) => {
+    // Don't toggle if the option is disabled
+    if (optionDisabled) return
+
     if (selected.includes(value)) {
       onChange(selected.filter((v) => v !== value))
     } else {
@@ -87,16 +95,25 @@ export function MultiSelect({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]" align="start">
-        {options.map((option) => (
-          <DropdownMenuCheckboxItem
-            key={option.value}
-            checked={selected.includes(option.value)}
-            onCheckedChange={() => toggleOption(option.value)}
-            onSelect={(e) => e.preventDefault()}
-          >
-            {option.label}
-          </DropdownMenuCheckboxItem>
-        ))}
+        {options.map((option) => {
+          const isOptionDisabled = option.disabled || (option.count === 0 && !selected.includes(option.value))
+          const displayLabel = showCounts && option.count !== undefined
+            ? `${option.label} (${option.count})`
+            : option.label
+
+          return (
+            <DropdownMenuCheckboxItem
+              key={option.value}
+              checked={selected.includes(option.value)}
+              onCheckedChange={() => toggleOption(option.value, isOptionDisabled)}
+              onSelect={(e) => e.preventDefault()}
+              disabled={isOptionDisabled}
+              className={isOptionDisabled ? 'opacity-50 cursor-not-allowed' : ''}
+            >
+              {displayLabel}
+            </DropdownMenuCheckboxItem>
+          )
+        })}
       </DropdownMenuContent>
     </DropdownMenu>
   )

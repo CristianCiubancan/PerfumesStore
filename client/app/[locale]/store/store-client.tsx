@@ -34,8 +34,10 @@ import { productsApi } from '@/lib/api/products'
 import { Product } from '@/types'
 import { useFilterParams, FilterValues } from '@/hooks/use-filter-params'
 import { useFilterOptions } from '@/hooks/use-filter-options'
+import { useFilterCounts } from '@/hooks/use-filter-counts'
 import { useCurrencyStore } from '@/store/currency'
 import { PAGINATION, TIMING } from '@/lib/constants'
+import { buildPriceFilterParams } from '@/lib/currency-helpers'
 
 // UI Layout Constants
 const UI_DIMENSIONS = {
@@ -46,25 +48,6 @@ const UI_DIMENSIONS = {
   SIDEBAR_GAP: 32, // 2rem in pixels (gap-8)
   SCROLL_TOP: 0, // Scroll position for top of page
 } as const
-
-// Convert price from selected currency to RON for API filtering
-// This reverses the conversion done in formatPrice/convertPrice
-function convertToRON(
-  price: number,
-  currency: 'RON' | 'EUR' | 'GBP',
-  exchangeRates: { EUR: number; GBP: number; feePercent: number } | null
-): number {
-  if (currency === 'RON' || !exchangeRates) {
-    return price
-  }
-  // BNR rates are: 1 EUR = X RON, so to convert to RON, multiply by X
-  const priceInAdjustedRON = price * exchangeRates[currency]
-
-  // Remove the fee that was applied when displaying prices
-  // (formatPrice applies: priceRON * feeMultiplier / rate, so we reverse it)
-  const feeMultiplier = 1 + (exchangeRates.feePercent / 100)
-  return priceInAdjustedRON / feeMultiplier
-}
 
 export function StorePageClient() {
   const t = useTranslations()
@@ -83,14 +66,20 @@ export function StorePageClient() {
   // Filter options from API
   const { filterOptions, isLoadingOptions } = useFilterOptions()
 
+  // Filter counts for dynamic filtering (show counts, disable zero-result options)
+  const { filterCounts } = useFilterCounts(filters, {
+    currency,
+    exchangeRates,
+  })
+
   // Memoize API params to prevent unnecessary re-fetches
   const apiParams = useMemo(() => {
-    const minPriceRON = filters.minPrice
-      ? convertToRON(parseFloat(filters.minPrice), currency, exchangeRates)
-      : undefined
-    const maxPriceRON = filters.maxPrice
-      ? convertToRON(parseFloat(filters.maxPrice), currency, exchangeRates)
-      : undefined
+    const priceParams = buildPriceFilterParams(
+      filters.minPrice,
+      filters.maxPrice,
+      currency,
+      exchangeRates
+    )
 
     return {
       page,
@@ -98,8 +87,7 @@ export function StorePageClient() {
       search: filters.search || undefined,
       gender: filters.gender || undefined,
       concentration: filters.concentration || undefined,
-      minPrice: minPriceRON,
-      maxPrice: maxPriceRON,
+      ...priceParams,
       sortBy: filters.sortBy,
       sortOrder: filters.sortOrder,
       fragranceFamilyId: filters.fragranceFamilyId ?? undefined,
@@ -224,6 +212,7 @@ export function StorePageClient() {
       onReset={handleResetFilters}
       filterOptions={filterOptions}
       isLoadingOptions={isLoadingOptions}
+      filterCounts={filterCounts}
     />
   )
 

@@ -24,6 +24,12 @@ router.get(
 )
 
 router.get(
+  '/filter-counts',
+  validate(listProductsSchema),
+  asyncHandler(productController.getFilterCounts)
+)
+
+router.get(
   '/brands',
   validate(listBrandsSchema),
   asyncHandler(productController.getBrands)

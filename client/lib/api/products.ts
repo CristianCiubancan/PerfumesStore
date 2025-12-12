@@ -5,6 +5,7 @@ import {
   CreateProductInput,
   UpdateProductInput,
   FilterOptions,
+  FilterCounts,
 } from '@/types'
 
 export interface ListProductsParams {
@@ -77,6 +78,25 @@ export const productsApi = {
 
   getFilterOptions: () =>
     api.get<FilterOptions>('/api/products/filter-options'),
+
+  getFilterCounts: (params?: Omit<ListProductsParams, 'page' | 'limit' | 'sortBy' | 'sortOrder'>, options?: Omit<ApiClientOptions, 'method' | 'body'>) => {
+    const searchParams = new URLSearchParams()
+    if (params) {
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          if (Array.isArray(value)) {
+            if (value.length > 0) {
+              searchParams.append(key, value.join(','))
+            }
+          } else {
+            searchParams.append(key, String(value))
+          }
+        }
+      })
+    }
+    const query = searchParams.toString()
+    return api.get<FilterCounts>(`/api/products/filter-counts${query ? `?${query}` : ''}`, options)
+  },
 
   getBrands: async () => {
     const result = await api.get<{ brands: string[] }>('/api/products/brands')

@@ -7,6 +7,7 @@ import morgan from 'morgan'
 import path from 'path'
 import { config } from './config'
 import routes from './routes'
+import swaggerRoutes from './swagger'
 import { errorHandler, notFoundHandler } from './middleware/errorHandler'
 import { requestIdMiddleware } from './middleware/requestId'
 import { logger } from './lib/logger'
@@ -73,6 +74,9 @@ app.use('/uploads', (req, res, next) => {
   res.setHeader('X-Content-Type-Options', 'nosniff')
   next()
 }, express.static(path.join(process.cwd(), 'uploads')))
+
+// API documentation (Swagger UI) - available in all environments
+app.use('/api/docs', swaggerRoutes)
 
 app.use('/api', routes)
 app.use(notFoundHandler)

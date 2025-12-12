@@ -22,7 +22,7 @@ import { TIMING, RATING } from '@/lib/constants'
 import { FilterValues } from '@/hooks/use-filter-params'
 import { useDebouncedFilters, DebouncedFields } from '@/hooks/use-debounced-filters'
 
-interface ProductFiltersProps {
+export interface ProductFiltersProps {
   filters: FilterValues
   onFiltersChange: (filters: FilterValues) => void
   onReset: () => void

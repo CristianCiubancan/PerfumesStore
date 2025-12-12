@@ -1,0 +1,2474 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Perfumes Store API",
+    "description": "REST API for the Perfumes Store e-commerce platform. This API provides endpoints for managing products, orders, users, and administrative functions.\n\n## Authentication\nMost endpoints require authentication via JWT tokens. The API uses HTTP-only cookies for token storage:\n- `accessToken`: Short-lived access token (15 minutes)\n- `refreshToken`: Long-lived refresh token (7 days)\n\n## CSRF Protection\nAll state-changing operations (POST, PUT, DELETE) require a CSRF token. Obtain one via `GET /api/auth/csrf` before making requests.\n\n## Rate Limiting\n- General API: 100 requests per 15 minutes\n- Authentication: 5 requests per 15 minutes\n- Sensitive operations: 10 requests per hour\n\n## Response Format\nAll successful responses follow this format:\n```json\n{\n  \"data\": { ... }\n}\n```\n\nError responses:\n```json\n{\n  \"error\": {\n    \"message\": \"Error description\",\n    \"code\": \"ERROR_CODE\"\n  }\n}\n```",
+    "version": "1.0.0",
+    "contact": {
+      "name": "API Support"
+    },
+    "license": {
+      "name": "MIT"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8000/api",
+      "description": "Development server"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Health",
+      "description": "Health check endpoints"
+    },
+    {
+      "name": "Auth",
+      "description": "Authentication and user management"
+    },
+    {
+      "name": "Products",
+      "description": "Product catalog operations"
+    },
+    {
+      "name": "Checkout",
+      "description": "Shopping cart and order processing"
+    },
+    {
+      "name": "Promotions",
+      "description": "Promotional campaigns and discounts"
+    },
+    {
+      "name": "Exchange Rates",
+      "description": "Currency exchange rates (RON base)"
+    },
+    {
+      "name": "Newsletter",
+      "description": "Newsletter subscription"
+    },
+    {
+      "name": "Upload",
+      "description": "File upload operations (Admin)"
+    },
+    {
+      "name": "Admin - Orders",
+      "description": "Order management (Admin)"
+    },
+    {
+      "name": "Admin - Newsletter",
+      "description": "Newsletter subscriber management (Admin)"
+    },
+    {
+      "name": "Admin - Campaigns",
+      "description": "Email campaign management (Admin)"
+    },
+    {
+      "name": "Admin - Email",
+      "description": "Email template management (Admin)"
+    },
+    {
+      "name": "Admin - Audit",
+      "description": "Audit log viewing (Admin)"
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "tags": ["Health"],
+        "summary": "Health check",
+        "description": "Returns the health status of all services including database, Stripe, email, and exchange rates.",
+        "responses": {
+          "200": {
+            "description": "System is healthy or degraded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthStatus"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "System is unhealthy",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthStatus"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/csrf": {
+      "get": {
+        "tags": ["Auth"],
+        "summary": "Get CSRF token",
+        "description": "Obtains a CSRF token required for state-changing operations. The token is set as an HTTP-only cookie.",
+        "responses": {
+          "200": {
+            "description": "CSRF token set in cookie",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "CSRF token set"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/register": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Register a new user",
+        "description": "Creates a new user account. Password must meet complexity requirements: 12+ characters, uppercase, lowercase, number, and special character.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Email already registered",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Login",
+        "description": "Authenticates a user and returns JWT tokens in HTTP-only cookies.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/refresh": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Refresh access token",
+        "description": "Uses the refresh token cookie to issue a new access token.",
+        "responses": {
+          "200": {
+            "description": "Token refreshed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or expired refresh token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Logout",
+        "description": "Clears authentication cookies for the current session.",
+        "responses": {
+          "200": {
+            "description": "Logout successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "Logged out successfully"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/logout-all": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Logout from all devices",
+        "description": "Invalidates all refresh tokens for the user, logging them out from all devices.",
+        "security": [{"cookieAuth": []}],
+        "responses": {
+          "200": {
+            "description": "Logged out from all devices",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "Logged out from all devices"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/auth/profile": {
+      "get": {
+        "tags": ["Auth"],
+        "summary": "Get user profile",
+        "description": "Returns the authenticated user's profile information.",
+        "security": [{"cookieAuth": []}],
+        "responses": {
+          "200": {
+            "description": "User profile",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/User"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/auth/change-password": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Change password",
+        "description": "Changes the authenticated user's password.",
+        "security": [{"cookieAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePasswordInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password changed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "Password changed successfully"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Current password incorrect or new password invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/products": {
+      "get": {
+        "tags": ["Products"],
+        "summary": "List products",
+        "description": "Returns a paginated list of products with optional filtering and sorting.",
+        "parameters": [
+          {"$ref": "#/components/parameters/Page"},
+          {"$ref": "#/components/parameters/Limit"},
+          {
+            "name": "brand",
+            "in": "query",
+            "schema": {"type": "string"},
+            "description": "Filter by brand name"
+          },
+          {
+            "name": "gender",
+            "in": "query",
+            "schema": {"type": "string", "enum": ["MASCULINE", "FEMININE", "UNISEX"]},
+            "description": "Filter by target gender"
+          },
+          {
+            "name": "concentration",
+            "in": "query",
+            "schema": {"type": "string", "enum": ["PARFUM", "EAU_DE_PARFUM", "EAU_DE_TOILETTE", "EAU_DE_COLOGNE", "EAU_FRAICHE"]},
+            "description": "Filter by fragrance concentration"
+          },
+          {
+            "name": "minPrice",
+            "in": "query",
+            "schema": {"type": "number"},
+            "description": "Minimum price in RON"
+          },
+          {
+            "name": "maxPrice",
+            "in": "query",
+            "schema": {"type": "number"},
+            "description": "Maximum price in RON"
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {"type": "string"},
+            "description": "Search in name, brand, and notes"
+          },
+          {
+            "name": "sortBy",
+            "in": "query",
+            "schema": {"type": "string", "enum": ["name", "price", "rating", "newest", "stock"]},
+            "description": "Sort field"
+          },
+          {
+            "name": "sortOrder",
+            "in": "query",
+            "schema": {"type": "string", "enum": ["asc", "desc"]},
+            "description": "Sort direction"
+          },
+          {
+            "name": "fragranceFamilyId",
+            "in": "query",
+            "schema": {"type": "integer"},
+            "description": "Filter by fragrance family ID"
+          },
+          {
+            "name": "seasonIds",
+            "in": "query",
+            "schema": {"type": "string"},
+            "description": "Comma-separated season IDs (e.g., '1,2,3')"
+          },
+          {
+            "name": "seasonMatchMode",
+            "in": "query",
+            "schema": {"type": "string", "enum": ["any", "all"]},
+            "description": "Match any or all seasons"
+          },
+          {
+            "name": "occasionIds",
+            "in": "query",
+            "schema": {"type": "string"},
+            "description": "Comma-separated occasion IDs"
+          },
+          {
+            "name": "stockStatus",
+            "in": "query",
+            "schema": {"type": "string", "enum": ["all", "in_stock", "low_stock", "out_of_stock"]},
+            "description": "Filter by stock status"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated product list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "products": {
+                          "type": "array",
+                          "items": {"$ref": "#/components/schemas/Product"}
+                        },
+                        "pagination": {"$ref": "#/components/schemas/Pagination"}
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Products"],
+        "summary": "Create product",
+        "description": "Creates a new product. Requires admin authentication.",
+        "security": [{"cookieAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {"$ref": "#/components/schemas/CreateProductInput"}
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Product created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {"$ref": "#/components/schemas/Product"}
+                  }
+                }
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized"},
+          "403": {"$ref": "#/components/responses/Forbidden"}
+        }
+      }
+    },
+    "/products/filter-options": {
+      "get": {
+        "tags": ["Products"],
+        "summary": "Get filter options",
+        "description": "Returns all available filter options (brands, genders, concentrations, fragrance families, etc.) for the product catalog.",
+        "responses": {
+          "200": {
+            "description": "Filter options",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {"$ref": "#/components/schemas/FilterOptions"}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/products/filter-counts": {
+      "get": {
+        "tags": ["Products"],
+        "summary": "Get filter counts",
+        "description": "Returns the count of products for each filter option based on current filters.",
+        "parameters": [
+          {
+            "name": "brand",
+            "in": "query",
+            "schema": {"type": "string"}
+          },
+          {
+            "name": "gender",
+            "in": "query",
+            "schema": {"type": "string", "enum": ["MASCULINE", "FEMININE", "UNISEX"]}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Filter counts",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {"$ref": "#/components/schemas/FilterCounts"}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/products/brands": {
+      "get": {
+        "tags": ["Products"],
+        "summary": "List brands",
+        "description": "Returns a paginated list of brands with product counts.",
+        "parameters": [
+          {"$ref": "#/components/parameters/Page"},
+          {"$ref": "#/components/parameters/Limit"},
+          {
+            "name": "inStockOnly",
+            "in": "query",
+            "schema": {"type": "string", "enum": ["true", "false"]},
+            "description": "Only show brands with in-stock products"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Brand list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "brands": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "name": {"type": "string"},
+                              "productCount": {"type": "integer"}
+                            }
+                          }
+                        },
+                        "pagination": {"$ref": "#/components/schemas/Pagination"}
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/products/stats": {
+      "get": {
+        "tags": ["Products"],
+        "summary": "Get product statistics",
+        "description": "Returns aggregate statistics about the product catalog.",
+        "responses": {
+          "200": {
+            "description": "Product statistics",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "totalProducts": {"type": "integer"},
+                        "totalBrands": {"type": "integer"},
+                        "averagePrice": {"type": "number"},
+                        "averageRating": {"type": "number"}
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/products/by-slug/{slug}": {
+      "get": {
+        "tags": ["Products"],
+        "summary": "Get product by slug",
+        "description": "Returns a single product by its SEO-friendly slug.",
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "string"},
+            "description": "Product slug (e.g., 'chanel-no-5-edp-100ml')"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Product details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {"$ref": "#/components/schemas/Product"}
+                  }
+                }
+              }
+            }
+          },
+          "404": {"$ref": "#/components/responses/NotFound"}
+        }
+      }
+    },
+    "/products/{id}": {
+      "get": {
+        "tags": ["Products"],
+        "summary": "Get product by ID",
+        "description": "Returns a single product by its numeric ID.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "integer"},
+            "description": "Product ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Product details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {"$ref": "#/components/schemas/Product"}
+                  }
+                }
+              }
+            }
+          },
+          "404": {"$ref": "#/components/responses/NotFound"}
+        }
+      },
+      "put": {
+        "tags": ["Products"],
+        "summary": "Update product",
+        "description": "Updates an existing product. Requires admin authentication.",
+        "security": [{"cookieAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "integer"}
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {"$ref": "#/components/schemas/UpdateProductInput"}
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Product updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {"$ref": "#/components/schemas/Product"}
+                  }
+                }
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized"},
+          "403": {"$ref": "#/components/responses/Forbidden"},
+          "404": {"$ref": "#/components/responses/NotFound"}
+        }
+      },
+      "delete": {
+        "tags": ["Products"],
+        "summary": "Delete product",
+        "description": "Deletes a product. Requires admin authentication.",
+        "security": [{"cookieAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "integer"}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Product deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "message": {"type": "string", "example": "Product deleted successfully"}
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized"},
+          "403": {"$ref": "#/components/responses/Forbidden"},
+          "404": {"$ref": "#/components/responses/NotFound"}
+        }
+      }
+    },
+    "/products/bulk-delete": {
+      "post": {
+        "tags": ["Products"],
+        "summary": "Bulk delete products",
+        "description": "Deletes multiple products at once. Requires admin authentication.",
+        "security": [{"cookieAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["ids"],
+                "properties": {
+                  "ids": {
+                    "type": "array",
+                    "items": {"type": "integer"},
+                    "minItems": 1,
+                    "maxItems": 100,
+                    "description": "Array of product IDs to delete"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Products deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "deletedCount": {"type": "integer"}
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized"},
+          "403": {"$ref": "#/components/responses/Forbidden"}
+        }
+      }
+    },
+    "/checkout/create-session": {
+      "post": {
+        "tags": ["Checkout"],
+        "summary": "Create checkout session",
+        "description": "Creates a Stripe checkout session for the cart items. Guests can checkout by providing an email.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {"$ref": "#/components/schemas/CreateCheckoutSessionInput"}
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Checkout session created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "sessionId": {"type": "string", "description": "Stripe session ID"},
+                        "url": {"type": "string", "description": "Stripe checkout URL"}
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {"$ref": "#/components/responses/BadRequest"}
+        }
+      }
+    },
+    "/checkout/session/{sessionId}": {
+      "get": {
+        "tags": ["Checkout"],
+        "summary": "Get order by session",
+        "description": "Retrieves the order associated with a Stripe checkout session (for success page).",
+        "parameters": [
+          {
+            "name": "sessionId",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "string"},
+            "description": "Stripe session ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Order details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {"$ref": "#/components/schemas/Order"}
+                  }
+                }
+              }
+            }
+          },
+          "404": {"$ref": "#/components/responses/NotFound"}
+        }
+      }
+    },
+    "/checkout/orders": {
+      "get": {
+        "tags": ["Checkout"],
+        "summary": "List user orders",
+        "description": "Returns the authenticated user's order history.",
+        "security": [{"cookieAuth": []}],
+        "parameters": [
+          {"$ref": "#/components/parameters/Page"},
+          {"$ref": "#/components/parameters/Limit"},
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {"type": "string", "enum": ["PENDING", "PAID", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED", "REFUNDED"]},
+            "description": "Filter by order status"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Order list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "orders": {
+                          "type": "array",
+                          "items": {"$ref": "#/components/schemas/Order"}
+                        },
+                        "pagination": {"$ref": "#/components/schemas/Pagination"}
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized"}
+        }
+      }
+    },
+    "/checkout/orders/{id}": {
+      "get": {
+        "tags": ["Checkout"],
+        "summary": "Get order",
+        "description": "Returns a single order by ID. Users can only view their own orders.",
+        "security": [{"cookieAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "integer"}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Order details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {"$ref": "#/components/schemas/Order"}
+                  }
+                }
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized"},
+          "404": {"$ref": "#/components/responses/NotFound"}
+        }
+      }
+    },
+    "/checkout/webhook": {
+      "post": {
+        "tags": ["Checkout"],
+        "summary": "Stripe webhook",
+        "description": "Handles Stripe webhook events for payment confirmation. This endpoint is called by Stripe, not by clients.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {"type": "object"}
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Webhook processed"
+          },
+          "400": {
+            "description": "Invalid webhook signature"
+          }
+        }
+      }
+    },
+    "/promotions/active": {
+      "get": {
+        "tags": ["Promotions"],
+        "summary": "Get active promotion",
+        "description": "Returns the currently active promotion, if any.",
+        "responses": {
+          "200": {
+            "description": "Active promotion or null",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "oneOf": [
+                        {"$ref": "#/components/schemas/Promotion"},
+                        {"type": "null"}
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/promotions": {
+      "get": {
+        "tags": ["Promotions"],
+        "summary": "List promotions",
+        "description": "Returns all promotions. Requires admin authentication.",
+        "security": [{"cookieAuth": []}],
+        "parameters": [
+          {"$ref": "#/components/parameters/Page"},
+          {"$ref": "#/components/parameters/Limit"}
+        ],
+        "responses": {
+          "200": {
+            "description": "Promotion list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "promotions": {
+                          "type": "array",
+                          "items": {"$ref": "#/components/schemas/Promotion"}
+                        },
+                        "pagination": {"$ref": "#/components/schemas/Pagination"}
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized"},
+          "403": {"$ref": "#/components/responses/Forbidden"}
+        }
+      },
+      "post": {
+        "tags": ["Promotions"],
+        "summary": "Create promotion",
+        "description": "Creates a new promotion. Requires admin authentication.",
+        "security": [{"cookieAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {"$ref": "#/components/schemas/CreatePromotionInput"}
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Promotion created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {"$ref": "#/components/schemas/Promotion"}
+                  }
+                }
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized"},
+          "403": {"$ref": "#/components/responses/Forbidden"}
+        }
+      }
+    },
+    "/promotions/{id}": {
+      "get": {
+        "tags": ["Promotions"],
+        "summary": "Get promotion",
+        "description": "Returns a single promotion. Requires admin authentication.",
+        "security": [{"cookieAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "integer"}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Promotion details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {"$ref": "#/components/schemas/Promotion"}
+                  }
+                }
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized"},
+          "403": {"$ref": "#/components/responses/Forbidden"},
+          "404": {"$ref": "#/components/responses/NotFound"}
+        }
+      },
+      "put": {
+        "tags": ["Promotions"],
+        "summary": "Update promotion",
+        "security": [{"cookieAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "integer"}
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {"$ref": "#/components/schemas/UpdatePromotionInput"}
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Promotion updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {"$ref": "#/components/schemas/Promotion"}
+                  }
+                }
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized"},
+          "403": {"$ref": "#/components/responses/Forbidden"},
+          "404": {"$ref": "#/components/responses/NotFound"}
+        }
+      },
+      "delete": {
+        "tags": ["Promotions"],
+        "summary": "Delete promotion",
+        "security": [{"cookieAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "integer"}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Promotion deleted"
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized"},
+          "403": {"$ref": "#/components/responses/Forbidden"},
+          "404": {"$ref": "#/components/responses/NotFound"}
+        }
+      }
+    },
+    "/exchange-rates": {
+      "get": {
+        "tags": ["Exchange Rates"],
+        "summary": "Get exchange rates",
+        "description": "Returns current exchange rates for RON to EUR and USD, including the conversion fee.",
+        "responses": {
+          "200": {
+            "description": "Exchange rates",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "rates": {
+                          "type": "object",
+                          "properties": {
+                            "EUR": {"type": "number", "example": 4.95},
+                            "USD": {"type": "number", "example": 4.55}
+                          }
+                        },
+                        "feePercent": {"type": "number", "example": 2.5},
+                        "fetchedAt": {"type": "string", "format": "date-time"}
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/exchange-rates/settings": {
+      "get": {
+        "tags": ["Exchange Rates"],
+        "summary": "Get exchange rate settings",
+        "description": "Returns admin settings for exchange rates. Requires admin authentication.",
+        "security": [{"cookieAuth": []}],
+        "responses": {
+          "200": {
+            "description": "Settings",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "feePercent": {"type": "number"},
+                        "lastFetchedAt": {"type": "string", "format": "date-time"}
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized"},
+          "403": {"$ref": "#/components/responses/Forbidden"}
+        }
+      },
+      "put": {
+        "tags": ["Exchange Rates"],
+        "summary": "Update exchange rate settings",
+        "security": [{"cookieAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "feePercent": {"type": "number", "minimum": 0, "maximum": 10}
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Settings updated"
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized"},
+          "403": {"$ref": "#/components/responses/Forbidden"}
+        }
+      }
+    },
+    "/newsletter/subscribe": {
+      "post": {
+        "tags": ["Newsletter"],
+        "summary": "Subscribe to newsletter",
+        "description": "Subscribes an email address to the newsletter. Supports idempotency via the Idempotency-Key header.",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "schema": {"type": "string", "format": "uuid"},
+            "description": "Optional idempotency key for duplicate request handling"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email"],
+                "properties": {
+                  "email": {"type": "string", "format": "email"},
+                  "locale": {"type": "string", "enum": ["en", "ro", "fr", "de", "es"]}
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Subscribed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "message": {"type": "string"},
+                        "email": {"type": "string"}
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {"$ref": "#/components/responses/BadRequest"}
+        }
+      }
+    },
+    "/upload": {
+      "post": {
+        "tags": ["Upload"],
+        "summary": "Upload image",
+        "description": "Uploads an image file. Requires admin authentication.",
+        "security": [{"cookieAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "image": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Image file (JPEG, PNG, WebP)"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Image uploaded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "url": {"type": "string"},
+                        "filename": {"type": "string"}
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized"},
+          "403": {"$ref": "#/components/responses/Forbidden"}
+        }
+      }
+    },
+    "/upload/{filename}": {
+      "delete": {
+        "tags": ["Upload"],
+        "summary": "Delete image",
+        "description": "Deletes an uploaded image. Requires admin authentication.",
+        "security": [{"cookieAuth": []}],
+        "parameters": [
+          {
+            "name": "filename",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "string"}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Image deleted"
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized"},
+          "403": {"$ref": "#/components/responses/Forbidden"},
+          "404": {"$ref": "#/components/responses/NotFound"}
+        }
+      }
+    },
+    "/admin/orders": {
+      "get": {
+        "tags": ["Admin - Orders"],
+        "summary": "List all orders",
+        "description": "Returns all orders with pagination and filtering. Requires admin authentication.",
+        "security": [{"cookieAuth": []}],
+        "parameters": [
+          {"$ref": "#/components/parameters/Page"},
+          {"$ref": "#/components/parameters/Limit"},
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {"type": "string", "enum": ["PENDING", "PAID", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED", "REFUNDED"]}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Order list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "orders": {
+                          "type": "array",
+                          "items": {"$ref": "#/components/schemas/Order"}
+                        },
+                        "pagination": {"$ref": "#/components/schemas/Pagination"}
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized"},
+          "403": {"$ref": "#/components/responses/Forbidden"}
+        }
+      }
+    },
+    "/admin/orders/stats": {
+      "get": {
+        "tags": ["Admin - Orders"],
+        "summary": "Get order statistics",
+        "security": [{"cookieAuth": []}],
+        "responses": {
+          "200": {
+            "description": "Order statistics",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "totalOrders": {"type": "integer"},
+                        "totalRevenue": {"type": "number"},
+                        "ordersByStatus": {"type": "object"}
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized"},
+          "403": {"$ref": "#/components/responses/Forbidden"}
+        }
+      }
+    },
+    "/admin/orders/{id}": {
+      "get": {
+        "tags": ["Admin - Orders"],
+        "summary": "Get order details",
+        "security": [{"cookieAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "integer"}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Order details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {"$ref": "#/components/schemas/Order"}
+                  }
+                }
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized"},
+          "403": {"$ref": "#/components/responses/Forbidden"},
+          "404": {"$ref": "#/components/responses/NotFound"}
+        }
+      }
+    },
+    "/admin/orders/{id}/status": {
+      "patch": {
+        "tags": ["Admin - Orders"],
+        "summary": "Update order status",
+        "security": [{"cookieAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "integer"}
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["status"],
+                "properties": {
+                  "status": {
+                    "type": "string",
+                    "enum": ["PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED", "REFUNDED"]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Status updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {"$ref": "#/components/schemas/Order"}
+                  }
+                }
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized"},
+          "403": {"$ref": "#/components/responses/Forbidden"},
+          "404": {"$ref": "#/components/responses/NotFound"}
+        }
+      }
+    },
+    "/admin/newsletter": {
+      "get": {
+        "tags": ["Admin - Newsletter"],
+        "summary": "List subscribers",
+        "security": [{"cookieAuth": []}],
+        "parameters": [
+          {"$ref": "#/components/parameters/Page"},
+          {"$ref": "#/components/parameters/Limit"}
+        ],
+        "responses": {
+          "200": {
+            "description": "Subscriber list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "subscribers": {
+                          "type": "array",
+                          "items": {"$ref": "#/components/schemas/Subscriber"}
+                        },
+                        "pagination": {"$ref": "#/components/schemas/Pagination"}
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized"},
+          "403": {"$ref": "#/components/responses/Forbidden"}
+        }
+      }
+    },
+    "/admin/newsletter/{id}/unsubscribe": {
+      "post": {
+        "tags": ["Admin - Newsletter"],
+        "summary": "Unsubscribe user",
+        "description": "Soft-deletes a subscriber (sets isActive to false).",
+        "security": [{"cookieAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "integer"}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Unsubscribed"
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized"},
+          "403": {"$ref": "#/components/responses/Forbidden"},
+          "404": {"$ref": "#/components/responses/NotFound"}
+        }
+      }
+    },
+    "/admin/newsletter/{id}": {
+      "delete": {
+        "tags": ["Admin - Newsletter"],
+        "summary": "Delete subscriber",
+        "description": "Permanently deletes a subscriber.",
+        "security": [{"cookieAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "integer"}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Deleted"
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized"},
+          "403": {"$ref": "#/components/responses/Forbidden"},
+          "404": {"$ref": "#/components/responses/NotFound"}
+        }
+      }
+    },
+    "/admin/campaigns": {
+      "get": {
+        "tags": ["Admin - Campaigns"],
+        "summary": "List campaigns",
+        "security": [{"cookieAuth": []}],
+        "parameters": [
+          {"$ref": "#/components/parameters/Page"},
+          {"$ref": "#/components/parameters/Limit"},
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {"type": "string", "enum": ["DRAFT", "SCHEDULED", "SENDING", "SENT", "FAILED"]}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Campaign list"
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized"},
+          "403": {"$ref": "#/components/responses/Forbidden"}
+        }
+      },
+      "post": {
+        "tags": ["Admin - Campaigns"],
+        "summary": "Create campaign",
+        "security": [{"cookieAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {"$ref": "#/components/schemas/CreateCampaignInput"}
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Campaign created"
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized"},
+          "403": {"$ref": "#/components/responses/Forbidden"}
+        }
+      }
+    },
+    "/admin/campaigns/templates": {
+      "get": {
+        "tags": ["Admin - Campaigns"],
+        "summary": "Get campaign templates",
+        "security": [{"cookieAuth": []}],
+        "responses": {
+          "200": {
+            "description": "Available templates"
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized"},
+          "403": {"$ref": "#/components/responses/Forbidden"}
+        }
+      }
+    },
+    "/admin/campaigns/{id}": {
+      "get": {
+        "tags": ["Admin - Campaigns"],
+        "summary": "Get campaign",
+        "security": [{"cookieAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "integer"}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Campaign details"
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized"},
+          "403": {"$ref": "#/components/responses/Forbidden"},
+          "404": {"$ref": "#/components/responses/NotFound"}
+        }
+      },
+      "put": {
+        "tags": ["Admin - Campaigns"],
+        "summary": "Update campaign",
+        "security": [{"cookieAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "integer"}
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {"$ref": "#/components/schemas/UpdateCampaignInput"}
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Campaign updated"
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized"},
+          "403": {"$ref": "#/components/responses/Forbidden"},
+          "404": {"$ref": "#/components/responses/NotFound"}
+        }
+      },
+      "delete": {
+        "tags": ["Admin - Campaigns"],
+        "summary": "Delete campaign",
+        "security": [{"cookieAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "integer"}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Campaign deleted"
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized"},
+          "403": {"$ref": "#/components/responses/Forbidden"},
+          "404": {"$ref": "#/components/responses/NotFound"}
+        }
+      }
+    },
+    "/admin/campaigns/{id}/schedule": {
+      "post": {
+        "tags": ["Admin - Campaigns"],
+        "summary": "Schedule campaign",
+        "security": [{"cookieAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "integer"}
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["scheduledAt"],
+                "properties": {
+                  "scheduledAt": {"type": "string", "format": "date-time"}
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Campaign scheduled"
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized"},
+          "403": {"$ref": "#/components/responses/Forbidden"},
+          "404": {"$ref": "#/components/responses/NotFound"}
+        }
+      }
+    },
+    "/admin/campaigns/{id}/send": {
+      "post": {
+        "tags": ["Admin - Campaigns"],
+        "summary": "Send campaign immediately",
+        "security": [{"cookieAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "integer"}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Campaign sent"
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized"},
+          "403": {"$ref": "#/components/responses/Forbidden"},
+          "404": {"$ref": "#/components/responses/NotFound"}
+        }
+      }
+    },
+    "/admin/campaigns/{id}/cancel": {
+      "post": {
+        "tags": ["Admin - Campaigns"],
+        "summary": "Cancel scheduled campaign",
+        "security": [{"cookieAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "integer"}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Campaign cancelled"
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized"},
+          "403": {"$ref": "#/components/responses/Forbidden"},
+          "404": {"$ref": "#/components/responses/NotFound"}
+        }
+      }
+    },
+    "/admin/email/status": {
+      "get": {
+        "tags": ["Admin - Email"],
+        "summary": "Get email service status",
+        "security": [{"cookieAuth": []}],
+        "responses": {
+          "200": {
+            "description": "Email service status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "enabled": {"type": "boolean"},
+                        "provider": {"type": "string"},
+                        "fromEmail": {"type": "string", "nullable": true}
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized"},
+          "403": {"$ref": "#/components/responses/Forbidden"}
+        }
+      }
+    },
+    "/admin/email/locales": {
+      "get": {
+        "tags": ["Admin - Email"],
+        "summary": "Get supported locales",
+        "security": [{"cookieAuth": []}],
+        "responses": {
+          "200": {
+            "description": "Supported locales"
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized"},
+          "403": {"$ref": "#/components/responses/Forbidden"}
+        }
+      }
+    },
+    "/admin/email/templates": {
+      "get": {
+        "tags": ["Admin - Email"],
+        "summary": "List email templates",
+        "security": [{"cookieAuth": []}],
+        "responses": {
+          "200": {
+            "description": "Template list"
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized"},
+          "403": {"$ref": "#/components/responses/Forbidden"}
+        }
+      }
+    },
+    "/admin/email/templates/{id}": {
+      "get": {
+        "tags": ["Admin - Email"],
+        "summary": "Get template details",
+        "security": [{"cookieAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "string"}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Template details"
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized"},
+          "403": {"$ref": "#/components/responses/Forbidden"},
+          "404": {"$ref": "#/components/responses/NotFound"}
+        }
+      }
+    },
+    "/admin/email/templates/{id}/preview": {
+      "get": {
+        "tags": ["Admin - Email"],
+        "summary": "Preview template",
+        "security": [{"cookieAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "string"}
+          },
+          {
+            "name": "locale",
+            "in": "query",
+            "schema": {"type": "string", "enum": ["en", "ro", "fr", "de", "es"]}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Template preview"
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized"},
+          "403": {"$ref": "#/components/responses/Forbidden"},
+          "404": {"$ref": "#/components/responses/NotFound"}
+        }
+      }
+    },
+    "/admin/audit-logs": {
+      "get": {
+        "tags": ["Admin - Audit"],
+        "summary": "List audit logs",
+        "description": "Returns paginated audit logs with optional filtering.",
+        "security": [{"cookieAuth": []}],
+        "parameters": [
+          {"$ref": "#/components/parameters/Page"},
+          {"$ref": "#/components/parameters/Limit"},
+          {
+            "name": "action",
+            "in": "query",
+            "schema": {"type": "string"},
+            "description": "Filter by action type"
+          },
+          {
+            "name": "userId",
+            "in": "query",
+            "schema": {"type": "integer"},
+            "description": "Filter by user ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Audit log list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "logs": {
+                          "type": "array",
+                          "items": {"$ref": "#/components/schemas/AuditLog"}
+                        },
+                        "pagination": {"$ref": "#/components/schemas/Pagination"}
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized"},
+          "403": {"$ref": "#/components/responses/Forbidden"}
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "cookieAuth": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "accessToken",
+        "description": "JWT access token stored in HTTP-only cookie"
+      }
+    },
+    "parameters": {
+      "Page": {
+        "name": "page",
+        "in": "query",
+        "schema": {"type": "integer", "minimum": 1, "default": 1},
+        "description": "Page number"
+      },
+      "Limit": {
+        "name": "limit",
+        "in": "query",
+        "schema": {"type": "integer", "minimum": 1, "maximum": 100, "default": 20},
+        "description": "Items per page"
+      }
+    },
+    "responses": {
+      "Unauthorized": {
+        "description": "Authentication required",
+        "content": {
+          "application/json": {
+            "schema": {"$ref": "#/components/schemas/Error"}
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "Insufficient permissions",
+        "content": {
+          "application/json": {
+            "schema": {"$ref": "#/components/schemas/Error"}
+          }
+        }
+      },
+      "NotFound": {
+        "description": "Resource not found",
+        "content": {
+          "application/json": {
+            "schema": {"$ref": "#/components/schemas/Error"}
+          }
+        }
+      },
+      "BadRequest": {
+        "description": "Invalid request",
+        "content": {
+          "application/json": {
+            "schema": {"$ref": "#/components/schemas/Error"}
+          }
+        }
+      }
+    },
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "message": {"type": "string"},
+              "code": {"type": "string"}
+            }
+          }
+        }
+      },
+      "Pagination": {
+        "type": "object",
+        "properties": {
+          "page": {"type": "integer"},
+          "limit": {"type": "integer"},
+          "total": {"type": "integer"},
+          "totalPages": {"type": "integer"}
+        }
+      },
+      "HealthStatus": {
+        "type": "object",
+        "properties": {
+          "status": {"type": "string", "enum": ["ok", "degraded", "unhealthy"]},
+          "timestamp": {"type": "string", "format": "date-time"},
+          "services": {
+            "type": "object",
+            "properties": {
+              "database": {
+                "type": "object",
+                "properties": {
+                  "status": {"type": "string", "enum": ["healthy", "unhealthy"]},
+                  "latencyMs": {"type": "integer"},
+                  "error": {"type": "string"}
+                }
+              },
+              "stripe": {
+                "type": "object",
+                "properties": {
+                  "status": {"type": "string", "enum": ["healthy", "unhealthy", "unconfigured"]},
+                  "error": {"type": "string"}
+                }
+              },
+              "email": {
+                "type": "object",
+                "properties": {
+                  "status": {"type": "string", "enum": ["healthy", "unconfigured"]}
+                }
+              },
+              "exchangeRates": {
+                "type": "object",
+                "properties": {
+                  "status": {"type": "string", "enum": ["healthy", "stale", "missing"]},
+                  "lastFetchedAt": {"type": "string", "format": "date-time"},
+                  "staleSinceMinutes": {"type": "integer"}
+                }
+              }
+            }
+          }
+        }
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "integer"},
+          "email": {"type": "string", "format": "email"},
+          "name": {"type": "string"},
+          "role": {"type": "string", "enum": ["USER", "ADMIN"]},
+          "createdAt": {"type": "string", "format": "date-time"}
+        }
+      },
+      "RegisterInput": {
+        "type": "object",
+        "required": ["email", "password", "name"],
+        "properties": {
+          "email": {"type": "string", "format": "email"},
+          "password": {"type": "string", "minLength": 12, "description": "Must contain uppercase, lowercase, number, and special character"},
+          "name": {"type": "string", "minLength": 2}
+        }
+      },
+      "LoginInput": {
+        "type": "object",
+        "required": ["email", "password"],
+        "properties": {
+          "email": {"type": "string", "format": "email"},
+          "password": {"type": "string"}
+        }
+      },
+      "ChangePasswordInput": {
+        "type": "object",
+        "required": ["currentPassword", "newPassword"],
+        "properties": {
+          "currentPassword": {"type": "string"},
+          "newPassword": {"type": "string", "minLength": 12}
+        }
+      },
+      "AuthResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "user": {"$ref": "#/components/schemas/User"}
+            }
+          }
+        }
+      },
+      "Product": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "integer"},
+          "name": {"type": "string"},
+          "slug": {"type": "string"},
+          "brand": {"type": "string"},
+          "concentration": {"type": "string", "enum": ["PARFUM", "EAU_DE_PARFUM", "EAU_DE_TOILETTE", "EAU_DE_COLOGNE", "EAU_FRAICHE"]},
+          "gender": {"type": "string", "enum": ["MASCULINE", "FEMININE", "UNISEX"]},
+          "fragranceFamily": {"$ref": "#/components/schemas/LookupItem"},
+          "topNotes": {"type": "array", "items": {"type": "string"}},
+          "heartNotes": {"type": "array", "items": {"type": "string"}},
+          "baseNotes": {"type": "array", "items": {"type": "string"}},
+          "volumeMl": {"type": "integer"},
+          "priceRON": {"type": "number"},
+          "launchYear": {"type": "integer"},
+          "perfumer": {"type": "string", "nullable": true},
+          "longevity": {"$ref": "#/components/schemas/LookupItem"},
+          "sillage": {"$ref": "#/components/schemas/LookupItem"},
+          "seasons": {"type": "array", "items": {"$ref": "#/components/schemas/LookupItem"}},
+          "occasions": {"type": "array", "items": {"$ref": "#/components/schemas/LookupItem"}},
+          "rating": {"type": "number"},
+          "stock": {"type": "integer"},
+          "imageUrl": {"type": "string", "nullable": true},
+          "description": {"type": "string", "nullable": true},
+          "createdAt": {"type": "string", "format": "date-time"},
+          "updatedAt": {"type": "string", "format": "date-time"}
+        }
+      },
+      "LookupItem": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "integer"},
+          "name": {"type": "string"}
+        }
+      },
+      "CreateProductInput": {
+        "type": "object",
+        "required": ["name", "brand", "concentration", "gender", "fragranceFamilyId", "topNotes", "heartNotes", "baseNotes", "volumeMl", "priceRON", "launchYear", "longevityId", "sillageId", "seasonIds", "occasionIds", "rating"],
+        "properties": {
+          "name": {"type": "string"},
+          "brand": {"type": "string"},
+          "concentration": {"type": "string", "enum": ["PARFUM", "EAU_DE_PARFUM", "EAU_DE_TOILETTE", "EAU_DE_COLOGNE", "EAU_FRAICHE"]},
+          "gender": {"type": "string", "enum": ["MASCULINE", "FEMININE", "UNISEX"]},
+          "fragranceFamilyId": {"type": "integer"},
+          "topNotes": {"type": "array", "items": {"type": "string"}},
+          "heartNotes": {"type": "array", "items": {"type": "string"}},
+          "baseNotes": {"type": "array", "items": {"type": "string"}},
+          "volumeMl": {"type": "integer"},
+          "priceRON": {"type": "number"},
+          "launchYear": {"type": "integer"},
+          "perfumer": {"type": "string"},
+          "longevityId": {"type": "integer"},
+          "sillageId": {"type": "integer"},
+          "seasonIds": {"type": "array", "items": {"type": "integer"}},
+          "occasionIds": {"type": "array", "items": {"type": "integer"}},
+          "rating": {"type": "number", "minimum": 0, "maximum": 5},
+          "stock": {"type": "integer", "minimum": 0},
+          "imageUrl": {"type": "string"},
+          "description": {"type": "string"}
+        }
+      },
+      "UpdateProductInput": {
+        "type": "object",
+        "properties": {
+          "name": {"type": "string"},
+          "brand": {"type": "string"},
+          "concentration": {"type": "string"},
+          "gender": {"type": "string"},
+          "fragranceFamilyId": {"type": "integer"},
+          "topNotes": {"type": "array", "items": {"type": "string"}},
+          "heartNotes": {"type": "array", "items": {"type": "string"}},
+          "baseNotes": {"type": "array", "items": {"type": "string"}},
+          "volumeMl": {"type": "integer"},
+          "priceRON": {"type": "number"},
+          "launchYear": {"type": "integer"},
+          "perfumer": {"type": "string"},
+          "longevityId": {"type": "integer"},
+          "sillageId": {"type": "integer"},
+          "seasonIds": {"type": "array", "items": {"type": "integer"}},
+          "occasionIds": {"type": "array", "items": {"type": "integer"}},
+          "rating": {"type": "number"},
+          "stock": {"type": "integer"},
+          "imageUrl": {"type": "string"},
+          "description": {"type": "string"}
+        }
+      },
+      "FilterOptions": {
+        "type": "object",
+        "properties": {
+          "brands": {"type": "array", "items": {"type": "string"}},
+          "genders": {"type": "array", "items": {"type": "string"}},
+          "concentrations": {"type": "array", "items": {"type": "string"}},
+          "fragranceFamilies": {"type": "array", "items": {"$ref": "#/components/schemas/LookupItem"}},
+          "longevities": {"type": "array", "items": {"$ref": "#/components/schemas/LookupItem"}},
+          "sillages": {"type": "array", "items": {"$ref": "#/components/schemas/LookupItem"}},
+          "seasons": {"type": "array", "items": {"$ref": "#/components/schemas/LookupItem"}},
+          "occasions": {"type": "array", "items": {"$ref": "#/components/schemas/LookupItem"}},
+          "priceRange": {
+            "type": "object",
+            "properties": {
+              "min": {"type": "number"},
+              "max": {"type": "number"}
+            }
+          }
+        }
+      },
+      "FilterCounts": {
+        "type": "object",
+        "properties": {
+          "brands": {"type": "object", "additionalProperties": {"type": "integer"}},
+          "genders": {"type": "object", "additionalProperties": {"type": "integer"}},
+          "concentrations": {"type": "object", "additionalProperties": {"type": "integer"}},
+          "fragranceFamilies": {"type": "object", "additionalProperties": {"type": "integer"}},
+          "seasons": {"type": "object", "additionalProperties": {"type": "integer"}},
+          "occasions": {"type": "object", "additionalProperties": {"type": "integer"}}
+        }
+      },
+      "Order": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "integer"},
+          "orderNumber": {"type": "string"},
+          "status": {"type": "string", "enum": ["PENDING", "PAID", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED", "REFUNDED"]},
+          "totalRON": {"type": "number"},
+          "shippingAddress": {"$ref": "#/components/schemas/ShippingAddress"},
+          "items": {"type": "array", "items": {"$ref": "#/components/schemas/OrderItem"}},
+          "user": {"$ref": "#/components/schemas/User"},
+          "guestEmail": {"type": "string", "nullable": true},
+          "createdAt": {"type": "string", "format": "date-time"},
+          "updatedAt": {"type": "string", "format": "date-time"}
+        }
+      },
+      "OrderItem": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "integer"},
+          "productId": {"type": "integer"},
+          "productName": {"type": "string"},
+          "quantity": {"type": "integer"},
+          "priceRON": {"type": "number"}
+        }
+      },
+      "ShippingAddress": {
+        "type": "object",
+        "properties": {
+          "name": {"type": "string"},
+          "phone": {"type": "string"},
+          "addressLine1": {"type": "string"},
+          "addressLine2": {"type": "string"},
+          "city": {"type": "string"},
+          "state": {"type": "string"},
+          "postalCode": {"type": "string"},
+          "country": {"type": "string"}
+        }
+      },
+      "CreateCheckoutSessionInput": {
+        "type": "object",
+        "required": ["items", "shippingAddress"],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["productId", "quantity"],
+              "properties": {
+                "productId": {"type": "integer"},
+                "quantity": {"type": "integer", "minimum": 1, "maximum": 99}
+              }
+            },
+            "minItems": 1,
+            "maxItems": 50
+          },
+          "shippingAddress": {"$ref": "#/components/schemas/ShippingAddress"},
+          "guestEmail": {"type": "string", "format": "email"},
+          "locale": {"type": "string", "enum": ["en", "ro", "fr", "de", "es"]}
+        }
+      },
+      "Promotion": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "integer"},
+          "name": {"type": "string"},
+          "discountPercent": {"type": "number"},
+          "startDate": {"type": "string", "format": "date-time"},
+          "endDate": {"type": "string", "format": "date-time"},
+          "isActive": {"type": "boolean"},
+          "createdAt": {"type": "string", "format": "date-time"}
+        }
+      },
+      "CreatePromotionInput": {
+        "type": "object",
+        "required": ["name", "discountPercent", "startDate", "endDate"],
+        "properties": {
+          "name": {"type": "string"},
+          "discountPercent": {"type": "number", "minimum": 0, "maximum": 100},
+          "startDate": {"type": "string", "format": "date-time"},
+          "endDate": {"type": "string", "format": "date-time"}
+        }
+      },
+      "UpdatePromotionInput": {
+        "type": "object",
+        "properties": {
+          "name": {"type": "string"},
+          "discountPercent": {"type": "number"},
+          "startDate": {"type": "string", "format": "date-time"},
+          "endDate": {"type": "string", "format": "date-time"},
+          "isActive": {"type": "boolean"}
+        }
+      },
+      "Subscriber": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "integer"},
+          "email": {"type": "string", "format": "email"},
+          "locale": {"type": "string"},
+          "isActive": {"type": "boolean"},
+          "subscribedAt": {"type": "string", "format": "date-time"}
+        }
+      },
+      "CreateCampaignInput": {
+        "type": "object",
+        "required": ["name", "subject", "templateId"],
+        "properties": {
+          "name": {"type": "string"},
+          "subject": {"type": "string"},
+          "templateId": {"type": "string"},
+          "templateData": {"type": "object"}
+        }
+      },
+      "UpdateCampaignInput": {
+        "type": "object",
+        "properties": {
+          "name": {"type": "string"},
+          "subject": {"type": "string"},
+          "templateId": {"type": "string"},
+          "templateData": {"type": "object"}
+        }
+      },
+      "AuditLog": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "integer"},
+          "action": {"type": "string"},
+          "entityType": {"type": "string"},
+          "entityId": {"type": "string"},
+          "userId": {"type": "integer", "nullable": true},
+          "details": {"type": "object"},
+          "ipAddress": {"type": "string"},
+          "createdAt": {"type": "string", "format": "date-time"}
+        }
+      }
+    }
+  }
+}

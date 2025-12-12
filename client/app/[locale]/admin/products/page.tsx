@@ -1,21 +1,14 @@
 'use client'
 
-// TODO: REFACTORING OPPORTUNITY (Code Quality)
-// This component has grown to 377+ lines with multiple responsibilities:
-// - State management for filters, pagination, sorting
-// - Product CRUD operations
-// - Bulk selection and actions
-// - URL sync logic
-// Consider splitting into:
-// 1. useProductsManager hook (data fetching, state, mutations)
-// 2. useProductFilters hook (filter state and URL sync)
-// 3. useProductSelection hook (bulk selection logic)
-// 4. Smaller sub-components for each section
-// This would improve maintainability and testability.
+/**
+ * Admin products page
+ * Refactored to use extracted hooks for better maintainability:
+ * - useAdminProductFilters: Filter state and URL sync
+ * - useAdminProducts: Data fetching and mutations
+ * - useProductSelection: Bulk selection logic
+ */
 
-import { useEffect, useState, useCallback, useRef } from 'react'
-import { useSearchParams, useRouter, usePathname } from 'next/navigation'
-import { toast } from 'sonner'
+import { useState, useCallback } from 'react'
 import { useTranslations } from 'next-intl'
 import { Plus, Package } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -26,60 +19,47 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { productsApi, ListProductsParams } from '@/lib/api/products'
 import { Product } from '@/types'
-import { ApiError } from '@/lib/api/client'
 import { ProductDialog } from '../components/product-dialog'
-import { useDebounce } from '@/hooks/use-debounce'
-import { PAGINATION, TIMING } from '@/lib/constants'
 import { ProductFilters } from './components/product-filters'
 import { ProductTable } from './components/product-table'
 import { ProductPagination } from './components/product-pagination'
 import { BulkActionBar } from './components/bulk-action-bar'
 import { DeleteDialog, BulkDeleteDialog } from './components/delete-dialogs'
 import { EmptyState } from './components/empty-state'
-
-type SortField = 'name' | 'price' | 'stock' | 'newest'
-type SortOrder = 'asc' | 'desc'
-type StockStatus = 'all' | 'in_stock' | 'low_stock' | 'out_of_stock'
+import { LoadingSkeleton } from './components/loading-skeleton'
+import { useAdminProductFilters } from '@/hooks/use-admin-product-filters'
+import { useAdminProducts } from '@/hooks/use-admin-products'
+import { useProductSelection } from '@/hooks/use-product-selection'
 
 export default function ProductsPage() {
   const t = useTranslations()
-  const router = useRouter()
-  const pathname = usePathname()
-  const searchParams = useSearchParams()
 
-  const [products, setProducts] = useState<Product[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [pagination, setPagination] = useState<{
-    page: number
-    limit: number
-    total: number
-    totalPages: number
-  }>({
-    page: 1,
-    limit: PAGINATION.ADMIN_DEFAULT_LIMIT,
-    total: 0,
-    totalPages: 0,
-  })
+  // Filter state and URL sync
+  const {
+    filters,
+    setSearchQuery,
+    setConcentration,
+    setGender,
+    setStockStatus,
+    handleSort,
+    handlePageChange,
+    handlePageSizeChange,
+    clearFilters,
+  } = useAdminProductFilters()
 
-  const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '')
-  const debouncedSearch = useDebounce(searchQuery, TIMING.DEBOUNCE_SHORT_MS)
-  const [concentration, setConcentration] = useState(searchParams.get('concentration') || 'all')
-  const [gender, setGender] = useState(searchParams.get('gender') || 'all')
-  const [stockStatus, setStockStatus] = useState<StockStatus>(
-    (searchParams.get('stockStatus') as StockStatus) || 'all'
-  )
-  const [sortBy, setSortBy] = useState<SortField>(
-    (searchParams.get('sortBy') as SortField) || 'newest'
-  )
-  const [sortOrder, setSortOrder] = useState<SortOrder>(
-    (searchParams.get('sortOrder') as SortOrder) || 'desc'
-  )
+  // Selection state
+  const { selectedIds, selectAll, handleSelectAll, handleSelectProduct, clearSelection } =
+    useProductSelection()
 
-  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set())
-  const [selectAll, setSelectAll] = useState(false)
+  // Products data and mutations
+  const { products, pagination, isLoading, loadProducts, deleteProduct, bulkDeleteProducts } =
+    useAdminProducts({
+      filters,
+      onDataLoaded: clearSelection,
+    })
 
+  // Dialog states
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
@@ -87,185 +67,67 @@ export default function ProductsPage() {
   const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
 
-  const pageParam = searchParams.get('page') || '1'
-  const limitParam = searchParams.get('limit') || String(PAGINATION.ADMIN_DEFAULT_LIMIT)
-
-  const updateUrlParams = useCallback((params: Record<string, string | undefined>) => {
-    const current = new URLSearchParams(window.location.search)
-    Object.entries(params).forEach(([key, value]) => {
-      if (value && value !== 'all' && value !== '') {
-        current.set(key, value)
-      } else {
-        current.delete(key)
+  // Handlers
+  const handleFilterChange = useCallback(
+    (key: string, value: string) => {
+      switch (key) {
+        case 'concentration':
+          setConcentration(value)
+          break
+        case 'gender':
+          setGender(value)
+          break
+        case 'stockStatus':
+          setStockStatus(value as 'all' | 'in_stock' | 'low_stock' | 'out_of_stock')
+          break
       }
-    })
-    router.replace(`${pathname}?${current.toString()}`, { scroll: false })
-  }, [pathname, router])
+    },
+    [setConcentration, setGender, setStockStatus]
+  )
 
-  const loadProducts = useCallback(async () => {
-    setIsLoading(true)
-    try {
-      const params: ListProductsParams = {
-        page: parseInt(pageParam, 10),
-        limit: parseInt(limitParam, 10),
-        search: debouncedSearch || undefined,
-        concentration: concentration !== 'all' ? concentration : undefined,
-        gender: gender !== 'all' ? gender : undefined,
-        stockStatus: stockStatus !== 'all' ? stockStatus : undefined,
-        sortBy,
-        sortOrder,
-      }
-      const response = await productsApi.list(params)
-      setProducts(response.products)
-      setPagination(response.pagination)
-      setSelectedIds(new Set())
-      setSelectAll(false)
-    } catch (error) {
-      if (error instanceof ApiError) {
-        toast.error(error.message)
-      } else {
-        toast.error(t('admin.failedToLoad'))
-      }
-    } finally {
-      setIsLoading(false)
-    }
-  }, [pageParam, limitParam, debouncedSearch, concentration, gender, stockStatus, sortBy, sortOrder, t])
-
-  useEffect(() => {
-    loadProducts()
-  }, [loadProducts])
-
-  const prevDebouncedSearch = useRef(debouncedSearch)
-  useEffect(() => {
-    if (prevDebouncedSearch.current === debouncedSearch) {
-      return
-    }
-    prevDebouncedSearch.current = debouncedSearch
-    updateUrlParams({ search: debouncedSearch, page: '1' })
-  }, [debouncedSearch, updateUrlParams])
-
-  const handleFilterChange = (key: string, value: string) => {
-    switch (key) {
-      case 'concentration':
-        setConcentration(value)
-        break
-      case 'gender':
-        setGender(value)
-        break
-      case 'stockStatus':
-        setStockStatus(value as StockStatus)
-        break
-    }
-    updateUrlParams({ [key]: value, page: '1' })
-  }
-
-  const handleSort = (field: SortField) => {
-    let newOrder: SortOrder = 'asc'
-    if (sortBy === field) {
-      newOrder = sortOrder === 'asc' ? 'desc' : 'asc'
-    }
-    setSortBy(field)
-    setSortOrder(newOrder)
-    updateUrlParams({ sortBy: field, sortOrder: newOrder, page: '1' })
-  }
-
-  const handlePageChange = (newPage: number) => {
-    updateUrlParams({ page: newPage.toString() })
-  }
-
-  const handlePageSizeChange = (newSize: string) => {
-    updateUrlParams({ limit: newSize, page: '1' })
-  }
-
-  const handleSelectAll = (checked: boolean) => {
-    setSelectAll(checked)
-    setSelectedIds(checked ? new Set(products.map((p) => p.id)) : new Set())
-  }
-
-  const handleSelectProduct = (id: number, checked: boolean) => {
-    const newSelected = new Set(selectedIds)
-    if (checked) {
-      newSelected.add(id)
-    } else {
-      newSelected.delete(id)
-    }
-    setSelectedIds(newSelected)
-    setSelectAll(newSelected.size === products.length && products.length > 0)
-  }
-
-  const handleAddProduct = () => {
+  const handleAddProduct = useCallback(() => {
     setEditingProduct(null)
     setDialogOpen(true)
-  }
+  }, [])
 
-  const handleEditProduct = (product: Product) => {
+  const handleEditProduct = useCallback((product: Product) => {
     setEditingProduct(product)
     setDialogOpen(true)
-  }
+  }, [])
 
-  const handleDeleteClick = (product: Product) => {
+  const handleDeleteClick = useCallback((product: Product) => {
     setProductToDelete(product)
     setDeleteDialogOpen(true)
-  }
+  }, [])
 
-  const handleDeleteConfirm = async () => {
+  const handleDeleteConfirm = useCallback(async () => {
     if (!productToDelete) return
 
     setIsDeleting(true)
-    try {
-      await productsApi.delete(productToDelete.id)
-      toast.success(t('admin.deleteDialog.success'))
-      loadProducts()
-    } catch (error) {
-      if (error instanceof ApiError) {
-        toast.error(error.message)
-      } else {
-        toast.error(t('admin.deleteDialog.error'))
-      }
-    } finally {
-      setIsDeleting(false)
+    const success = await deleteProduct(productToDelete.id)
+    setIsDeleting(false)
+    if (success) {
       setDeleteDialogOpen(false)
       setProductToDelete(null)
     }
-  }
+  }, [productToDelete, deleteProduct])
 
-  const handleBulkDeleteConfirm = async () => {
+  const handleBulkDeleteConfirm = useCallback(async () => {
     if (selectedIds.size === 0) return
 
     setIsDeleting(true)
-    try {
-      const result = await productsApi.bulkDelete(Array.from(selectedIds))
-      toast.success(t('admin.products.bulkDeleteSuccess', { count: result.deletedCount }))
-      loadProducts()
-    } catch (error) {
-      if (error instanceof ApiError) {
-        toast.error(error.message)
-      } else {
-        toast.error(t('admin.products.bulkDeleteError'))
-      }
-    } finally {
-      setIsDeleting(false)
+    const success = await bulkDeleteProducts(Array.from(selectedIds))
+    setIsDeleting(false)
+    if (success) {
       setBulkDeleteDialogOpen(false)
     }
-  }
+  }, [selectedIds, bulkDeleteProducts])
 
-  const handleDialogSuccess = () => {
+  const handleDialogSuccess = useCallback(() => {
     setDialogOpen(false)
     setEditingProduct(null)
     loadProducts()
-  }
-
-  const clearFilters = () => {
-    setSearchQuery('')
-    setConcentration('all')
-    setGender('all')
-    setStockStatus('all')
-    setSortBy('newest')
-    setSortOrder('desc')
-    router.replace(pathname, { scroll: false })
-  }
-
-  const hasActiveFilters = Boolean(searchQuery) || concentration !== 'all' || gender !== 'all' || stockStatus !== 'all'
+  }, [loadProducts])
 
   return (
     <div className="space-y-4">
@@ -289,49 +151,27 @@ export default function ProductsPage() {
         </CardHeader>
         <CardContent className="space-y-4">
           <ProductFilters
-            searchQuery={searchQuery}
+            searchQuery={filters.searchQuery}
             onSearchChange={setSearchQuery}
-            concentration={concentration}
-            gender={gender}
-            stockStatus={stockStatus}
+            concentration={filters.concentration}
+            gender={filters.gender}
+            stockStatus={filters.stockStatus}
             onFilterChange={handleFilterChange}
-            hasActiveFilters={hasActiveFilters}
+            hasActiveFilters={filters.hasActiveFilters}
             onClearFilters={clearFilters}
           />
 
           <BulkActionBar
             selectedCount={selectedIds.size}
             onBulkDelete={() => setBulkDeleteDialogOpen(true)}
-            onClearSelection={() => {
-              setSelectedIds(new Set())
-              setSelectAll(false)
-            }}
+            onClearSelection={clearSelection}
           />
 
           {isLoading ? (
-            <div className="space-y-3">
-              <div className="flex items-center space-x-4">
-                <div className="h-4 w-8 animate-pulse rounded bg-muted" />
-                <div className="h-4 w-48 animate-pulse rounded bg-muted" />
-                <div className="h-4 w-24 animate-pulse rounded bg-muted" />
-                <div className="h-4 w-20 animate-pulse rounded bg-muted" />
-                <div className="h-4 w-16 animate-pulse rounded bg-muted" />
-              </div>
-              {[...Array(5)].map((_, i) => (
-                <div key={i} className="flex items-center space-x-4 py-4 border-b">
-                  <div className="h-4 w-8 animate-pulse rounded bg-muted" />
-                  <div className="h-12 w-12 animate-pulse rounded bg-muted" />
-                  <div className="h-4 w-48 animate-pulse rounded bg-muted" />
-                  <div className="h-4 w-24 animate-pulse rounded bg-muted" />
-                  <div className="h-4 w-20 animate-pulse rounded bg-muted" />
-                  <div className="h-4 w-16 animate-pulse rounded bg-muted" />
-                  <div className="h-8 w-20 animate-pulse rounded bg-muted" />
-                </div>
-              ))}
-            </div>
+            <LoadingSkeleton />
           ) : products.length === 0 ? (
             <EmptyState
-              hasActiveFilters={hasActiveFilters}
+              hasActiveFilters={filters.hasActiveFilters}
               onClearFilters={clearFilters}
               onAddProduct={handleAddProduct}
             />
@@ -341,10 +181,17 @@ export default function ProductsPage() {
                 products={products}
                 selectedIds={selectedIds}
                 selectAll={selectAll}
-                onSelectAll={handleSelectAll}
-                onSelectProduct={handleSelectProduct}
-                sortBy={sortBy}
-                sortOrder={sortOrder}
+                onSelectAll={(checked) =>
+                  handleSelectAll(
+                    checked,
+                    products.map((p) => p.id)
+                  )
+                }
+                onSelectProduct={(id, checked) =>
+                  handleSelectProduct(id, checked, products.length)
+                }
+                sortBy={filters.sortBy}
+                sortOrder={filters.sortOrder}
                 onSort={handleSort}
                 onEdit={handleEditProduct}
                 onDelete={handleDeleteClick}

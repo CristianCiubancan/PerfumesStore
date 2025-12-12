@@ -1,0 +1,42 @@
+# <type>(<scope>): <description>
+#
+# [optional body]
+#
+# [optional footer]
+#
+# --- COMMIT GUIDELINES ---
+#
+# Type must be one of:
+#   feat     - A new feature
+#   fix      - A bug fix
+#   docs     - Documentation only changes
+#   style    - Formatting, no code change
+#   refactor - Code restructuring, no feature change
+#   test     - Adding or updating tests
+#   chore    - Maintenance tasks (deps, build, etc.)
+#
+# Scope (optional): component/module affected
+#   Examples: cart, auth, products, checkout, admin, api
+#
+# Description:
+#   - Use imperative mood: "add" not "added" or "adds"
+#   - Don't capitalize first letter
+#   - No period at the end
+#   - Max 72 characters
+#
+# Examples:
+#   feat(cart): add quantity selector component
+#   fix(auth): resolve token refresh race condition
+#   docs(api): update checkout endpoint documentation
+#   refactor(products): extract filter logic to service
+#   test(orders): add integration tests for order creation
+#   chore(deps): update Prisma to v6.1.0
+#
+# Body (optional):
+#   - Explain WHAT and WHY, not HOW
+#   - Wrap at 72 characters
+#   - Separate from subject with blank line
+#
+# Footer (optional):
+#   - Reference issues: Closes #123, Fixes #456
+#   - Breaking changes: BREAKING CHANGE: description

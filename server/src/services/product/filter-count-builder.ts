@@ -13,7 +13,7 @@ import {
   buildStockStatusFilter,
   ProductFilterParams,
 } from './filter-builder'
-import { CACHE } from '../../config/constants'
+import { CACHE, STOCK } from '../../config/constants'
 
 // Types for filter counts response
 export interface EnumFilterCount {
@@ -142,14 +142,13 @@ export function buildWhereExcluding(
 export async function getFilterCounts(
   params: ProductFilterParams
 ): Promise<FilterCounts> {
-  // Build WHERE clauses excluding each filter type
+  // Build WHERE clauses excluding each filter type (for Prisma groupBy queries)
   const whereExcludingGender = buildWhereExcluding(params, 'gender')
   const whereExcludingConcentration = buildWhereExcluding(params, 'concentration')
   const whereExcludingFragranceFamily = buildWhereExcluding(params, 'fragranceFamilyId')
   const whereExcludingLongevity = buildWhereExcluding(params, 'longevityId')
   const whereExcludingSillage = buildWhereExcluding(params, 'sillageId')
-  const whereExcludingSeason = buildWhereExcluding(params, 'seasonIds')
-  const whereExcludingOccasion = buildWhereExcluding(params, 'occasionIds')
+  // Note: Season/occasion counts use optimized raw SQL with subqueries (no WHERE clause needed)
 
   // Run all count queries in parallel
   const [
@@ -196,11 +195,11 @@ export async function getFilterCounts(
       _count: { id: true },
     }),
 
-    // Season counts (many-to-many)
-    countSeasons(whereExcludingSeason),
+    // Season counts (many-to-many) - uses optimized raw SQL subquery
+    countSeasons(params, 'seasonIds'),
 
-    // Occasion counts (many-to-many)
-    countOccasions(whereExcludingOccasion),
+    // Occasion counts (many-to-many) - uses optimized raw SQL subquery
+    countOccasions(params, 'occasionIds'),
   ])
 
   return {
@@ -239,81 +238,230 @@ export async function getFilterCounts(
 }
 
 /**
- * Count products for each season (many-to-many relation)
- * Uses a single query with raw SQL aggregation to avoid N+1 problem
+ * Build raw SQL WHERE conditions for product filtering.
+ * Used in subqueries to avoid loading all product IDs into memory.
+ * Returns SQL condition fragments and parameter values.
  */
-async function countSeasons(
-  baseWhere: Prisma.ProductWhereInput
-): Promise<IdFilterCount[]> {
-  // Get matching product IDs first (respecting all filters)
-  const matchingProducts = await prisma.product.findMany({
-    where: baseWhere,
-    select: { id: true },
-  })
+function buildRawSQLConditions(
+  params: ProductFilterParams,
+  excludeField: ExcludeField
+): { conditions: string[]; values: unknown[] } {
+  const conditions: string[] = ['"deletedAt" IS NULL']
+  const values: unknown[] = []
+  let paramIndex = 1
 
-  if (matchingProducts.length === 0) {
-    // Return all seasons with 0 count
-    const allSeasons = await prisma.season.findMany({ select: { id: true } })
-    return allSeasons.map((s) => ({ id: s.id, count: 0 }))
+  // Brand filter (case-insensitive contains)
+  if (params.brand) {
+    conditions.push(`"brand" ILIKE $${paramIndex}`)
+    values.push(`%${params.brand}%`)
+    paramIndex++
   }
 
-  const productIds = matchingProducts.map((p) => p.id)
+  // Gender filter
+  if (excludeField !== 'gender' && params.gender) {
+    conditions.push(`"gender" = $${paramIndex}::"Gender"`)
+    values.push(params.gender)
+    paramIndex++
+  }
 
-  // Single aggregation query: count products per season
-  // In _ProductSeasons: A = Product ID, B = Season ID (Prisma orders by model name alphabetically)
-  const seasonCounts = await prisma.$queryRaw<{ seasonId: number; count: bigint }[]>`
-    SELECT "B" as "seasonId", COUNT(DISTINCT "A") as count
-    FROM "_ProductSeasons"
-    WHERE "A" = ANY(${productIds}::int[])
-    GROUP BY "B"
+  // Concentration filter
+  if (excludeField !== 'concentration' && params.concentration) {
+    conditions.push(`"concentration" = $${paramIndex}::"Concentration"`)
+    values.push(params.concentration)
+    paramIndex++
+  }
+
+  // Price range filter
+  if (params.minPrice !== undefined) {
+    conditions.push(`"priceRON" >= $${paramIndex}`)
+    values.push(params.minPrice)
+    paramIndex++
+  }
+  if (params.maxPrice !== undefined) {
+    conditions.push(`"priceRON" <= $${paramIndex}`)
+    values.push(params.maxPrice)
+    paramIndex++
+  }
+
+  // Rating range filter
+  if (params.minRating !== undefined) {
+    conditions.push(`"rating" >= $${paramIndex}`)
+    values.push(params.minRating)
+    paramIndex++
+  }
+  if (params.maxRating !== undefined) {
+    conditions.push(`"rating" <= $${paramIndex}`)
+    values.push(params.maxRating)
+    paramIndex++
+  }
+
+  // Lookup ID filters
+  if (excludeField !== 'fragranceFamilyId' && params.fragranceFamilyId !== undefined) {
+    conditions.push(`"fragranceFamilyId" = $${paramIndex}`)
+    values.push(params.fragranceFamilyId)
+    paramIndex++
+  }
+  if (excludeField !== 'longevityId' && params.longevityId !== undefined) {
+    conditions.push(`"longevityId" = $${paramIndex}`)
+    values.push(params.longevityId)
+    paramIndex++
+  }
+  if (excludeField !== 'sillageId' && params.sillageId !== undefined) {
+    conditions.push(`"sillageId" = $${paramIndex}`)
+    values.push(params.sillageId)
+    paramIndex++
+  }
+
+  // Stock status filter
+  if (params.stockStatus && params.stockStatus !== 'all') {
+    switch (params.stockStatus) {
+      case 'in_stock':
+        conditions.push(`"stock" > ${STOCK.LOW_STOCK_THRESHOLD}`)
+        break
+      case 'low_stock':
+        conditions.push(`"stock" > 0 AND "stock" <= ${STOCK.LOW_STOCK_THRESHOLD}`)
+        break
+      case 'out_of_stock':
+        conditions.push(`"stock" = 0`)
+        break
+    }
+  }
+
+  // Search filter (name, brand, description)
+  if (params.search) {
+    const searchCondition = `("name" ILIKE $${paramIndex} OR "brand" ILIKE $${paramIndex} OR "description" ILIKE $${paramIndex})`
+    conditions.push(searchCondition)
+    values.push(`%${params.search}%`)
+    paramIndex++
+  }
+
+  return { conditions, values }
+}
+
+/**
+ * Count products for each season (many-to-many relation)
+ * Uses a single query with raw SQL subquery to avoid loading all product IDs into memory
+ */
+async function countSeasons(
+  params: ProductFilterParams,
+  excludeField: ExcludeField
+): Promise<IdFilterCount[]> {
+  const { conditions, values } = buildRawSQLConditions(params, excludeField)
+
+  // Build season join condition if not excluded and seasonIds are specified
+  let seasonJoinSQL = ''
+  if (excludeField !== 'seasonIds' && params.seasonIds && params.seasonIds.length > 0) {
+    if (params.seasonMatchMode === 'all') {
+      // Product must have ALL specified seasons
+      const seasonConditions = params.seasonIds.map((id) =>
+        `EXISTS (SELECT 1 FROM "_ProductSeasons" ps WHERE ps."A" = p.id AND ps."B" = ${id})`
+      )
+      seasonJoinSQL = ` AND ${seasonConditions.join(' AND ')}`
+    } else {
+      // Product must have ANY of the specified seasons
+      seasonJoinSQL = ` AND EXISTS (SELECT 1 FROM "_ProductSeasons" ps WHERE ps."A" = p.id AND ps."B" = ANY(ARRAY[${params.seasonIds.join(',')}]))`
+    }
+  }
+
+  // Build occasion join condition if not excluded and occasionIds are specified
+  let occasionJoinSQL = ''
+  if (excludeField !== 'occasionIds' && params.occasionIds && params.occasionIds.length > 0) {
+    if (params.occasionMatchMode === 'all') {
+      const occasionConditions = params.occasionIds.map((id) =>
+        `EXISTS (SELECT 1 FROM "_ProductOccasions" po WHERE po."B" = p.id AND po."A" = ${id})`
+      )
+      occasionJoinSQL = ` AND ${occasionConditions.join(' AND ')}`
+    } else {
+      occasionJoinSQL = ` AND EXISTS (SELECT 1 FROM "_ProductOccasions" po WHERE po."B" = p.id AND po."A" = ANY(ARRAY[${params.occasionIds.join(',')}]))`
+    }
+  }
+
+  const whereClause = conditions.join(' AND ')
+
+  // Single query with subquery - no need to load all IDs into memory
+  // In _ProductSeasons: A = Product ID, B = Season ID (Prisma alphabetical ordering)
+  const query = `
+    SELECT s.id as "seasonId", COUNT(DISTINCT ps."A") as count
+    FROM "Season" s
+    LEFT JOIN "_ProductSeasons" ps ON ps."B" = s.id
+      AND ps."A" IN (
+        SELECT p.id FROM "Product" p
+        WHERE ${whereClause}${seasonJoinSQL}${occasionJoinSQL}
+      )
+    GROUP BY s.id
+    ORDER BY s.id
   `
 
-  // Get all seasons to ensure we return counts for all (even 0)
-  const allSeasons = await prisma.season.findMany({ select: { id: true } })
-  const countsMap = new Map(seasonCounts.map((sc) => [sc.seasonId, Number(sc.count)]))
+  const seasonCounts = await prisma.$queryRawUnsafe<{ seasonId: number; count: bigint }[]>(
+    query,
+    ...values
+  )
 
-  return allSeasons.map((s) => ({
-    id: s.id,
-    count: countsMap.get(s.id) ?? 0,
+  return seasonCounts.map((sc) => ({
+    id: sc.seasonId,
+    count: Number(sc.count),
   }))
 }
 
 /**
  * Count products for each occasion (many-to-many relation)
- * Uses a single query with raw SQL aggregation to avoid N+1 problem
+ * Uses a single query with raw SQL subquery to avoid loading all product IDs into memory
  */
 async function countOccasions(
-  baseWhere: Prisma.ProductWhereInput
+  params: ProductFilterParams,
+  excludeField: ExcludeField
 ): Promise<IdFilterCount[]> {
-  // Get matching product IDs first (respecting all filters)
-  const matchingProducts = await prisma.product.findMany({
-    where: baseWhere,
-    select: { id: true },
-  })
+  const { conditions, values } = buildRawSQLConditions(params, excludeField)
 
-  if (matchingProducts.length === 0) {
-    // Return all occasions with 0 count
-    const allOccasions = await prisma.occasion.findMany({ select: { id: true } })
-    return allOccasions.map((o) => ({ id: o.id, count: 0 }))
+  // Build season join condition if not excluded and seasonIds are specified
+  let seasonJoinSQL = ''
+  if (excludeField !== 'seasonIds' && params.seasonIds && params.seasonIds.length > 0) {
+    if (params.seasonMatchMode === 'all') {
+      const seasonConditions = params.seasonIds.map((id) =>
+        `EXISTS (SELECT 1 FROM "_ProductSeasons" ps WHERE ps."A" = p.id AND ps."B" = ${id})`
+      )
+      seasonJoinSQL = ` AND ${seasonConditions.join(' AND ')}`
+    } else {
+      seasonJoinSQL = ` AND EXISTS (SELECT 1 FROM "_ProductSeasons" ps WHERE ps."A" = p.id AND ps."B" = ANY(ARRAY[${params.seasonIds.join(',')}]))`
+    }
   }
 
-  const productIds = matchingProducts.map((p) => p.id)
+  // Build occasion join condition if not excluded and occasionIds are specified
+  let occasionJoinSQL = ''
+  if (excludeField !== 'occasionIds' && params.occasionIds && params.occasionIds.length > 0) {
+    if (params.occasionMatchMode === 'all') {
+      const occasionConditions = params.occasionIds.map((id) =>
+        `EXISTS (SELECT 1 FROM "_ProductOccasions" po WHERE po."B" = p.id AND po."A" = ${id})`
+      )
+      occasionJoinSQL = ` AND ${occasionConditions.join(' AND ')}`
+    } else {
+      occasionJoinSQL = ` AND EXISTS (SELECT 1 FROM "_ProductOccasions" po WHERE po."B" = p.id AND po."A" = ANY(ARRAY[${params.occasionIds.join(',')}]))`
+    }
+  }
 
-  // Single aggregation query: count products per occasion
-  // In _ProductOccasions: A = Occasion ID, B = Product ID (Prisma orders by model name alphabetically)
-  const occasionCounts = await prisma.$queryRaw<{ occasionId: number; count: bigint }[]>`
-    SELECT "A" as "occasionId", COUNT(DISTINCT "B") as count
-    FROM "_ProductOccasions"
-    WHERE "B" = ANY(${productIds}::int[])
-    GROUP BY "A"
+  const whereClause = conditions.join(' AND ')
+
+  // Single query with subquery - no need to load all IDs into memory
+  // In _ProductOccasions: A = Occasion ID, B = Product ID (Prisma alphabetical ordering)
+  const query = `
+    SELECT o.id as "occasionId", COUNT(DISTINCT po."B") as count
+    FROM "Occasion" o
+    LEFT JOIN "_ProductOccasions" po ON po."A" = o.id
+      AND po."B" IN (
+        SELECT p.id FROM "Product" p
+        WHERE ${whereClause}${seasonJoinSQL}${occasionJoinSQL}
+      )
+    GROUP BY o.id
+    ORDER BY o.id
   `
 
-  // Get all occasions to ensure we return counts for all (even 0)
-  const allOccasions = await prisma.occasion.findMany({ select: { id: true } })
-  const countsMap = new Map(occasionCounts.map((oc) => [oc.occasionId, Number(oc.count)]))
+  const occasionCounts = await prisma.$queryRawUnsafe<{ occasionId: number; count: bigint }[]>(
+    query,
+    ...values
+  )
 
-  return allOccasions.map((o) => ({
-    id: o.id,
-    count: countsMap.get(o.id) ?? 0,
+  return occasionCounts.map((oc) => ({
+    id: oc.occasionId,
+    count: Number(oc.count),
   }))
 }

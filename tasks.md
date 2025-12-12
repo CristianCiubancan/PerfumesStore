@@ -2,8 +2,8 @@
 
 **Source:** code-review.md
 **Date:** 2025-12-12
-**Last Updated:** 2025-12-12
-**Total Issues:** 39 (21 completed, 18 remaining)
+**Last Updated:** 2025-12-13
+**Total Issues:** 39 (25 completed, 14 remaining)
 
 ---
 
@@ -31,7 +31,7 @@ Issues that pose significant risk to production stability, security, or data int
 
 ---
 
-## HIGH (19 issues - 10 completed)
+## HIGH (19 issues - 12 completed)
 
 Issues that significantly impact code quality, performance, or maintainability.
 
@@ -40,7 +40,7 @@ Issues that significantly impact code quality, performance, or maintainability.
 | 9 | ~~Missing `unhandledRejection` global handler~~ | Reliability | `server/src/index.ts` | 1h | ✅ Done |
 | 10 | ~~Missing `uncaughtException` global handler~~ | Reliability | `server/src/index.ts` | 1h | ✅ Done |
 | 11 | ~~Missing HTTP compression (gzip/brotli)~~ | Performance | `server/src/index.ts` | 1h | ✅ Done |
-| 12 | No README.md at project root | Maintainability | Project root | 3h | |
+| 12 | ~~No README.md at project root~~ | Maintainability | `README.md` | 3h | ✅ Done |
 | 13 | No API documentation (Swagger/OpenAPI) | Maintainability | Project-wide | 4h | |
 | 14 | 25+ outdated dependencies (Prisma 6→7, Express 4→5) | Maintainability | `server/package.json`, `client/package.json` | 6h | |
 | 15 | ~~Fire-and-forget email without retry mechanism~~ | Reliability | `server/src/services/stripe-webhook.service.ts:79` | 4h | ✅ Done |
@@ -53,23 +53,25 @@ Issues that significantly impact code quality, performance, or maintainability.
 | 22 | No secret management solution (Vault/AWS Secrets Manager) | DevOps | Project-wide | 8h | |
 | 23 | ~~No request correlation/tracing IDs~~ | Observability | `server/src/middleware/` | 2h | ✅ Done |
 | 24 | ~~Client errors swallowed in production~~ | Observability | `client/components/error-boundary.tsx` | 2h | ✅ Done |
-| 25 | Filter counts query fetches all products then aggregates | Performance | `server/src/services/product/filter-count-builder.ts:245-279` | 4h | |
+| 25 | ~~Filter counts query fetches all products then aggregates~~ | Performance | `server/src/services/product/filter-count-builder.ts` | 4h | ✅ Done |
 | 26 | ~~No Cache-Control headers for GET endpoints~~ | Performance | `server/src/controllers/product.controller.ts` | 2h | ✅ Done |
 | 27 | ~~No CHANGELOG.md or versioning strategy~~ | Maintainability | Project root | 2h | ✅ Done |
 
 **Completed:**
 - **#9 & #10**: Added global error handlers in `server/src/index.ts` for uncaught exceptions and unhandled rejections
 - **#11**: Added `compression` middleware to server for gzip/deflate compression
+- **#12**: Created comprehensive README.md with tech stack, features, getting started guide, project structure, and API overview
 - **#15**: Added email retry mechanism with exponential backoff (3 attempts, 2-30s delays) using generic retry utility
 - **#21**: Added Trivy container image vulnerability scanning to CI pipeline (fails on CRITICAL/HIGH)
 - **#23**: Added `server/src/middleware/requestId.ts` for request correlation IDs (X-Request-ID header)
 - **#24**: Updated `ErrorBoundary` to report errors via `reportError()` which sends to Sentry in production
+- **#25**: Optimized filter counts query to use raw SQL subqueries instead of loading all product IDs into memory
 - **#26**: Added Cache-Control headers to product, promotion, and exchange-rate controllers (30s-1hr based on data volatility)
 - **#27**: Created CHANGELOG.md with Keep a Changelog format and semantic versioning
 
 ---
 
-## MEDIUM (8 issues - 4 completed)
+## MEDIUM (8 issues - 6 completed)
 
 Issues that should be addressed but don't pose immediate risk.
 
@@ -81,14 +83,16 @@ Issues that should be addressed but don't pose immediate risk.
 | 31 | ~~Health check only tests database (not Stripe, email)~~ | Observability | `server/src/routes/index.ts:24-31` | 2h | ✅ Done |
 | 32 | ~~No lazy loading for product images~~ | Performance | `client/components/` | 2h | ✅ Done |
 | 33 | ~~No retry logic for BNR exchange rate fetch~~ | Reliability | `server/src/services/exchange-rate.service.ts:37-42` | 2h | ✅ Done |
-| 34 | Inconsistent commit message format | Maintainability | Git history | 1h | |
-| 35 | Missing CONTRIBUTING.md | Maintainability | Project root | 2h | |
+| 34 | ~~Inconsistent commit message format~~ | Maintainability | `.gitmessage` | 1h | ✅ Done |
+| 35 | ~~Missing CONTRIBUTING.md~~ | Maintainability | `CONTRIBUTING.md` | 2h | ✅ Done |
 
 **Completed:**
 - **#28**: Updated Next.js from 16.0.0-beta.0 to 16.0.10 via `npm audit fix`, resolving both vulnerabilities
 - **#31**: Enhanced health check to verify database (with latency), Stripe API, email service (Resend), and exchange rate freshness
 - **#32**: Added `loading="lazy"` to product images in cart-item-row.tsx and brand-story.tsx (product-card.tsx already had it)
 - **#33**: Added exponential backoff retry (3 attempts, 1-10s delays with jitter) for BNR exchange rate fetch
+- **#34**: Added `.gitmessage` commit template with Conventional Commits guidelines
+- **#35**: Created CONTRIBUTING.md with development workflow, commit guidelines, testing, and PR process
 
 ---
 
@@ -117,12 +121,12 @@ Nice-to-have improvements with minimal immediate impact.
 | Observability | 4 | 2 | 1 | 0 | **5** | 2 |
 | Testing | 2 | 3 | 0 | 0 | **1** | 4 |
 | DevOps | 2 | 2 | 1 | 0 | **3** | 2 |
-| Maintainability | 0 | 4 | 2 | 0 | **1** | 5 |
+| Maintainability | 0 | 4 | 2 | 0 | **4** | 2 |
 | Reliability | 0 | 2 | 1 | 1 | **5** | 0 |
-| Performance | 0 | 3 | 1 | 1 | **4** | 1 |
+| Performance | 0 | 3 | 1 | 1 | **5** | 0 |
 | Code Quality | 0 | 2 | 1 | 1 | **1** | 3 |
 | Security | 0 | 0 | 1 | 1 | **1** | 1 |
-| **Total** | **8** | **19** | **8** | **4** | **21** | **18** |
+| **Total** | **8** | **19** | **8** | **4** | **25** | **14** |
 
 ---
 
@@ -154,13 +158,14 @@ Focus: Production visibility
 ### Sprint 3 (Documentation & Quality - 1 week)
 Focus: Developer experience
 
-- [ ] #12 - Create README.md - 3h
+- [x] #12 - Create README.md - 3h ✅
 - [ ] #13 - Add Swagger/OpenAPI docs - 4h
 - [ ] #14 - Update outdated dependencies - 6h
 - [x] #27 - Set up CHANGELOG and versioning - 2h ✅
-- [ ] #35 - Create CONTRIBUTING.md - 2h
+- [x] #34 - Standardize commit messages - 1h ✅
+- [x] #35 - Create CONTRIBUTING.md - 2h ✅
 
-**Total: ~17 hours (2h completed, 15h remaining)**
+**Total: ~18 hours (8h completed, 10h remaining)**
 
 ### Sprint 4 (Testing - 2 weeks)
 Focus: Test coverage and reliability
@@ -187,13 +192,13 @@ Focus: Production hardening
 - [ ] #16, #17 - Refactor large components - 8h
 - [ ] #18 - Client component tests - 30h
 - [ ] #22 - Secret management solution - 8h
-- [ ] #25 - Optimize filter counts query - 4h
+- [x] #25 - Optimize filter counts query - 4h ✅
 - [x] #26 - Add Cache-Control headers - 2h ✅
 - [ ] #29 - Reorganize types by domain - 4h
 - [ ] #30 - Add runtime security policies - 3h
 - [x] #32 - Add image lazy loading - 2h ✅
 - [x] #33 - Add exchange rate retry logic - 2h ✅
-- [ ] #34 - Standardize commit messages - 1h
+- [x] #34 - Standardize commit messages - 1h ✅
 - [ ] #36 - Redis-backed rate limiting - 4h
 - [x] #38 - Configure connection pool - 1h ✅
 - [x] #39 - Increase shutdown timeout - 1h ✅
@@ -205,11 +210,11 @@ Focus: Production hardening
 | Priority | Issues | Completed | Remaining Effort |
 |----------|--------|-----------|------------------|
 | Critical | 8 | 5 | ~54h |
-| High | 19 | 10 | ~66h |
-| Medium | 8 | 4 | ~10h |
+| High | 19 | 12 | ~59h |
+| Medium | 8 | 6 | ~7h |
 | Low | 4 | 3 | ~4h |
-| **Total** | **39** | **21** | **~134h** |
+| **Total** | **39** | **25** | **~124h** |
 
-**Progress:** 21/39 issues completed (~54%)
-**Effort saved:** ~52h completed
-**Remaining:** ~134h (~3-4 sprints with 1 developer)
+**Progress:** 25/39 issues completed (~64%)
+**Effort saved:** ~62h completed
+**Remaining:** ~124h (~3 sprints with 1 developer)

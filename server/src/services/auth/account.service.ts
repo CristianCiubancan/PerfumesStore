@@ -1,17 +1,18 @@
 import { prisma } from '../../lib/prisma'
 import { AppError } from '../../middleware/errorHandler'
 import { logger } from '../../lib/logger'
+import { getRedis, isRedisAvailable } from '../../lib/redis'
 
 // Account lockout configuration
 const MAX_FAILED_ATTEMPTS = 5
 const LOCKOUT_DURATION_MINUTES = 15
 
 // Per-email rate limiting configuration
-// NOTE: For production, consider using rate-limiter-flexible package with Redis backend
-// This in-memory implementation will be reset on server restart
-const EMAIL_RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000 // 15 minutes
+const EMAIL_RATE_LIMIT_WINDOW_SECONDS = 15 * 60 // 15 minutes
 const EMAIL_RATE_LIMIT_MAX_ATTEMPTS = 5
+const RATE_LIMIT_KEY_PREFIX = 'rate_limit:login:'
 
+// In-memory fallback for when Redis is unavailable
 interface RateLimitEntry {
   count: number
   resetAt: number
@@ -19,7 +20,7 @@ interface RateLimitEntry {
 
 const emailRateLimitStore = new Map<string, RateLimitEntry>()
 
-// Clean up expired rate limit entries periodically
+// Clean up expired in-memory rate limit entries periodically
 setInterval(() => {
   const now = Date.now()
   for (const [email, entry] of emailRateLimitStore.entries()) {
@@ -30,35 +31,128 @@ setInterval(() => {
 }, 60 * 1000) // Run every minute
 
 /**
- * Check and enforce per-email rate limiting
+ * Check and enforce per-email rate limiting using Redis (with in-memory fallback)
  * Returns true if rate limit exceeded
  */
-export function checkEmailRateLimit(email: string): boolean {
+export async function checkEmailRateLimit(email: string): Promise<boolean> {
+  const redis = getRedis()
+
+  if (redis && isRedisAvailable()) {
+    return checkEmailRateLimitRedis(email)
+  }
+
+  return checkEmailRateLimitMemory(email)
+}
+
+/**
+ * Redis-based rate limit check
+ * Uses Redis INCR with TTL for distributed rate limiting
+ */
+async function checkEmailRateLimitRedis(email: string): Promise<boolean> {
+  const redis = getRedis()
+  if (!redis) return checkEmailRateLimitMemory(email)
+
+  const key = `${RATE_LIMIT_KEY_PREFIX}${email.toLowerCase()}`
+
+  try {
+    // Use Lua script for atomic increment + TTL check
+    const result = await redis.eval(
+      `
+      local key = KEYS[1]
+      local limit = tonumber(ARGV[1])
+      local window = tonumber(ARGV[2])
+
+      local current = redis.call('INCR', key)
+
+      if current == 1 then
+        redis.call('EXPIRE', key, window)
+      end
+
+      return current
+      `,
+      1,
+      key,
+      EMAIL_RATE_LIMIT_MAX_ATTEMPTS,
+      EMAIL_RATE_LIMIT_WINDOW_SECONDS
+    ) as number
+
+    const exceeded = result > EMAIL_RATE_LIMIT_MAX_ATTEMPTS
+
+    if (exceeded) {
+      logger.warn(
+        `Rate limit exceeded for ${email} (attempt ${result}/${EMAIL_RATE_LIMIT_MAX_ATTEMPTS})`,
+        'RateLimit'
+      )
+    }
+
+    return exceeded
+  } catch (err) {
+    logger.error(
+      `Redis rate limit error: ${err instanceof Error ? err.message : 'Unknown'}`,
+      'RateLimit'
+    )
+    // Fallback to in-memory on Redis error
+    return checkEmailRateLimitMemory(email)
+  }
+}
+
+/**
+ * In-memory rate limit check (fallback when Redis unavailable)
+ */
+function checkEmailRateLimitMemory(email: string): boolean {
   const now = Date.now()
-  const entry = emailRateLimitStore.get(email)
+  const normalizedEmail = email.toLowerCase()
+  const entry = emailRateLimitStore.get(normalizedEmail)
 
   if (!entry || now >= entry.resetAt) {
     // Create new entry or reset expired entry
-    emailRateLimitStore.set(email, {
+    emailRateLimitStore.set(normalizedEmail, {
       count: 1,
-      resetAt: now + EMAIL_RATE_LIMIT_WINDOW_MS,
+      resetAt: now + EMAIL_RATE_LIMIT_WINDOW_SECONDS * 1000,
     })
     return false
   }
 
   // Increment attempt count
   entry.count++
-  emailRateLimitStore.set(email, entry)
+  emailRateLimitStore.set(normalizedEmail, entry)
 
   // Check if limit exceeded
-  return entry.count > EMAIL_RATE_LIMIT_MAX_ATTEMPTS
+  const exceeded = entry.count > EMAIL_RATE_LIMIT_MAX_ATTEMPTS
+
+  if (exceeded) {
+    logger.warn(
+      `Rate limit exceeded for ${email} (attempt ${entry.count}/${EMAIL_RATE_LIMIT_MAX_ATTEMPTS}) [in-memory]`,
+      'RateLimit'
+    )
+  }
+
+  return exceeded
 }
 
 /**
  * Reset email rate limit (called on successful login)
+ * Uses Redis if available, otherwise in-memory
  */
-export function resetEmailRateLimit(email: string): void {
-  emailRateLimitStore.delete(email)
+export async function resetEmailRateLimit(email: string): Promise<void> {
+  const redis = getRedis()
+  const normalizedEmail = email.toLowerCase()
+
+  // Always clear from in-memory store
+  emailRateLimitStore.delete(normalizedEmail)
+
+  // Also clear from Redis if available
+  if (redis && isRedisAvailable()) {
+    const key = `${RATE_LIMIT_KEY_PREFIX}${normalizedEmail}`
+    try {
+      await redis.del(key)
+    } catch (err) {
+      logger.error(
+        `Redis rate limit reset error: ${err instanceof Error ? err.message : 'Unknown'}`,
+        'RateLimit'
+      )
+    }
+  }
 }
 
 /**

@@ -2,7 +2,9 @@ import { Request, Response } from 'express'
 import * as exchangeRateService from '../../services/exchange-rate.service'
 import * as exchangeRateController from '../exchange-rate.controller'
 import { AppError } from '../../middleware/errorHandler'
-import { Decimal } from '@prisma/client/runtime/library'
+import { Prisma } from '@prisma/client'
+
+const Decimal = Prisma.Decimal
 
 // Mock exchange rate service
 jest.mock('../../services/exchange-rate.service', () => ({

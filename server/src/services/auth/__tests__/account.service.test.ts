@@ -24,7 +24,14 @@ jest.mock('../../../lib/prisma', () => ({
 jest.mock('../../../lib/logger', () => ({
   logger: {
     warn: jest.fn(),
+    error: jest.fn(),
   },
+}))
+
+// Mock Redis (not available in tests)
+jest.mock('../../../lib/redis', () => ({
+  getRedis: jest.fn(() => null),
+  isRedisAvailable: jest.fn(() => false),
 }))
 
 describe('AccountService', () => {
@@ -33,52 +40,52 @@ describe('AccountService', () => {
   })
 
   describe('checkEmailRateLimit', () => {
-    beforeEach(() => {
+    beforeEach(async () => {
       // Reset rate limit store between tests
-      resetEmailRateLimit('test@example.com')
+      await resetEmailRateLimit('test@example.com')
     })
 
-    it('should return false for first attempt', () => {
-      const result = checkEmailRateLimit('fresh@example.com')
+    it('should return false for first attempt', async () => {
+      const result = await checkEmailRateLimit('fresh@example.com')
       expect(result).toBe(false)
-      resetEmailRateLimit('fresh@example.com')
+      await resetEmailRateLimit('fresh@example.com')
     })
 
-    it('should return false for attempts within limit', () => {
+    it('should return false for attempts within limit', async () => {
       const email = 'limit@example.com'
       for (let i = 0; i < 5; i++) {
-        expect(checkEmailRateLimit(email)).toBe(false)
+        expect(await checkEmailRateLimit(email)).toBe(false)
       }
-      resetEmailRateLimit(email)
+      await resetEmailRateLimit(email)
     })
 
-    it('should return true when rate limit exceeded', () => {
+    it('should return true when rate limit exceeded', async () => {
       const email = 'exceeded@example.com'
       // Make 5 attempts (at the limit)
       for (let i = 0; i < 5; i++) {
-        checkEmailRateLimit(email)
+        await checkEmailRateLimit(email)
       }
       // 6th attempt should exceed limit
-      expect(checkEmailRateLimit(email)).toBe(true)
-      resetEmailRateLimit(email)
+      expect(await checkEmailRateLimit(email)).toBe(true)
+      await resetEmailRateLimit(email)
     })
   })
 
   describe('resetEmailRateLimit', () => {
-    it('should reset rate limit for email', () => {
+    it('should reset rate limit for email', async () => {
       const email = 'reset@example.com'
       // Hit rate limit
       for (let i = 0; i < 6; i++) {
-        checkEmailRateLimit(email)
+        await checkEmailRateLimit(email)
       }
-      expect(checkEmailRateLimit(email)).toBe(true)
+      expect(await checkEmailRateLimit(email)).toBe(true)
 
       // Reset
-      resetEmailRateLimit(email)
+      await resetEmailRateLimit(email)
 
       // Should allow again
-      expect(checkEmailRateLimit(email)).toBe(false)
-      resetEmailRateLimit(email)
+      expect(await checkEmailRateLimit(email)).toBe(false)
+      await resetEmailRateLimit(email)
     })
   })
 

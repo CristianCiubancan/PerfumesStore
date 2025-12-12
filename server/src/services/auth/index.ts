@@ -88,7 +88,7 @@ export async function register(input: RegisterInput, context?: TokenContext) {
  */
 export async function login(input: LoginInput, context?: TokenContext) {
   // SEC-009: Check per-email rate limiting (in addition to per-IP rate limiting at middleware level)
-  if (checkEmailRateLimit(input.email)) {
+  if (await checkEmailRateLimit(input.email)) {
     throw new AppError(
       'Too many login attempts. Please try again later.',
       429,
@@ -129,7 +129,7 @@ export async function login(input: LoginInput, context?: TokenContext) {
 
   // Reset failed login attempts and email rate limit on successful login
   await resetFailedLoginAttempts(user.id)
-  resetEmailRateLimit(input.email)
+  await resetEmailRateLimit(input.email)
 
   const payload: TokenPayload = {
     userId: user.id,

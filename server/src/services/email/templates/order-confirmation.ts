@@ -17,8 +17,10 @@ import {
   renderTwoColumns,
   renderInfoRow,
 } from './base'
-import type { Order, OrderItem } from '@prisma/client'
-import { Decimal } from '@prisma/client/runtime/library'
+import { Prisma, type Order, type OrderItem } from '@prisma/client'
+
+const Decimal = Prisma.Decimal
+type Decimal = Prisma.Decimal
 
 // ============================================================================
 // Types

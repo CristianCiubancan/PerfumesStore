@@ -94,6 +94,7 @@ export async function createCheckoutSession({ input, userId }: CreateSessionPara
     shippingAddress,
     items,
     stripeSessionId: session.id,
+    locale,
   })
 
   logger.info(

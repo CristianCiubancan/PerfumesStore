@@ -1,0 +1,61 @@
+{
+  "orderConfirmation": {
+    "subject": "Bestellbestätigung - {orderNumber}",
+    "title": "Vielen Dank für Ihre Bestellung!",
+    "greeting": "Liebe(r) {name},",
+    "thankYou": "Vielen Dank für Ihren Einkauf. Ihre Bestellung wurde bestätigt und wird bearbeitet.",
+    "orderNumber": "Bestellnummer",
+    "orderDate": "Bestelldatum",
+    "shippingAddress": "Lieferadresse",
+    "orderSummary": "Bestellübersicht",
+    "product": "Produkt",
+    "quantity": "Menge",
+    "price": "Preis",
+    "subtotal": "Zwischensumme",
+    "discount": "Rabatt",
+    "total": "Gesamt",
+    "paidAmount": "Bezahlter Betrag",
+    "invoiceAttached": "Ihre Rechnung ist dieser E-Mail als PDF beigefügt.",
+    "questions": "Bei Fragen zu Ihrer Bestellung können Sie uns gerne kontaktieren.",
+    "footer": "Vielen Dank für Ihren Einkauf!"
+  },
+  "newsletterWelcome": {
+    "subject": "Willkommen in Unserem Newsletter!",
+    "title": "Willkommen in der Duft-Familie!",
+    "greeting": "Hallo,",
+    "thankYou": "Vielen Dank für Ihre Newsletter-Anmeldung. Wir freuen uns, Sie dabei zu haben!",
+    "whatToExpect": "Was Sie erwartet:",
+    "exclusiveOffers": "Exklusive Angebote und Rabatte",
+    "newArrivals": "Erste Einblicke in neue Produkte",
+    "fragranceTips": "Dufttipps und Empfehlungen",
+    "cta": "Kollektion Entdecken",
+    "unsubscribe": "Sie können sich jederzeit abmelden, indem Sie auf den Link in unseren E-Mails klicken.",
+    "footer": "Bleiben Sie duftend!"
+  },
+  "common": {
+    "currency": "RON",
+    "viewOrder": "Bestellung Ansehen",
+    "visitStore": "Shop Besuchen"
+  },
+  "invoice": {
+    "title": "RECHNUNG",
+    "invoiceNumber": "Rechnungsnummer",
+    "date": "Datum",
+    "billTo": "Rechnungsadresse",
+    "shipTo": "Lieferadresse",
+    "description": "Beschreibung",
+    "quantity": "Menge",
+    "unitPrice": "Einzelpreis",
+    "amount": "Betrag",
+    "subtotal": "Zwischensumme",
+    "discount": "Rabatt",
+    "total": "Gesamtsumme",
+    "paidAmount": "Gezahlter Betrag",
+    "paymentMethod": "Zahlungsmethode",
+    "creditCard": "Kreditkarte (Stripe)",
+    "thankYou": "Vielen Dank für Ihren Einkauf!",
+    "questions": "Bei Fragen kontaktieren Sie uns bitte.",
+    "page": "Seite",
+    "of": "von"
+  }
+}

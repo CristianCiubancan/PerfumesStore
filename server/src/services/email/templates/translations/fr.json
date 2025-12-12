@@ -1,0 +1,61 @@
+{
+  "orderConfirmation": {
+    "subject": "Confirmation de Commande - {orderNumber}",
+    "title": "Merci pour Votre Commande!",
+    "greeting": "Cher(e) {name},",
+    "thankYou": "Merci pour votre achat. Votre commande a été confirmée et est en cours de traitement.",
+    "orderNumber": "Numéro de Commande",
+    "orderDate": "Date de Commande",
+    "shippingAddress": "Adresse de Livraison",
+    "orderSummary": "Récapitulatif de Commande",
+    "product": "Produit",
+    "quantity": "Qté",
+    "price": "Prix",
+    "subtotal": "Sous-total",
+    "discount": "Réduction",
+    "total": "Total",
+    "paidAmount": "Montant Payé",
+    "invoiceAttached": "Votre facture est jointe à cet email en PDF.",
+    "questions": "Si vous avez des questions concernant votre commande, n'hésitez pas à nous contacter.",
+    "footer": "Merci d'avoir choisi notre boutique!"
+  },
+  "newsletterWelcome": {
+    "subject": "Bienvenue dans Notre Newsletter!",
+    "title": "Bienvenue dans la Famille des Parfums!",
+    "greeting": "Bonjour,",
+    "thankYou": "Merci de vous être inscrit à notre newsletter. Nous sommes ravis de vous accueillir!",
+    "whatToExpect": "Ce qui vous attend:",
+    "exclusiveOffers": "Offres et réductions exclusives",
+    "newArrivals": "Aperçu en avant-première des nouveautés",
+    "fragranceTips": "Conseils et recommandations de parfums",
+    "cta": "Explorer la Collection",
+    "unsubscribe": "Vous pouvez vous désabonner à tout moment en cliquant sur le lien dans nos emails.",
+    "footer": "Restez parfumé(e)!"
+  },
+  "common": {
+    "currency": "RON",
+    "viewOrder": "Voir la Commande",
+    "visitStore": "Visiter la Boutique"
+  },
+  "invoice": {
+    "title": "FACTURE",
+    "invoiceNumber": "Numéro de Facture",
+    "date": "Date",
+    "billTo": "Facturé à",
+    "shipTo": "Livré à",
+    "description": "Description",
+    "quantity": "Qté",
+    "unitPrice": "Prix Unitaire",
+    "amount": "Montant",
+    "subtotal": "Sous-total",
+    "discount": "Réduction",
+    "total": "Total",
+    "paidAmount": "Montant Payé",
+    "paymentMethod": "Mode de Paiement",
+    "creditCard": "Carte de Crédit (Stripe)",
+    "thankYou": "Merci pour votre achat!",
+    "questions": "Si vous avez des questions, veuillez nous contacter.",
+    "page": "Page",
+    "of": "sur"
+  }
+}

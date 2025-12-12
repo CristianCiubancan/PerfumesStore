@@ -1,9 +1,12 @@
 import { prisma } from '../lib/prisma'
 import { AppError } from '../middleware/errorHandler'
+import { sendNewsletterWelcomeEmail, normalizeLocale, type Locale } from './email'
+import { logger } from '../lib/logger'
 
 export interface NewsletterSubscriber {
   id: number
   email: string
+  preferredLanguage: string
   isActive: boolean
   subscribedAt: Date
   unsubscribedAt: Date | null
@@ -25,22 +28,45 @@ export interface ListSubscribersResult {
   }
 }
 
-export async function subscribe(email: string): Promise<NewsletterSubscriber> {
+export async function subscribe(email: string, locale?: string): Promise<NewsletterSubscriber> {
+  const preferredLanguage = normalizeLocale(locale)
+
+  // Check if this is a new subscriber (for welcome email)
+  const existing = await prisma.newsletterSubscriber.findUnique({
+    where: { email },
+  })
+  const isNewSubscriber = !existing
+
   // Use upsert to handle race conditions atomically
   // - If email doesn't exist: create new subscriber
   // - If email exists but inactive: reactivate
   // - If email exists and active: no-op (returns existing)
-  return prisma.newsletterSubscriber.upsert({
+  const subscriber = await prisma.newsletterSubscriber.upsert({
     where: { email },
     create: {
       email,
+      preferredLanguage,
       isActive: true,
     },
     update: {
       isActive: true,
       unsubscribedAt: null,
+      // Update language preference on resubscription
+      preferredLanguage,
     },
   })
+
+  // Send welcome email for new subscribers (fire and forget)
+  if (isNewSubscriber) {
+    sendNewsletterWelcomeEmail(email, preferredLanguage as Locale).catch((err) => {
+      logger.error(
+        `Failed to send welcome email to ${email}: ${err instanceof Error ? err.message : 'Unknown error'}`,
+        'Newsletter'
+      )
+    })
+  }
+
+  return subscriber
 }
 
 export async function unsubscribe(id: number): Promise<{ oldValue: NewsletterSubscriber; newValue: NewsletterSubscriber }> {

@@ -298,6 +298,8 @@
       "promotions": "Aktionen",
       "auditLogs": "Prüfprotokoll",
       "newsletter": "Newsletter",
+      "emailTemplates": "E-Mail-Vorlagen",
+      "campaigns": "Kampagnen",
       "settings": "Einstellungen",
       "orders": "Bestellungen",
       "customers": "Kunden",
@@ -600,6 +602,105 @@
         "description": "Möchten Sie \"{email}\" wirklich dauerhaft löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
         "success": "Abonnent erfolgreich gelöscht",
         "error": "Löschen des Abonnenten fehlgeschlagen"
+      }
+    },
+    "emailTemplates": {
+      "title": "E-Mail-Vorlagen",
+      "description": "Vorschau und Verwaltung von E-Mail-Vorlagen für Bestellbestätigungen, Newsletter und mehr",
+      "failedToLoad": "Laden der E-Mail-Vorlagen fehlgeschlagen",
+      "noTemplates": "Keine E-Mail-Vorlagen",
+      "noTemplatesDescription": "E-Mail-Vorlagen werden hier angezeigt, sobald sie konfiguriert sind",
+      "preview": "Vorschau",
+      "selectLocale": "Sprache",
+      "subject": "Betreff",
+      "htmlPreview": "HTML-Vorschau",
+      "textPreview": "Klartext",
+      "table": {
+        "name": "Vorlage",
+        "description": "Beschreibung",
+        "category": "Kategorie",
+        "actions": "Aktionen"
+      },
+      "categories": {
+        "transactional": "Transaktional",
+        "marketing": "Marketing"
+      },
+      "status": {
+        "title": "E-Mail-Service-Status",
+        "enabled": "E-Mail-Service ist aktiviert über {provider}",
+        "disabled": "E-Mail-Service ist nicht konfiguriert. Setzen Sie RESEND_API_KEY in den Umgebungsvariablen.",
+        "from": "Von"
+      }
+    },
+    "campaigns": {
+      "title": "E-Mail-Kampagnen",
+      "description": "Erstellen und senden Sie Marketing-E-Mails an Newsletter-Abonnenten",
+      "addCampaign": "Neue Kampagne",
+      "failedToLoad": "Laden der Kampagnen fehlgeschlagen",
+      "noCampaigns": "Noch keine Kampagnen",
+      "noCampaignsDescription": "Erstellen Sie Ihre erste E-Mail-Kampagne, um Ihre Abonnenten zu erreichen",
+      "filterStatus": "Nach Status filtern",
+      "send": "Senden",
+      "cancel": "Abbrechen",
+      "cancelSchedule": "Planung Abbrechen",
+      "sending": "Wird gesendet...",
+      "failed": "fehlgeschlagen",
+      "table": {
+        "name": "Name",
+        "template": "Vorlage",
+        "status": "Status",
+        "scheduledFor": "Geplant / Gesendet",
+        "results": "Ergebnisse",
+        "actions": "Aktionen"
+      },
+      "status": {
+        "all": "Alle Status",
+        "DRAFT": "Entwurf",
+        "SCHEDULED": "Geplant",
+        "SENDING": "Wird Gesendet",
+        "SENT": "Gesendet",
+        "FAILED": "Fehlgeschlagen"
+      },
+      "deleteDialog": {
+        "title": "Kampagne Löschen",
+        "description": "Sind Sie sicher, dass Sie \"{name}\" löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.",
+        "success": "Kampagne erfolgreich gelöscht",
+        "error": "Löschen der Kampagne fehlgeschlagen"
+      },
+      "sendDialog": {
+        "title": "Kampagne Jetzt Senden",
+        "description": "Sind Sie sicher, dass Sie \"{name}\" sofort an alle Abonnenten senden möchten? Diese Aktion kann nicht rückgängig gemacht werden.",
+        "success": "Kampagne erfolgreich an {sent} von {total} Abonnenten gesendet",
+        "error": "Senden der Kampagne fehlgeschlagen"
+      },
+      "cancelDialog": {
+        "title": "Geplante Kampagne Abbrechen",
+        "description": "Sind Sie sicher, dass Sie den geplanten Versand von \"{name}\" abbrechen möchten? Die Kampagne wird zurück in den Entwurfsstatus versetzt.",
+        "success": "Kampagnenplanung abgebrochen",
+        "error": "Abbrechen der Kampagne fehlgeschlagen"
+      },
+      "dialog": {
+        "createTitle": "Kampagne Erstellen",
+        "editTitle": "Kampagne Bearbeiten",
+        "createDescription": "Wählen Sie eine Vorlage und planen Sie Ihre Kampagne",
+        "editDescription": "Aktualisieren Sie die Kampagnendetails",
+        "name": "Kampagnenname",
+        "namePlaceholder": "z.B. Sommerschlussverkauf 2025",
+        "template": "E-Mail-Vorlage",
+        "selectTemplate": "Vorlage auswählen",
+        "failedToLoadTemplates": "Vorlagen konnten nicht geladen werden",
+        "sendMode": "Wann Senden",
+        "saveAsDraft": "Als Entwurf Speichern",
+        "scheduleForLater": "Für Später Planen",
+        "scheduledFor": "Geplantes Datum und Uhrzeit",
+        "createButton": "Kampagne Erstellen",
+        "updateButton": "Kampagne Aktualisieren",
+        "creating": "Wird erstellt...",
+        "updating": "Wird aktualisiert...",
+        "createSuccess": "Kampagne erfolgreich erstellt",
+        "updateSuccess": "Kampagne erfolgreich aktualisiert",
+        "scheduled": "Kampagne erfolgreich geplant",
+        "error": "Ein unerwarteter Fehler ist aufgetreten"
       }
     }
   },

@@ -297,6 +297,8 @@
       "products": "Products",
       "promotions": "Promotions",
       "newsletter": "Newsletter",
+      "emailTemplates": "Email Templates",
+      "campaigns": "Campaigns",
       "auditLogs": "Audit Logs",
       "settings": "Settings",
       "orders": "Orders",
@@ -600,6 +602,105 @@
         "description": "Are you sure you want to permanently delete \"{email}\"? This action cannot be undone.",
         "success": "Subscriber deleted successfully",
         "error": "Failed to delete subscriber"
+      }
+    },
+    "emailTemplates": {
+      "title": "Email Templates",
+      "description": "Preview and manage email templates for order confirmations, newsletters, and more",
+      "failedToLoad": "Failed to load email templates",
+      "noTemplates": "No email templates",
+      "noTemplatesDescription": "Email templates will appear here once configured",
+      "preview": "Preview",
+      "selectLocale": "Language",
+      "subject": "Subject",
+      "htmlPreview": "HTML Preview",
+      "textPreview": "Plain Text",
+      "table": {
+        "name": "Template",
+        "description": "Description",
+        "category": "Category",
+        "actions": "Actions"
+      },
+      "categories": {
+        "transactional": "Transactional",
+        "marketing": "Marketing"
+      },
+      "status": {
+        "title": "Email Service Status",
+        "enabled": "Email service is enabled via {provider}",
+        "disabled": "Email service is not configured. Set RESEND_API_KEY in environment variables.",
+        "from": "From"
+      }
+    },
+    "campaigns": {
+      "title": "Email Campaigns",
+      "description": "Create and send marketing emails to newsletter subscribers",
+      "addCampaign": "New Campaign",
+      "failedToLoad": "Failed to load campaigns",
+      "noCampaigns": "No campaigns yet",
+      "noCampaignsDescription": "Create your first email campaign to reach your subscribers",
+      "filterStatus": "Filter by status",
+      "send": "Send",
+      "cancel": "Cancel",
+      "cancelSchedule": "Cancel Schedule",
+      "sending": "Sending...",
+      "failed": "failed",
+      "table": {
+        "name": "Name",
+        "template": "Template",
+        "status": "Status",
+        "scheduledFor": "Scheduled / Sent",
+        "results": "Results",
+        "actions": "Actions"
+      },
+      "status": {
+        "all": "All Statuses",
+        "DRAFT": "Draft",
+        "SCHEDULED": "Scheduled",
+        "SENDING": "Sending",
+        "SENT": "Sent",
+        "FAILED": "Failed"
+      },
+      "deleteDialog": {
+        "title": "Delete Campaign",
+        "description": "Are you sure you want to delete \"{name}\"? This action cannot be undone.",
+        "success": "Campaign deleted successfully",
+        "error": "Failed to delete campaign"
+      },
+      "sendDialog": {
+        "title": "Send Campaign Now",
+        "description": "Are you sure you want to send \"{name}\" to all subscribers immediately? This action cannot be undone.",
+        "success": "Campaign sent successfully to {sent} of {total} subscribers",
+        "error": "Failed to send campaign"
+      },
+      "cancelDialog": {
+        "title": "Cancel Scheduled Campaign",
+        "description": "Are you sure you want to cancel the scheduled send for \"{name}\"? The campaign will be moved back to draft status.",
+        "success": "Campaign schedule cancelled",
+        "error": "Failed to cancel campaign"
+      },
+      "dialog": {
+        "createTitle": "Create Campaign",
+        "editTitle": "Edit Campaign",
+        "createDescription": "Select a template and schedule your campaign",
+        "editDescription": "Update the campaign details",
+        "name": "Campaign Name",
+        "namePlaceholder": "e.g., Summer Sale 2025",
+        "template": "Email Template",
+        "selectTemplate": "Select a template",
+        "failedToLoadTemplates": "Failed to load templates",
+        "sendMode": "When to Send",
+        "saveAsDraft": "Save as Draft",
+        "scheduleForLater": "Schedule for Later",
+        "scheduledFor": "Scheduled Date & Time",
+        "createButton": "Create Campaign",
+        "updateButton": "Update Campaign",
+        "creating": "Creating...",
+        "updating": "Updating...",
+        "createSuccess": "Campaign created successfully",
+        "updateSuccess": "Campaign updated successfully",
+        "scheduled": "Campaign scheduled successfully",
+        "error": "An unexpected error occurred"
       }
     }
   },

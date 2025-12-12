@@ -631,4 +631,248 @@ describe('OrderService', () => {
       jest.restoreAllMocks()
     })
   })
+
+  // ============================================================================
+  // Admin Functions
+  // ============================================================================
+
+  describe('adminListOrders', () => {
+    const mockOrders = [
+      {
+        id: 1,
+        orderNumber: 'ORD-20241215-000001',
+        status: 'PAID',
+        customerName: 'John Doe',
+        guestEmail: 'john@example.com',
+        totalRON: new Prisma.Decimal(500),
+        createdAt: new Date('2024-12-15'),
+        items: [],
+        user: null,
+      },
+    ]
+
+    it('should list orders with default pagination', async () => {
+      ;(prisma.order.findMany as jest.Mock).mockResolvedValue(mockOrders)
+      ;(prisma.order.count as jest.Mock).mockResolvedValue(1)
+
+      const result = await orderService.adminListOrders()
+
+      expect(result.orders).toEqual(mockOrders)
+      expect(result.pagination.page).toBe(1)
+      expect(result.pagination.limit).toBe(20)
+      expect(result.pagination.total).toBe(1)
+    })
+
+    it('should filter by status', async () => {
+      ;(prisma.order.findMany as jest.Mock).mockResolvedValue(mockOrders)
+      ;(prisma.order.count as jest.Mock).mockResolvedValue(1)
+
+      await orderService.adminListOrders({ status: 'PAID' })
+
+      expect(prisma.order.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { status: 'PAID' },
+        })
+      )
+    })
+
+    it('should filter with search term', async () => {
+      ;(prisma.order.findMany as jest.Mock).mockResolvedValue(mockOrders)
+      ;(prisma.order.count as jest.Mock).mockResolvedValue(1)
+
+      await orderService.adminListOrders({ search: 'john' })
+
+      expect(prisma.order.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: {
+            OR: expect.arrayContaining([
+              { orderNumber: expect.any(Object) },
+              { customerName: expect.any(Object) },
+              { guestEmail: expect.any(Object) },
+              { user: expect.any(Object) },
+            ]),
+          },
+        })
+      )
+    })
+
+    it('should ignore status filter when set to all', async () => {
+      ;(prisma.order.findMany as jest.Mock).mockResolvedValue(mockOrders)
+      ;(prisma.order.count as jest.Mock).mockResolvedValue(1)
+
+      await orderService.adminListOrders({ status: 'all' })
+
+      expect(prisma.order.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: {},
+        })
+      )
+    })
+
+    it('should support custom sorting', async () => {
+      ;(prisma.order.findMany as jest.Mock).mockResolvedValue(mockOrders)
+      ;(prisma.order.count as jest.Mock).mockResolvedValue(1)
+
+      await orderService.adminListOrders({ sortBy: 'totalRON', sortOrder: 'asc' })
+
+      expect(prisma.order.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          orderBy: { totalRON: 'asc' },
+        })
+      )
+    })
+  })
+
+  describe('adminGetOrderById', () => {
+    const mockOrder = {
+      id: 1,
+      orderNumber: 'ORD-20241215-000001',
+      status: 'PAID',
+      items: [],
+      user: null,
+    }
+
+    it('should return order by id', async () => {
+      ;(prisma.order.findUnique as jest.Mock).mockResolvedValue(mockOrder)
+
+      const result = await orderService.adminGetOrderById(1)
+
+      expect(result).toEqual(mockOrder)
+      expect(prisma.order.findUnique).toHaveBeenCalledWith({
+        where: { id: 1 },
+        include: {
+          items: true,
+          user: { select: { id: true, email: true, name: true } },
+        },
+      })
+    })
+
+    it('should throw error when order not found', async () => {
+      ;(prisma.order.findUnique as jest.Mock).mockResolvedValue(null)
+
+      await expect(orderService.adminGetOrderById(999)).rejects.toThrow(AppError)
+      await expect(orderService.adminGetOrderById(999)).rejects.toMatchObject({
+        statusCode: 404,
+        code: 'ORDER_NOT_FOUND',
+      })
+    })
+  })
+
+  describe('adminUpdateOrderStatus', () => {
+    const mockOrder = {
+      id: 1,
+      orderNumber: 'ORD-20241215-000001',
+      status: 'PAID',
+      items: [{ productId: 1, quantity: 2 }],
+    }
+
+    beforeEach(() => {
+      ;(prisma.order.findUnique as jest.Mock).mockResolvedValue(mockOrder)
+    })
+
+    it('should update order status with valid transition', async () => {
+      ;(prisma.order.update as jest.Mock).mockResolvedValue({
+        ...mockOrder,
+        status: 'PROCESSING',
+      })
+      ;(prisma.order.findUnique as jest.Mock)
+        .mockResolvedValueOnce(mockOrder) // First call to check current status
+        .mockResolvedValueOnce({ ...mockOrder, status: 'PROCESSING' }) // Second call for adminGetOrderById
+
+      const result = await orderService.adminUpdateOrderStatus(1, 'PROCESSING')
+
+      expect(result.order.status).toBe('PROCESSING')
+      expect(result.stockRestored).toBe(false)
+    })
+
+    it('should restore stock when cancelling order', async () => {
+      ;(prisma.$transaction as jest.Mock).mockImplementation(async (fn) => {
+        await fn({
+          product: { update: jest.fn() },
+          order: { update: jest.fn() },
+        })
+      })
+      ;(prisma.order.findUnique as jest.Mock)
+        .mockResolvedValueOnce(mockOrder)
+        .mockResolvedValueOnce({ ...mockOrder, status: 'CANCELLED' })
+
+      const result = await orderService.adminUpdateOrderStatus(1, 'CANCELLED')
+
+      expect(result.stockRestored).toBe(true)
+    })
+
+    it('should restore stock when refunding order', async () => {
+      ;(prisma.$transaction as jest.Mock).mockImplementation(async (fn) => {
+        await fn({
+          product: { update: jest.fn() },
+          order: { update: jest.fn() },
+        })
+      })
+      ;(prisma.order.findUnique as jest.Mock)
+        .mockResolvedValueOnce(mockOrder)
+        .mockResolvedValueOnce({ ...mockOrder, status: 'REFUNDED' })
+
+      const result = await orderService.adminUpdateOrderStatus(1, 'REFUNDED')
+
+      expect(result.stockRestored).toBe(true)
+    })
+
+    it('should throw error for invalid status transition', async () => {
+      await expect(orderService.adminUpdateOrderStatus(1, 'DELIVERED')).rejects.toThrow(
+        AppError
+      )
+      await expect(orderService.adminUpdateOrderStatus(1, 'DELIVERED')).rejects.toMatchObject({
+        statusCode: 400,
+        code: 'INVALID_STATUS_TRANSITION',
+      })
+    })
+
+    it('should throw error when order not found', async () => {
+      ;(prisma.order.findUnique as jest.Mock).mockResolvedValue(null)
+
+      await expect(orderService.adminUpdateOrderStatus(999, 'PROCESSING')).rejects.toThrow(
+        AppError
+      )
+      await expect(orderService.adminUpdateOrderStatus(999, 'PROCESSING')).rejects.toMatchObject({
+        statusCode: 404,
+        code: 'ORDER_NOT_FOUND',
+      })
+    })
+  })
+
+  describe('getOrderStats', () => {
+    it('should return order statistics', async () => {
+      ;(prisma.order.groupBy as jest.Mock).mockResolvedValue([
+        { status: 'PAID', _count: { id: 5 } },
+        { status: 'PROCESSING', _count: { id: 3 } },
+      ])
+      ;(prisma.order.count as jest.Mock).mockResolvedValue(2)
+      ;(prisma.order.aggregate as jest.Mock).mockResolvedValue({
+        _sum: { totalRON: new Prisma.Decimal(5000) },
+      })
+
+      const result = await orderService.getOrderStats()
+
+      expect(result.byStatus).toEqual({
+        PAID: 5,
+        PROCESSING: 3,
+      })
+      expect(result.last24Hours).toBe(2)
+      expect(result.totalRevenue).toBe(5000)
+    })
+
+    it('should return zero revenue when no orders', async () => {
+      ;(prisma.order.groupBy as jest.Mock).mockResolvedValue([])
+      ;(prisma.order.count as jest.Mock).mockResolvedValue(0)
+      ;(prisma.order.aggregate as jest.Mock).mockResolvedValue({
+        _sum: { totalRON: null },
+      })
+
+      const result = await orderService.getOrderStats()
+
+      expect(result.byStatus).toEqual({})
+      expect(result.last24Hours).toBe(0)
+      expect(result.totalRevenue).toBe(0)
+    })
+  })
 })

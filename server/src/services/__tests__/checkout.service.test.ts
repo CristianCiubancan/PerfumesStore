@@ -109,6 +109,7 @@ describe('CheckoutService', () => {
         shippingAddress: validInput.shippingAddress,
         items: validInput.items,
         stripeSessionId: 'cs_test_abc123',
+        locale: 'en',
       })
     })
 

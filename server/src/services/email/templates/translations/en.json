@@ -1,0 +1,61 @@
+{
+  "orderConfirmation": {
+    "subject": "Order Confirmation - {orderNumber}",
+    "title": "Thank You for Your Order!",
+    "greeting": "Dear {name},",
+    "thankYou": "Thank you for your purchase. Your order has been confirmed and is being processed.",
+    "orderNumber": "Order Number",
+    "orderDate": "Order Date",
+    "shippingAddress": "Shipping Address",
+    "orderSummary": "Order Summary",
+    "product": "Product",
+    "quantity": "Qty",
+    "price": "Price",
+    "subtotal": "Subtotal",
+    "discount": "Discount",
+    "total": "Total",
+    "paidAmount": "Paid Amount",
+    "invoiceAttached": "Your invoice is attached to this email as a PDF.",
+    "questions": "If you have any questions about your order, please don't hesitate to contact us.",
+    "footer": "Thank you for shopping with us!"
+  },
+  "newsletterWelcome": {
+    "subject": "Welcome to Our Newsletter!",
+    "title": "Welcome to the Fragrance Family!",
+    "greeting": "Hello,",
+    "thankYou": "Thank you for subscribing to our newsletter. We're excited to have you on board!",
+    "whatToExpect": "What to expect:",
+    "exclusiveOffers": "Exclusive offers and discounts",
+    "newArrivals": "First look at new arrivals",
+    "fragranceTips": "Fragrance tips and recommendations",
+    "cta": "Explore Our Collection",
+    "unsubscribe": "You can unsubscribe at any time by clicking the link in our emails.",
+    "footer": "Stay fragrant!"
+  },
+  "common": {
+    "currency": "RON",
+    "viewOrder": "View Order",
+    "visitStore": "Visit Store"
+  },
+  "invoice": {
+    "title": "INVOICE",
+    "invoiceNumber": "Invoice Number",
+    "date": "Date",
+    "billTo": "Bill To",
+    "shipTo": "Ship To",
+    "description": "Description",
+    "quantity": "Qty",
+    "unitPrice": "Unit Price",
+    "amount": "Amount",
+    "subtotal": "Subtotal",
+    "discount": "Discount",
+    "total": "Total",
+    "paidAmount": "Paid Amount",
+    "paymentMethod": "Payment Method",
+    "creditCard": "Credit Card (Stripe)",
+    "thankYou": "Thank you for your purchase!",
+    "questions": "If you have any questions, please contact us.",
+    "page": "Page",
+    "of": "of"
+  }
+}

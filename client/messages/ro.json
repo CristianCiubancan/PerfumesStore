@@ -297,6 +297,8 @@
       "products": "Produse",
       "promotions": "Promoții",
       "newsletter": "Newsletter",
+      "emailTemplates": "Șabloane Email",
+      "campaigns": "Campanii",
       "auditLogs": "Jurnal Audit",
       "settings": "Setări",
       "orders": "Comenzi",
@@ -600,6 +602,105 @@
         "description": "Ești sigur că vrei să ștergi permanent \"{email}\"? Această acțiune nu poate fi anulată.",
         "success": "Abonatul a fost șters cu succes",
         "error": "Nu s-a putut șterge abonatul"
+      }
+    },
+    "emailTemplates": {
+      "title": "Șabloane Email",
+      "description": "Previzualizează și gestionează șabloanele de email pentru confirmări comenzi, newslettere și altele",
+      "failedToLoad": "Nu s-au putut încărca șabloanele de email",
+      "noTemplates": "Fără șabloane de email",
+      "noTemplatesDescription": "Șabloanele de email vor apărea aici odată configurate",
+      "preview": "Previzualizare",
+      "selectLocale": "Limbă",
+      "subject": "Subiect",
+      "htmlPreview": "Previzualizare HTML",
+      "textPreview": "Text Simplu",
+      "table": {
+        "name": "Șablon",
+        "description": "Descriere",
+        "category": "Categorie",
+        "actions": "Acțiuni"
+      },
+      "categories": {
+        "transactional": "Tranzacțional",
+        "marketing": "Marketing"
+      },
+      "status": {
+        "title": "Stare Serviciu Email",
+        "enabled": "Serviciul de email este activat prin {provider}",
+        "disabled": "Serviciul de email nu este configurat. Setează RESEND_API_KEY în variabilele de mediu.",
+        "from": "De la"
+      }
+    },
+    "campaigns": {
+      "title": "Campanii Email",
+      "description": "Creează și trimite emailuri de marketing către abonații newsletter",
+      "addCampaign": "Campanie Nouă",
+      "failedToLoad": "Nu s-au putut încărca campaniile",
+      "noCampaigns": "Nicio campanie încă",
+      "noCampaignsDescription": "Creează prima ta campanie de email pentru a ajunge la abonați",
+      "filterStatus": "Filtrează după status",
+      "send": "Trimite",
+      "cancel": "Anulează",
+      "cancelSchedule": "Anulează Programarea",
+      "sending": "Se trimite...",
+      "failed": "eșuate",
+      "table": {
+        "name": "Nume",
+        "template": "Șablon",
+        "status": "Status",
+        "scheduledFor": "Programat / Trimis",
+        "results": "Rezultate",
+        "actions": "Acțiuni"
+      },
+      "status": {
+        "all": "Toate Statusurile",
+        "DRAFT": "Ciornă",
+        "SCHEDULED": "Programat",
+        "SENDING": "Se Trimite",
+        "SENT": "Trimis",
+        "FAILED": "Eșuat"
+      },
+      "deleteDialog": {
+        "title": "Șterge Campanie",
+        "description": "Ești sigur că vrei să ștergi \"{name}\"? Această acțiune nu poate fi anulată.",
+        "success": "Campania a fost ștearsă cu succes",
+        "error": "Nu s-a putut șterge campania"
+      },
+      "sendDialog": {
+        "title": "Trimite Campania Acum",
+        "description": "Ești sigur că vrei să trimiți \"{name}\" către toți abonații imediat? Această acțiune nu poate fi anulată.",
+        "success": "Campania a fost trimisă cu succes la {sent} din {total} abonați",
+        "error": "Nu s-a putut trimite campania"
+      },
+      "cancelDialog": {
+        "title": "Anulează Campania Programată",
+        "description": "Ești sigur că vrei să anulezi trimiterea programată pentru \"{name}\"? Campania va fi mutată înapoi în status de ciornă.",
+        "success": "Programarea campaniei a fost anulată",
+        "error": "Nu s-a putut anula campania"
+      },
+      "dialog": {
+        "createTitle": "Creează Campanie",
+        "editTitle": "Editează Campanie",
+        "createDescription": "Selectează un șablon și programează campania",
+        "editDescription": "Actualizează detaliile campaniei",
+        "name": "Numele Campaniei",
+        "namePlaceholder": "ex., Reduceri de Vară 2025",
+        "template": "Șablon Email",
+        "selectTemplate": "Selectează un șablon",
+        "failedToLoadTemplates": "Nu s-au putut încărca șabloanele",
+        "sendMode": "Când să Trimită",
+        "saveAsDraft": "Salvează ca Ciornă",
+        "scheduleForLater": "Programează pentru Mai Târziu",
+        "scheduledFor": "Data și Ora Programată",
+        "createButton": "Creează Campanie",
+        "updateButton": "Actualizează Campanie",
+        "creating": "Se creează...",
+        "updating": "Se actualizează...",
+        "createSuccess": "Campania a fost creată cu succes",
+        "updateSuccess": "Campania a fost actualizată cu succes",
+        "scheduled": "Campania a fost programată cu succes",
+        "error": "A apărut o eroare neașteptată"
       }
     }
   },

@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { useTranslations } from 'next-intl'
+import { useTranslations, useLocale } from 'next-intl'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -24,6 +24,7 @@ type NewsletterFormData = z.infer<typeof newsletterSchema>
 
 export function Newsletter() {
   const t = useTranslations('home')
+  const locale = useLocale()
   const [status, setStatus] = useState<'idle' | 'loading' | 'success'>('idle')
 
   const form = useForm<NewsletterFormData>({
@@ -35,7 +36,7 @@ export function Newsletter() {
     setStatus('loading')
 
     try {
-      await newsletterApi.subscribe({ email: data.email })
+      await newsletterApi.subscribe({ email: data.email, locale })
       setStatus('success')
       toast.success(t('newsletter.success'))
       form.reset()

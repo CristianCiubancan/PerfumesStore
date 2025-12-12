@@ -3,7 +3,8 @@ import { updateExchangeRates } from './services/exchange-rate.service'
 import { cleanupExpiredTokens } from './services/auth.service'
 import { cleanupOrphanedImages } from './services/image-cleanup.service'
 import { cleanupStalePendingOrders } from './services/order.service'
-import { EXCHANGE_RATE, AUTH, UPLOADS, ORDER } from './config/constants'
+import { processScheduledCampaigns } from './services/campaign.service'
+import { EXCHANGE_RATE, AUTH, UPLOADS, ORDER, CAMPAIGN } from './config/constants'
 import { logger } from './lib/logger'
 
 export async function initExchangeRates(): Promise<void> {
@@ -80,6 +81,15 @@ export function registerCronJobs(): void {
       await cleanupStalePendingOrders(ORDER.STALE_PENDING_TIMEOUT_MINUTES)
     } catch (err: unknown) {
       logger.error('Order cleanup failed', 'OrderCleanup', err)
+    }
+  })
+
+  // Process scheduled email campaigns every minute
+  cron.schedule(CAMPAIGN.CRON_SCHEDULE, async () => {
+    try {
+      await processScheduledCampaigns()
+    } catch (err: unknown) {
+      logger.error('Campaign processing failed', 'CampaignCron', err)
     }
   })
 

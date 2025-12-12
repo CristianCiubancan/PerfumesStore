@@ -298,6 +298,8 @@
       "promotions": "Promociones",
       "auditLogs": "Registro de Auditoría",
       "newsletter": "Newsletter",
+      "emailTemplates": "Plantillas de Email",
+      "campaigns": "Campañas",
       "settings": "Configuración",
       "orders": "Pedidos",
       "customers": "Clientes",
@@ -600,6 +602,105 @@
         "description": "¿Estás seguro de que deseas eliminar permanentemente a \"{email}\"? Esta acción no se puede deshacer.",
         "success": "Suscriptor eliminado exitosamente",
         "error": "Error al eliminar el suscriptor"
+      }
+    },
+    "emailTemplates": {
+      "title": "Plantillas de Email",
+      "description": "Previsualiza y gestiona las plantillas de email para confirmaciones de pedidos, newsletters y más",
+      "failedToLoad": "Error al cargar las plantillas de email",
+      "noTemplates": "Sin plantillas de email",
+      "noTemplatesDescription": "Las plantillas de email aparecerán aquí una vez configuradas",
+      "preview": "Vista Previa",
+      "selectLocale": "Idioma",
+      "subject": "Asunto",
+      "htmlPreview": "Vista Previa HTML",
+      "textPreview": "Texto Plano",
+      "table": {
+        "name": "Plantilla",
+        "description": "Descripción",
+        "category": "Categoría",
+        "actions": "Acciones"
+      },
+      "categories": {
+        "transactional": "Transaccional",
+        "marketing": "Marketing"
+      },
+      "status": {
+        "title": "Estado del Servicio de Email",
+        "enabled": "El servicio de email está activado vía {provider}",
+        "disabled": "El servicio de email no está configurado. Establece RESEND_API_KEY en las variables de entorno.",
+        "from": "De"
+      }
+    },
+    "campaigns": {
+      "title": "Campañas de Email",
+      "description": "Crea y envía emails de marketing a los suscriptores del newsletter",
+      "addCampaign": "Nueva Campaña",
+      "failedToLoad": "Error al cargar las campañas",
+      "noCampaigns": "Sin campañas aún",
+      "noCampaignsDescription": "Crea tu primera campaña de email para llegar a tus suscriptores",
+      "filterStatus": "Filtrar por estado",
+      "send": "Enviar",
+      "cancel": "Cancelar",
+      "cancelSchedule": "Cancelar Programación",
+      "sending": "Enviando...",
+      "failed": "fallidos",
+      "table": {
+        "name": "Nombre",
+        "template": "Plantilla",
+        "status": "Estado",
+        "scheduledFor": "Programado / Enviado",
+        "results": "Resultados",
+        "actions": "Acciones"
+      },
+      "status": {
+        "all": "Todos los Estados",
+        "DRAFT": "Borrador",
+        "SCHEDULED": "Programado",
+        "SENDING": "Enviando",
+        "SENT": "Enviado",
+        "FAILED": "Fallido"
+      },
+      "deleteDialog": {
+        "title": "Eliminar Campaña",
+        "description": "¿Estás seguro de que deseas eliminar \"{name}\"? Esta acción no se puede deshacer.",
+        "success": "Campaña eliminada exitosamente",
+        "error": "Error al eliminar la campaña"
+      },
+      "sendDialog": {
+        "title": "Enviar Campaña Ahora",
+        "description": "¿Estás seguro de que deseas enviar \"{name}\" a todos los suscriptores inmediatamente? Esta acción no se puede deshacer.",
+        "success": "Campaña enviada exitosamente a {sent} de {total} suscriptores",
+        "error": "Error al enviar la campaña"
+      },
+      "cancelDialog": {
+        "title": "Cancelar Campaña Programada",
+        "description": "¿Estás seguro de que deseas cancelar el envío programado de \"{name}\"? La campaña volverá al estado de borrador.",
+        "success": "Programación de campaña cancelada",
+        "error": "Error al cancelar la campaña"
+      },
+      "dialog": {
+        "createTitle": "Crear Campaña",
+        "editTitle": "Editar Campaña",
+        "createDescription": "Selecciona una plantilla y programa tu campaña",
+        "editDescription": "Actualiza los detalles de la campaña",
+        "name": "Nombre de la Campaña",
+        "namePlaceholder": "ej., Rebajas de Verano 2025",
+        "template": "Plantilla de Email",
+        "selectTemplate": "Selecciona una plantilla",
+        "failedToLoadTemplates": "Error al cargar las plantillas",
+        "sendMode": "Cuándo Enviar",
+        "saveAsDraft": "Guardar como Borrador",
+        "scheduleForLater": "Programar para Después",
+        "scheduledFor": "Fecha y Hora Programadas",
+        "createButton": "Crear Campaña",
+        "updateButton": "Actualizar Campaña",
+        "creating": "Creando...",
+        "updating": "Actualizando...",
+        "createSuccess": "Campaña creada exitosamente",
+        "updateSuccess": "Campaña actualizada exitosamente",
+        "scheduled": "Campaña programada exitosamente",
+        "error": "Ha ocurrido un error inesperado"
       }
     }
   },

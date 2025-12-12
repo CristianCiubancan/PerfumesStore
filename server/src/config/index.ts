@@ -17,6 +17,9 @@ const envSchema = z.object({
   // Stripe configuration
   STRIPE_SECRET_KEY: z.string().min(1),
   STRIPE_WEBHOOK_SECRET: z.string().optional(), // Optional - needed for webhook signature verification
+  // Resend email configuration
+  RESEND_API_KEY: z.string().optional(), // Optional - emails disabled if not set
+  RESEND_FROM_EMAIL: z.string().email().optional(), // Required if RESEND_API_KEY is set
 })
 
 /**

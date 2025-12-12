@@ -28,10 +28,12 @@ describe('NewsletterService', () => {
         create: {
           email: 'new@example.com',
           isActive: true,
+          preferredLanguage: 'ro',
         },
         update: {
           isActive: true,
           unsubscribedAt: null,
+          preferredLanguage: 'ro',
         },
       })
       expect(result.email).toBe('test@example.com')
@@ -49,10 +51,12 @@ describe('NewsletterService', () => {
         create: {
           email: 'test@example.com',
           isActive: true,
+          preferredLanguage: 'ro',
         },
         update: {
           isActive: true,
           unsubscribedAt: null,
+          preferredLanguage: 'ro',
         },
       })
       expect(result).toEqual(mockSubscriber)
@@ -76,10 +80,12 @@ describe('NewsletterService', () => {
         create: {
           email: 'test@example.com',
           isActive: true,
+          preferredLanguage: 'ro',
         },
         update: {
           isActive: true,
           unsubscribedAt: null,
+          preferredLanguage: 'ro',
         },
       })
       expect(result.isActive).toBe(true)

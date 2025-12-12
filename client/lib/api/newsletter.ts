@@ -3,6 +3,7 @@ import { NewsletterSubscriber, NewsletterSubscribersResponse } from '@/types'
 
 export interface NewsletterSubscribeData {
   email: string
+  locale?: string // Captured from current site language
 }
 
 export interface NewsletterSubscribeResponse {

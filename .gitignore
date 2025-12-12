@@ -19,5 +19,8 @@ server/uploads/products/*
 # Claude Code
 .claude/
 
+# Email template previews (dev artifacts)
+email-preview-*.html
+
 # Shared folder copies (synced from /shared via postinstall)
 client/shared/*.ts

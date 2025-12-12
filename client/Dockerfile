@@ -2,7 +2,12 @@
 FROM node:20-alpine AS deps
 WORKDIR /app
 COPY package*.json ./
-RUN npm ci
+# This is a monorepo using npm workspaces. The root package-lock.json manages all dependencies.
+# In Docker context, we only have the client package.json, so we use npm install.
+# For more reproducible builds in production, consider:
+# 1. Multi-stage build that includes root lock file
+# 2. Pre-generating a standalone package-lock.json for Docker builds
+RUN npm install --prefer-offline
 
 # Stage 2: Build
 FROM node:20-alpine AS builder

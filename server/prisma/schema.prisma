@@ -13,6 +13,7 @@ model User {
   passwordHash         String
   name                 String
   role                 Role           @default(USER)
+  preferredLanguage    String         @default("ro") // Preferred locale: en, ro, fr, de, es
   tokenVersion         Int            @default(0) // Incremented to invalidate all tokens
   failedLoginAttempts  Int            @default(0) // Track failed login attempts
   lockedUntil          DateTime?      // Account locked until this time (null = not locked)
@@ -189,14 +190,54 @@ model AuditLog {
 
 // Newsletter subscribers
 model NewsletterSubscriber {
-  id           Int       @id @default(autoincrement())
-  email        String    @unique
-  isActive     Boolean   @default(true)
-  subscribedAt DateTime  @default(now())
-  unsubscribedAt DateTime?
+  id                Int       @id @default(autoincrement())
+  email             String    @unique
+  preferredLanguage String    @default("ro") // Captured from site locale at subscription
+  isActive          Boolean   @default(true)
+  subscribedAt      DateTime  @default(now())
+  unsubscribedAt    DateTime?
 
   @@index([isActive])
   @@index([subscribedAt])
+  @@index([preferredLanguage])
+}
+
+// Campaign status for newsletter campaigns
+enum CampaignStatus {
+  DRAFT       // Being composed, not ready to send
+  SCHEDULED   // Ready and waiting for scheduled time
+  SENDING     // Currently being processed
+  SENT        // Successfully completed
+  FAILED      // Failed with errors
+}
+
+// Newsletter campaigns for marketing emails
+model NewsletterCampaign {
+  id               Int             @id @default(autoincrement())
+  name             String          // Internal name for identification
+  templateId       String          // Reference to email template file ID
+
+  // Status and scheduling
+  status           CampaignStatus  @default(DRAFT)
+  scheduledFor     DateTime?       // When to send (null = not scheduled)
+
+  // Results (populated after sending)
+  sentAt           DateTime?       // When sending completed
+  totalRecipients  Int?            // Total subscribers targeted
+  sentCount        Int?            // Successfully sent
+  failedCount      Int?            // Failed to send
+
+  // Prevent duplicate sends
+  sendingStartedAt DateTime?       // Lock timestamp when sending begins
+
+  // Timestamps
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+
+  @@index([status])
+  @@index([scheduledFor])
+  @@index([templateId])
+  @@index([createdAt])
 }
 
 // Order status enum
@@ -221,6 +262,7 @@ model Order {
   guestEmail            String?       // Required for guest checkout
   customerName          String
   customerPhone         String?
+  orderLocale           String        @default("ro") // Locale at time of order (for emails/invoices)
 
   // Shipping address
   shippingAddressLine1  String

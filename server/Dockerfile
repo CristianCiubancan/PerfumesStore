@@ -50,6 +50,9 @@ COPY --from=builder /app/dist/app/src ./dist
 # Copy shared folder compiled output for runtime imports (../../../shared from dist/schemas/)
 COPY --from=builder /app/dist/shared /shared
 
+# Copy static assets (fonts for PDF generation)
+COPY --from=builder /app/src/assets ./dist/assets
+
 # Copy uploads directory (will be overwritten by volume mount)
 RUN mkdir -p uploads
 

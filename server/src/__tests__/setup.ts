@@ -87,6 +87,15 @@ jest.mock('../lib/prisma', () => ({
       delete: jest.fn(),
       count: jest.fn(),
     },
+    newsletterCampaign: {
+      findUnique: jest.fn(),
+      findMany: jest.fn(),
+      create: jest.fn(),
+      update: jest.fn(),
+      updateMany: jest.fn(),
+      delete: jest.fn(),
+      count: jest.fn(),
+    },
     order: {
       findUnique: jest.fn(),
       findFirst: jest.fn(),
@@ -95,6 +104,8 @@ jest.mock('../lib/prisma', () => ({
       update: jest.fn(),
       delete: jest.fn(),
       count: jest.fn(),
+      groupBy: jest.fn(),
+      aggregate: jest.fn(),
     },
     orderItem: {
       findMany: jest.fn(),

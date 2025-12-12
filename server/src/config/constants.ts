@@ -73,3 +73,18 @@ export const ORDER = {
   // Run cleanup every 15 minutes
   STALE_ORDER_CLEANUP_CRON_SCHEDULE: '*/15 * * * *',
 } as const
+
+// Email Campaigns
+export const CAMPAIGN = {
+  // Check for scheduled campaigns every minute
+  CRON_SCHEDULE: '* * * * *',
+} as const
+
+// Email Sending
+export const EMAIL = {
+  // Number of emails to send in parallel per batch
+  // Adjust based on your email provider's rate limits (Resend: 10/sec on free tier)
+  BATCH_SIZE: 10,
+  // Delay between batches in milliseconds (helps avoid rate limiting)
+  BATCH_DELAY_MS: 1000,
+} as const

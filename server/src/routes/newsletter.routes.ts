@@ -12,6 +12,7 @@ const router = Router()
 const subscribeSchema = z.object({
   body: z.object({
     email: z.string().email('Invalid email address'),
+    locale: z.enum(['en', 'ro', 'fr', 'de', 'es']).optional(), // Captured from site language
   }),
   headers: z.object({
     'idempotency-key': z.string().uuid('Invalid idempotency key format').optional(),
@@ -71,7 +72,7 @@ router.post(
   csrfProtection,
   validate(subscribeSchema),
   asyncHandler(async (req: Request, res: Response) => {
-    const { email } = req.body
+    const { email, locale } = req.body
     const idempotencyKey = req.headers['idempotency-key'] as string | undefined
 
     // If idempotency key provided, check if this request was already processed
@@ -100,7 +101,7 @@ router.post(
       }
     }
 
-    const subscriber = await newsletterService.subscribe(email)
+    const subscriber = await newsletterService.subscribe(email, locale)
 
     // Store idempotency key if provided
     if (idempotencyKey) {
@@ -113,7 +114,7 @@ router.post(
       evictOldestEntries()
     }
 
-    logger.info('Newsletter subscription received', 'Newsletter')
+    logger.info(`Newsletter subscription received (locale: ${locale || 'default'})`, 'Newsletter')
 
     res.json({
       data: {

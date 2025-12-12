@@ -13,6 +13,8 @@ import {
   Menu,
   FileText,
   Mail,
+  MailCheck,
+  Send,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
@@ -47,6 +49,8 @@ const navItems: NavItem[] = [
   { href: '/admin/orders', label: 'orders', icon: ShoppingCart },
   { href: '/admin/promotions', label: 'promotions', icon: Tag },
   { href: '/admin/newsletter', label: 'newsletter', icon: Mail },
+  { href: '/admin/email-templates', label: 'emailTemplates', icon: MailCheck },
+  { href: '/admin/campaigns', label: 'campaigns', icon: Send },
   { href: '/admin/audit-logs', label: 'auditLogs', icon: FileText },
   { href: '/admin/settings', label: 'settings', icon: Settings },
 ]

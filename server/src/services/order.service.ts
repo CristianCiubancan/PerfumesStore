@@ -16,6 +16,7 @@ export interface CreateOrderParams {
   shippingAddress: ShippingAddress
   items: CartItemInput[]
   stripeSessionId: string
+  locale?: string // Site locale at time of checkout
 }
 
 export interface OrderCalculation {
@@ -154,7 +155,7 @@ export async function calculateOrder(
 }
 
 export async function createOrder(params: CreateOrderParams) {
-  const { userId, guestEmail, shippingAddress, items, stripeSessionId } = params
+  const { userId, guestEmail, shippingAddress, items, stripeSessionId, locale } = params
 
   // Validate: either userId or guestEmail must be provided
   if (!userId && !guestEmail) {
@@ -185,6 +186,7 @@ export async function createOrder(params: CreateOrderParams) {
         shippingState: shippingAddress.state,
         shippingPostalCode: shippingAddress.postalCode,
         shippingCountry: shippingAddress.country,
+        orderLocale: locale || 'ro', // Capture locale for emails/invoices
         subtotalRON: calculation.subtotalRON,
         discountRON: calculation.discountRON,
         discountPercent: calculation.discountPercent,

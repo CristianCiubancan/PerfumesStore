@@ -9,6 +9,8 @@ import newsletterRoutes from './newsletter.routes'
 import newsletterAdminRoutes from './newsletter-admin.routes'
 import checkoutRoutes from './checkout.routes'
 import orderAdminRoutes from './order-admin.routes'
+import emailAdminRoutes from './email-admin.routes'
+import campaignAdminRoutes from './campaign-admin.routes'
 import { apiRateLimiter, healthRateLimiter } from '../middleware/rateLimit'
 import { asyncHandler } from '../lib/asyncHandler'
 import { prisma } from '../lib/prisma'
@@ -54,5 +56,11 @@ router.use('/checkout', checkoutRoutes)
 
 // Admin orders management
 router.use('/admin/orders', orderAdminRoutes)
+
+// Admin email templates management
+router.use('/admin/email', emailAdminRoutes)
+
+// Admin campaign management
+router.use('/admin/campaigns', campaignAdminRoutes)
 
 export default router

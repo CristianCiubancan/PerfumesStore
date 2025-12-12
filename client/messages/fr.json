@@ -298,6 +298,8 @@
       "promotions": "Promotions",
       "auditLogs": "Journal d'Audit",
       "newsletter": "Newsletter",
+      "emailTemplates": "Modèles d'Email",
+      "campaigns": "Campagnes",
       "settings": "Paramètres",
       "orders": "Commandes",
       "customers": "Clients",
@@ -600,6 +602,105 @@
         "description": "Êtes-vous sûr de vouloir supprimer définitivement \"{email}\" ? Cette action est irréversible.",
         "success": "Abonné supprimé avec succès",
         "error": "Échec de la suppression de l'abonné"
+      }
+    },
+    "emailTemplates": {
+      "title": "Modèles d'Email",
+      "description": "Prévisualisez et gérez les modèles d'email pour les confirmations de commandes, newsletters et plus",
+      "failedToLoad": "Échec du chargement des modèles d'email",
+      "noTemplates": "Aucun modèle d'email",
+      "noTemplatesDescription": "Les modèles d'email apparaîtront ici une fois configurés",
+      "preview": "Aperçu",
+      "selectLocale": "Langue",
+      "subject": "Sujet",
+      "htmlPreview": "Aperçu HTML",
+      "textPreview": "Texte Brut",
+      "table": {
+        "name": "Modèle",
+        "description": "Description",
+        "category": "Catégorie",
+        "actions": "Actions"
+      },
+      "categories": {
+        "transactional": "Transactionnel",
+        "marketing": "Marketing"
+      },
+      "status": {
+        "title": "État du Service Email",
+        "enabled": "Le service email est activé via {provider}",
+        "disabled": "Le service email n'est pas configuré. Définissez RESEND_API_KEY dans les variables d'environnement.",
+        "from": "De"
+      }
+    },
+    "campaigns": {
+      "title": "Campagnes Email",
+      "description": "Créez et envoyez des emails marketing aux abonnés de la newsletter",
+      "addCampaign": "Nouvelle Campagne",
+      "failedToLoad": "Échec du chargement des campagnes",
+      "noCampaigns": "Aucune campagne pour le moment",
+      "noCampaignsDescription": "Créez votre première campagne email pour atteindre vos abonnés",
+      "filterStatus": "Filtrer par statut",
+      "send": "Envoyer",
+      "cancel": "Annuler",
+      "cancelSchedule": "Annuler la Programmation",
+      "sending": "Envoi en cours...",
+      "failed": "échoués",
+      "table": {
+        "name": "Nom",
+        "template": "Modèle",
+        "status": "Statut",
+        "scheduledFor": "Programmé / Envoyé",
+        "results": "Résultats",
+        "actions": "Actions"
+      },
+      "status": {
+        "all": "Tous les Statuts",
+        "DRAFT": "Brouillon",
+        "SCHEDULED": "Programmé",
+        "SENDING": "En Cours",
+        "SENT": "Envoyé",
+        "FAILED": "Échoué"
+      },
+      "deleteDialog": {
+        "title": "Supprimer la Campagne",
+        "description": "Êtes-vous sûr de vouloir supprimer \"{name}\" ? Cette action est irréversible.",
+        "success": "Campagne supprimée avec succès",
+        "error": "Échec de la suppression de la campagne"
+      },
+      "sendDialog": {
+        "title": "Envoyer la Campagne Maintenant",
+        "description": "Êtes-vous sûr de vouloir envoyer \"{name}\" à tous les abonnés immédiatement ? Cette action est irréversible.",
+        "success": "Campagne envoyée avec succès à {sent} sur {total} abonnés",
+        "error": "Échec de l'envoi de la campagne"
+      },
+      "cancelDialog": {
+        "title": "Annuler la Campagne Programmée",
+        "description": "Êtes-vous sûr de vouloir annuler l'envoi programmé de \"{name}\" ? La campagne sera remise en brouillon.",
+        "success": "Programmation de la campagne annulée",
+        "error": "Échec de l'annulation de la campagne"
+      },
+      "dialog": {
+        "createTitle": "Créer une Campagne",
+        "editTitle": "Modifier la Campagne",
+        "createDescription": "Sélectionnez un modèle et programmez votre campagne",
+        "editDescription": "Mettez à jour les détails de la campagne",
+        "name": "Nom de la Campagne",
+        "namePlaceholder": "ex., Soldes d'Été 2025",
+        "template": "Modèle d'Email",
+        "selectTemplate": "Sélectionnez un modèle",
+        "failedToLoadTemplates": "Échec du chargement des modèles",
+        "sendMode": "Quand Envoyer",
+        "saveAsDraft": "Enregistrer comme Brouillon",
+        "scheduleForLater": "Programmer pour Plus Tard",
+        "scheduledFor": "Date et Heure Programmées",
+        "createButton": "Créer la Campagne",
+        "updateButton": "Mettre à Jour la Campagne",
+        "creating": "Création...",
+        "updating": "Mise à jour...",
+        "createSuccess": "Campagne créée avec succès",
+        "updateSuccess": "Campagne mise à jour avec succès",
+        "scheduled": "Campagne programmée avec succès",
+        "error": "Une erreur inattendue s'est produite"
       }
     }
   },

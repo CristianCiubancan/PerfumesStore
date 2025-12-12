@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { toast } from 'sonner'
 import { useTranslations } from 'next-intl'
-import { FileText, ChevronLeft, ChevronRight, Filter, X } from 'lucide-react'
+import { FileText, ChevronLeft, ChevronRight, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -139,74 +139,65 @@ export default function AuditLogsPage() {
     <div className="space-y-4">
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-3">
-              <FileText className="h-8 w-8" />
+              <FileText className="h-8 w-8 shrink-0" />
               <div>
-                <CardTitle className="text-2xl">{t('admin.auditLogs.title')}</CardTitle>
+                <CardTitle className="text-xl sm:text-2xl">{t('admin.auditLogs.title')}</CardTitle>
                 <CardDescription>
                   {t('admin.auditLogs.description')}
                 </CardDescription>
               </div>
             </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <Select
+                value={actionFilter}
+                onValueChange={(value) => {
+                  setActionFilter(value as AuditAction | 'ALL')
+                  setPage(1)
+                }}
+              >
+                <SelectTrigger className="w-[130px] sm:w-[150px]">
+                  <SelectValue placeholder={t('admin.auditLogs.filters.action')} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ALL">{t('admin.auditLogs.filters.allActions')}</SelectItem>
+                  <SelectItem value="CREATE">{t('admin.auditLogs.actions.CREATE')}</SelectItem>
+                  <SelectItem value="UPDATE">{t('admin.auditLogs.actions.UPDATE')}</SelectItem>
+                  <SelectItem value="DELETE">{t('admin.auditLogs.actions.DELETE')}</SelectItem>
+                  <SelectItem value="BULK_DELETE">{t('admin.auditLogs.actions.BULK_DELETE')}</SelectItem>
+                  <SelectItem value="LOGIN">{t('admin.auditLogs.actions.LOGIN')}</SelectItem>
+                  <SelectItem value="LOGOUT">{t('admin.auditLogs.actions.LOGOUT')}</SelectItem>
+                  <SelectItem value="PASSWORD_CHANGE">{t('admin.auditLogs.actions.PASSWORD_CHANGE')}</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select
+                value={entityTypeFilter}
+                onValueChange={(value) => {
+                  setEntityTypeFilter(value as AuditEntityType | 'ALL')
+                  setPage(1)
+                }}
+              >
+                <SelectTrigger className="w-[130px] sm:w-[150px]">
+                  <SelectValue placeholder={t('admin.auditLogs.filters.entityType')} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ALL">{t('admin.auditLogs.filters.allEntities')}</SelectItem>
+                  <SelectItem value="PRODUCT">{t('admin.auditLogs.entities.PRODUCT')}</SelectItem>
+                  <SelectItem value="PROMOTION">{t('admin.auditLogs.entities.PROMOTION')}</SelectItem>
+                  <SelectItem value="USER">{t('admin.auditLogs.entities.USER')}</SelectItem>
+                  <SelectItem value="SETTINGS">{t('admin.auditLogs.entities.SETTINGS')}</SelectItem>
+                </SelectContent>
+              </Select>
+              {hasFilters && (
+                <Button variant="ghost" size="icon" onClick={clearFilters} title={t('admin.auditLogs.filters.clear')}>
+                  <X className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
           </div>
         </CardHeader>
         <CardContent>
-          {/* Filters */}
-          <div className="flex flex-wrap items-center gap-4 mb-4">
-            <div className="flex items-center gap-2">
-              <Filter className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm text-muted-foreground">{t('admin.auditLogs.filters.title')}:</span>
-            </div>
-            <Select
-              value={actionFilter}
-              onValueChange={(value) => {
-                setActionFilter(value as AuditAction | 'ALL')
-                setPage(1)
-              }}
-            >
-              <SelectTrigger className="w-[150px]">
-                <SelectValue placeholder={t('admin.auditLogs.filters.action')} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="ALL">{t('admin.auditLogs.filters.allActions')}</SelectItem>
-                <SelectItem value="CREATE">{t('admin.auditLogs.actions.CREATE')}</SelectItem>
-                <SelectItem value="UPDATE">{t('admin.auditLogs.actions.UPDATE')}</SelectItem>
-                <SelectItem value="DELETE">{t('admin.auditLogs.actions.DELETE')}</SelectItem>
-                <SelectItem value="BULK_DELETE">{t('admin.auditLogs.actions.BULK_DELETE')}</SelectItem>
-                <SelectItem value="LOGIN">{t('admin.auditLogs.actions.LOGIN')}</SelectItem>
-                <SelectItem value="LOGOUT">{t('admin.auditLogs.actions.LOGOUT')}</SelectItem>
-                <SelectItem value="PASSWORD_CHANGE">{t('admin.auditLogs.actions.PASSWORD_CHANGE')}</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select
-              value={entityTypeFilter}
-              onValueChange={(value) => {
-                setEntityTypeFilter(value as AuditEntityType | 'ALL')
-                setPage(1)
-              }}
-            >
-              <SelectTrigger className="w-[150px]">
-                <SelectValue placeholder={t('admin.auditLogs.filters.entityType')} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="ALL">{t('admin.auditLogs.filters.allEntities')}</SelectItem>
-                <SelectItem value="PRODUCT">{t('admin.auditLogs.entities.PRODUCT')}</SelectItem>
-                <SelectItem value="PROMOTION">{t('admin.auditLogs.entities.PROMOTION')}</SelectItem>
-                <SelectItem value="USER">{t('admin.auditLogs.entities.USER')}</SelectItem>
-                <SelectItem value="SETTINGS">{t('admin.auditLogs.entities.SETTINGS')}</SelectItem>
-              </SelectContent>
-            </Select>
-            {hasFilters && (
-              <Button variant="ghost" size="sm" onClick={clearFilters}>
-                <X className="h-4 w-4 mr-1" />
-                {t('admin.auditLogs.filters.clear')}
-              </Button>
-            )}
-            <span className="text-sm text-muted-foreground ml-auto">
-              {t('admin.auditLogs.totalLogs', { count: total })}
-            </span>
-          </div>
 
           {isLoading ? (
             <div className="flex items-center justify-center py-8">
@@ -282,11 +273,11 @@ export default function AuditLogsPage() {
               </div>
 
               {/* Pagination */}
-              <div className="flex items-center justify-between mt-4">
-                <span className="text-sm text-muted-foreground">
-                  {t('admin.auditLogs.pageInfo', { current: page, total: totalPages })}
-                </span>
-                <div className="flex items-center gap-2">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mt-4">
+                <div className="text-sm text-muted-foreground">
+                  {t('admin.auditLogs.totalLogs', { count: total })}
+                </div>
+                <div className="flex items-center justify-center gap-2">
                   <Button
                     variant="outline"
                     size="sm"
@@ -294,15 +285,18 @@ export default function AuditLogsPage() {
                     disabled={page <= 1}
                   >
                     <ChevronLeft className="h-4 w-4" />
-                    {t('common.previous')}
+                    <span className="hidden sm:inline">{t('common.previous')}</span>
                   </Button>
+                  <span className="text-sm whitespace-nowrap">
+                    {t('admin.auditLogs.pageInfo', { current: page, total: totalPages })}
+                  </span>
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                     disabled={page >= totalPages}
                   >
-                    {t('common.next')}
+                    <span className="hidden sm:inline">{t('common.next')}</span>
                     <ChevronRight className="h-4 w-4" />
                   </Button>
                 </div>

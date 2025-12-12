@@ -1,0 +1,61 @@
+{
+  "orderConfirmation": {
+    "subject": "Confirmare Comandă - {orderNumber}",
+    "title": "Vă Mulțumim pentru Comandă!",
+    "greeting": "Dragă {name},",
+    "thankYou": "Vă mulțumim pentru achiziție. Comanda dumneavoastră a fost confirmată și este în curs de procesare.",
+    "orderNumber": "Număr Comandă",
+    "orderDate": "Data Comenzii",
+    "shippingAddress": "Adresa de Livrare",
+    "orderSummary": "Detalii Comandă",
+    "product": "Produs",
+    "quantity": "Cant.",
+    "price": "Preț",
+    "subtotal": "Subtotal",
+    "discount": "Reducere",
+    "total": "Total",
+    "paidAmount": "Sumă Plătită",
+    "invoiceAttached": "Factura este atașată acestui email în format PDF.",
+    "questions": "Dacă aveți întrebări despre comandă, nu ezitați să ne contactați.",
+    "footer": "Vă mulțumim că ați cumpărat de la noi!"
+  },
+  "newsletterWelcome": {
+    "subject": "Bine ați venit în Newsletter!",
+    "title": "Bine ați venit în Familia Parfumurilor!",
+    "greeting": "Bună ziua,",
+    "thankYou": "Vă mulțumim pentru abonarea la newsletter. Suntem încântați să vă avem alături!",
+    "whatToExpect": "La ce să vă așteptați:",
+    "exclusiveOffers": "Oferte și reduceri exclusive",
+    "newArrivals": "Primul acces la produsele noi",
+    "fragranceTips": "Sfaturi și recomandări de parfumuri",
+    "cta": "Explorați Colecția",
+    "unsubscribe": "Vă puteți dezabona oricând făcând clic pe linkul din emailurile noastre.",
+    "footer": "Rămâneți parfumați!"
+  },
+  "common": {
+    "currency": "RON",
+    "viewOrder": "Vezi Comanda",
+    "visitStore": "Vizitează Magazinul"
+  },
+  "invoice": {
+    "title": "FACTURĂ",
+    "invoiceNumber": "Număr Factură",
+    "date": "Data",
+    "billTo": "Cumpărător",
+    "shipTo": "Adresa de Livrare",
+    "description": "Descriere",
+    "quantity": "Cant.",
+    "unitPrice": "Preț Unitar",
+    "amount": "Valoare",
+    "subtotal": "Subtotal",
+    "discount": "Reducere",
+    "total": "Total",
+    "paidAmount": "Sumă Plătită",
+    "paymentMethod": "Metodă de Plată",
+    "creditCard": "Card de Credit (Stripe)",
+    "thankYou": "Vă mulțumim pentru achiziție!",
+    "questions": "Dacă aveți întrebări, vă rugăm să ne contactați.",
+    "page": "Pagina",
+    "of": "din"
+  }
+}

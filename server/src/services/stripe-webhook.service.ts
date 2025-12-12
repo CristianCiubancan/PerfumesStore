@@ -3,6 +3,8 @@ import { config } from '../config'
 import { markOrderPaid, markOrderCancelled } from './order.service'
 import { logger } from '../lib/logger'
 import { AppError } from '../middleware/errorHandler'
+import { sendOrderConfirmationEmail, normalizeLocale } from './email'
+import { prisma } from '../lib/prisma'
 import Stripe from 'stripe'
 
 export async function handleStripeWebhook(
@@ -48,7 +50,7 @@ async function processWebhookEvent(event: Stripe.Event): Promise<void> {
       const session = event.data.object as Stripe.Checkout.Session
 
       if (session.payment_status === 'paid') {
-        await markOrderPaid(
+        const order = await markOrderPaid(
           session.id,
           session.payment_intent as string,
           session.amount_total || 0
@@ -57,6 +59,36 @@ async function processWebhookEvent(event: Stripe.Event): Promise<void> {
           `Payment completed for session: ${session.id}`,
           'StripeWebhook'
         )
+
+        // Send order confirmation email with invoice (fire and forget)
+        if (order) {
+          // Get customer email (from user or guest)
+          let customerEmail: string | null = null
+          if (order.userId) {
+            const user = await prisma.user.findUnique({
+              where: { id: order.userId },
+              select: { email: true },
+            })
+            customerEmail = user?.email || null
+          } else {
+            customerEmail = order.guestEmail
+          }
+
+          if (customerEmail) {
+            const locale = normalizeLocale(order.orderLocale)
+            sendOrderConfirmationEmail(order, customerEmail, locale).catch((err) => {
+              logger.error(
+                `Failed to send order confirmation email for ${order.orderNumber}: ${err instanceof Error ? err.message : 'Unknown error'}`,
+                'StripeWebhook'
+              )
+            })
+          } else {
+            logger.warn(
+              `No email address found for order ${order.orderNumber}`,
+              'StripeWebhook'
+            )
+          }
+        }
       }
       break
     }

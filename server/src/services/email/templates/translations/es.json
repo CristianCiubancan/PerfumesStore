@@ -1,0 +1,61 @@
+{
+  "orderConfirmation": {
+    "subject": "Confirmación de Pedido - {orderNumber}",
+    "title": "¡Gracias por su Pedido!",
+    "greeting": "Estimado/a {name},",
+    "thankYou": "Gracias por su compra. Su pedido ha sido confirmado y está siendo procesado.",
+    "orderNumber": "Número de Pedido",
+    "orderDate": "Fecha del Pedido",
+    "shippingAddress": "Dirección de Envío",
+    "orderSummary": "Resumen del Pedido",
+    "product": "Producto",
+    "quantity": "Cant.",
+    "price": "Precio",
+    "subtotal": "Subtotal",
+    "discount": "Descuento",
+    "total": "Total",
+    "paidAmount": "Cantidad Pagada",
+    "invoiceAttached": "Su factura está adjunta a este correo en formato PDF.",
+    "questions": "Si tiene alguna pregunta sobre su pedido, no dude en contactarnos.",
+    "footer": "¡Gracias por comprar con nosotros!"
+  },
+  "newsletterWelcome": {
+    "subject": "¡Bienvenido/a a Nuestro Boletín!",
+    "title": "¡Bienvenido/a a la Familia de Fragancias!",
+    "greeting": "Hola,",
+    "thankYou": "Gracias por suscribirse a nuestro boletín. ¡Estamos encantados de tenerle!",
+    "whatToExpect": "Qué esperar:",
+    "exclusiveOffers": "Ofertas y descuentos exclusivos",
+    "newArrivals": "Primera vista de las novedades",
+    "fragranceTips": "Consejos y recomendaciones de fragancias",
+    "cta": "Explorar la Colección",
+    "unsubscribe": "Puede darse de baja en cualquier momento haciendo clic en el enlace de nuestros correos.",
+    "footer": "¡Manténgase perfumado/a!"
+  },
+  "common": {
+    "currency": "RON",
+    "viewOrder": "Ver Pedido",
+    "visitStore": "Visitar Tienda"
+  },
+  "invoice": {
+    "title": "FACTURA",
+    "invoiceNumber": "Número de Factura",
+    "date": "Fecha",
+    "billTo": "Facturar a",
+    "shipTo": "Enviar a",
+    "description": "Descripción",
+    "quantity": "Cant.",
+    "unitPrice": "Precio Unitario",
+    "amount": "Importe",
+    "subtotal": "Subtotal",
+    "discount": "Descuento",
+    "total": "Total",
+    "paidAmount": "Cantidad Pagada",
+    "paymentMethod": "Método de Pago",
+    "creditCard": "Tarjeta de Crédito (Stripe)",
+    "thankYou": "¡Gracias por su compra!",
+    "questions": "Si tiene preguntas, por favor contáctenos.",
+    "page": "Página",
+    "of": "de"
+  }
+}

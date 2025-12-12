@@ -108,7 +108,7 @@ export function MultiSelect({
               onCheckedChange={() => toggleOption(option.value, isOptionDisabled)}
               onSelect={(e) => e.preventDefault()}
               disabled={isOptionDisabled}
-              className={isOptionDisabled ? 'opacity-50 cursor-not-allowed' : ''}
+              className={isOptionDisabled ? '!opacity-50 !cursor-not-allowed !text-muted-foreground' : ''}
             >
               {displayLabel}
             </DropdownMenuCheckboxItem>

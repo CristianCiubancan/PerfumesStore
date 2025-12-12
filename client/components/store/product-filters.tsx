@@ -134,9 +134,11 @@ export function ProductFilters({
   )
 
   // Check if an option should be disabled (count is 0 and not currently selected)
+  // Must use same fallback logic as get*Count functions (default to 0 when not in map)
   const isGenderDisabled = useCallback(
     (gender: Gender): boolean => {
-      const count = genderCountMap?.get(gender) ?? undefined
+      if (!genderCountMap) return false
+      const count = genderCountMap.get(gender) ?? 0
       return count === 0 && filters.gender !== gender
     },
     [genderCountMap, filters.gender]
@@ -144,7 +146,8 @@ export function ProductFilters({
 
   const isConcentrationDisabled = useCallback(
     (concentration: Concentration): boolean => {
-      const count = concentrationCountMap?.get(concentration) ?? undefined
+      if (!concentrationCountMap) return false
+      const count = concentrationCountMap.get(concentration) ?? 0
       return count === 0 && filters.concentration !== concentration
     },
     [concentrationCountMap, filters.concentration]
@@ -152,7 +155,8 @@ export function ProductFilters({
 
   const isFragranceFamilyDisabled = useCallback(
     (id: number): boolean => {
-      const count = fragranceFamilyCountMap?.get(id) ?? undefined
+      if (!fragranceFamilyCountMap) return false
+      const count = fragranceFamilyCountMap.get(id) ?? 0
       return count === 0 && filters.fragranceFamilyId !== id
     },
     [fragranceFamilyCountMap, filters.fragranceFamilyId]
@@ -160,7 +164,8 @@ export function ProductFilters({
 
   const isLongevityDisabled = useCallback(
     (id: number): boolean => {
-      const count = longevityCountMap?.get(id) ?? undefined
+      if (!longevityCountMap) return false
+      const count = longevityCountMap.get(id) ?? 0
       return count === 0 && filters.longevityId !== id
     },
     [longevityCountMap, filters.longevityId]
@@ -168,7 +173,8 @@ export function ProductFilters({
 
   const isSillageDisabled = useCallback(
     (id: number): boolean => {
-      const count = sillageCountMap?.get(id) ?? undefined
+      if (!sillageCountMap) return false
+      const count = sillageCountMap.get(id) ?? 0
       return count === 0 && filters.sillageId !== id
     },
     [sillageCountMap, filters.sillageId]
@@ -293,7 +299,7 @@ export function ProductFilters({
                   key={gender}
                   value={gender}
                   disabled={disabled}
-                  className={disabled ? 'opacity-50' : ''}
+                  className={disabled ? '!opacity-50 !cursor-not-allowed !text-muted-foreground' : ''}
                 >
                   {label}
                 </SelectItem>
@@ -333,7 +339,7 @@ export function ProductFilters({
                   key={conc}
                   value={conc}
                   disabled={disabled}
-                  className={disabled ? 'opacity-50' : ''}
+                  className={disabled ? '!opacity-50 !cursor-not-allowed !text-muted-foreground' : ''}
                 >
                   {label}
                 </SelectItem>
@@ -371,7 +377,7 @@ export function ProductFilters({
                   key={family.id}
                   value={family.id.toString()}
                   disabled={disabled}
-                  className={disabled ? 'opacity-50' : ''}
+                  className={disabled ? '!opacity-50 !cursor-not-allowed !text-muted-foreground' : ''}
                 >
                   {label}
                 </SelectItem>
@@ -503,7 +509,7 @@ export function ProductFilters({
                   key={longevity.id}
                   value={longevity.id.toString()}
                   disabled={disabled}
-                  className={disabled ? 'opacity-50' : ''}
+                  className={disabled ? '!opacity-50 !cursor-not-allowed !text-muted-foreground' : ''}
                 >
                   {label}
                 </SelectItem>
@@ -539,7 +545,7 @@ export function ProductFilters({
                   key={sillage.id}
                   value={sillage.id.toString()}
                   disabled={disabled}
-                  className={disabled ? 'opacity-50' : ''}
+                  className={disabled ? '!opacity-50 !cursor-not-allowed !text-muted-foreground' : ''}
                 >
                   {label}
                 </SelectItem>

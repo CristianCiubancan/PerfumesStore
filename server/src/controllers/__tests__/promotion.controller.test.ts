@@ -27,6 +27,7 @@ describe('PromotionController', () => {
     res = {
       status: jest.fn().mockReturnThis(),
       json: jest.fn().mockReturnThis(),
+      set: jest.fn().mockReturnThis(),
     }
   })
 

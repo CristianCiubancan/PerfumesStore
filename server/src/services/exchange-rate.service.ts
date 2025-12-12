@@ -34,12 +34,81 @@ const xmlParser = new XMLParser({
   processEntities: false, // Prevents XXE attacks
 })
 
-export async function fetchRatesFromBNR(): Promise<ParsedRates> {
-  const response = await fetch(EXCHANGE_RATE.BNR_XML_URL)
+/**
+ * Sleep for a specified duration
+ */
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}
 
-  if (!response.ok) {
-    throw new AppError('Failed to fetch exchange rates from BNR', 503, 'BNR_FETCH_ERROR')
+/**
+ * Calculate exponential backoff delay with jitter
+ */
+function getBackoffDelay(attempt: number): number {
+  const baseDelay = EXCHANGE_RATE.RETRY_BASE_DELAY_MS
+  const maxDelay = EXCHANGE_RATE.RETRY_MAX_DELAY_MS
+  // Exponential backoff: 1s, 2s, 4s... with some jitter
+  const exponentialDelay = baseDelay * Math.pow(2, attempt)
+  const jitter = Math.random() * 0.3 * exponentialDelay // 0-30% jitter
+  return Math.min(exponentialDelay + jitter, maxDelay)
+}
+
+/**
+ * Execute fetch with retry logic (internal function)
+ */
+async function fetchBNRWithRetry(): Promise<Response> {
+  let lastError: Error | null = null
+
+  for (let attempt = 0; attempt < EXCHANGE_RATE.RETRY_MAX_ATTEMPTS; attempt++) {
+    try {
+      const response = await fetch(EXCHANGE_RATE.BNR_XML_URL)
+
+      if (response.ok) {
+        return response
+      }
+
+      // Non-retriable errors (4xx client errors)
+      if (response.status >= 400 && response.status < 500) {
+        throw new AppError(
+          `BNR returned client error: ${response.status}`,
+          503,
+          'BNR_CLIENT_ERROR'
+        )
+      }
+
+      // Server errors (5xx) - will retry
+      lastError = new Error(`BNR server error: ${response.status}`)
+    } catch (err) {
+      // Network errors - will retry
+      lastError = err instanceof Error ? err : new Error('Unknown error')
+
+      // Don't retry AppErrors (they're intentional failures)
+      if (err instanceof AppError) {
+        throw err
+      }
+    }
+
+    // Log retry attempt
+    if (attempt < EXCHANGE_RATE.RETRY_MAX_ATTEMPTS - 1) {
+      const delayMs = getBackoffDelay(attempt)
+      logger.warn(
+        `BNR fetch failed (attempt ${attempt + 1}/${EXCHANGE_RATE.RETRY_MAX_ATTEMPTS}), retrying in ${Math.round(delayMs)}ms: ${lastError?.message}`,
+        'ExchangeRate'
+      )
+      await sleep(delayMs)
+    }
   }
+
+  // All retries exhausted
+  logger.error(
+    `BNR fetch failed after ${EXCHANGE_RATE.RETRY_MAX_ATTEMPTS} attempts: ${lastError?.message}`,
+    'ExchangeRate'
+  )
+  throw new AppError('Failed to fetch exchange rates from BNR after retries', 503, 'BNR_FETCH_ERROR')
+}
+
+export async function fetchRatesFromBNR(): Promise<ParsedRates> {
+  const response = await fetchBNRWithRetry()
 
   const xmlText = await response.text()
   const parsed = xmlParser.parse(xmlText) as BNRXMLStructure

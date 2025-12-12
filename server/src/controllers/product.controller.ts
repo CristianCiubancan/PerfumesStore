@@ -56,6 +56,8 @@ export async function deleteProduct(req: Request, res: Response): Promise<void> 
 export async function getProduct(req: Request, res: Response): Promise<void> {
   const id = parseIdParam(req.params.id)
   const product = await productService.getProduct(id)
+  // Cache individual product lookups for 1 hour (admin use - slug preferred for public)
+  res.set('Cache-Control', 'public, max-age=3600')
   res.json({ data: product })
 }
 
@@ -120,6 +122,8 @@ export async function listProducts(req: Request, res: Response): Promise<void> {
     stockStatus: stockStatus as 'all' | 'in_stock' | 'low_stock' | 'out_of_stock',
   })
 
+  // Cache product listings for 1 minute - balances freshness with performance
+  res.set('Cache-Control', 'public, max-age=60')
   res.json({ data: result })
 }
 

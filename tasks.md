@@ -3,7 +3,7 @@
 **Source:** code-review.md
 **Date:** 2025-12-12
 **Last Updated:** 2025-12-12
-**Total Issues:** 39 (10 completed, 29 remaining)
+**Total Issues:** 39 (15 completed, 24 remaining)
 
 ---
 
@@ -31,7 +31,7 @@ Issues that pose significant risk to production stability, security, or data int
 
 ---
 
-## HIGH (19 issues - 5 completed)
+## HIGH (19 issues - 7 completed)
 
 Issues that significantly impact code quality, performance, or maintainability.
 
@@ -54,7 +54,7 @@ Issues that significantly impact code quality, performance, or maintainability.
 | 23 | ~~No request correlation/tracing IDs~~ | Observability | `server/src/middleware/` | 2h | ✅ Done |
 | 24 | ~~Client errors swallowed in production~~ | Observability | `client/components/error-boundary.tsx` | 2h | ✅ Done |
 | 25 | Filter counts query fetches all products then aggregates | Performance | `server/src/services/product/filter-count-builder.ts:245-279` | 4h | |
-| 26 | No Cache-Control headers for GET endpoints | Performance | `server/src/controllers/product.controller.ts` | 2h | |
+| 26 | ~~No Cache-Control headers for GET endpoints~~ | Performance | `server/src/controllers/product.controller.ts` | 2h | ✅ Done |
 | 27 | No CHANGELOG.md or versioning strategy | Maintainability | Project root | 2h | |
 
 **Completed:**
@@ -62,36 +62,45 @@ Issues that significantly impact code quality, performance, or maintainability.
 - **#11**: Added `compression` middleware to server for gzip/deflate compression
 - **#23**: Added `server/src/middleware/requestId.ts` for request correlation IDs (X-Request-ID header)
 - **#24**: Updated `ErrorBoundary` to report errors via `reportError()` which sends to Sentry in production
+- **#26**: Added Cache-Control headers to product, promotion, and exchange-rate controllers (30s-1hr based on data volatility)
 
 ---
 
-## MEDIUM (8 issues)
+## MEDIUM (8 issues - 3 completed)
 
 Issues that should be addressed but don't pose immediate risk.
 
 | # | Issue | Category | File:Line | Effort | Status |
 |---|-------|----------|-----------|--------|--------|
-| 28 | Next.js vulnerabilities (GHSA-w37m-7fhw-fmv9, GHSA-mwv6-3258-q52c) | Security | `client/package.json` | 1h | |
+| 28 | ~~Next.js vulnerabilities (GHSA-w37m-7fhw-fmv9, GHSA-mwv6-3258-q52c)~~ | Security | `client/package.json` | 1h | ✅ Done |
 | 29 | Types centralized in single 332-line file | Code Quality | `client/types/index.ts` | 4h | |
 | 30 | No runtime security policies (seccomp, AppArmor) | DevOps | `server/Dockerfile`, `client/Dockerfile` | 3h | |
-| 31 | Health check only tests database (not Stripe, email) | Observability | `server/src/routes/index.ts:24-31` | 2h | |
+| 31 | ~~Health check only tests database (not Stripe, email)~~ | Observability | `server/src/routes/index.ts:24-31` | 2h | ✅ Done |
 | 32 | No lazy loading for product images | Performance | `client/components/` | 2h | |
-| 33 | No retry logic for BNR exchange rate fetch | Reliability | `server/src/services/exchange-rate.service.ts:37-42` | 2h | |
+| 33 | ~~No retry logic for BNR exchange rate fetch~~ | Reliability | `server/src/services/exchange-rate.service.ts:37-42` | 2h | ✅ Done |
 | 34 | Inconsistent commit message format | Maintainability | Git history | 1h | |
 | 35 | Missing CONTRIBUTING.md | Maintainability | Project root | 2h | |
 
+**Completed:**
+- **#28**: Updated Next.js from 16.0.0-beta.0 to 16.0.10 via `npm audit fix`, resolving both vulnerabilities
+- **#31**: Enhanced health check to verify database (with latency), Stripe API, email service (Resend), and exchange rate freshness
+- **#33**: Added exponential backoff retry (3 attempts, 1-10s delays with jitter) for BNR exchange rate fetch
+
 ---
 
-## LOW (4 issues)
+## LOW (4 issues - 1 completed)
 
 Nice-to-have improvements with minimal immediate impact.
 
 | # | Issue | Category | File:Line | Effort | Status |
 |---|-------|----------|-----------|--------|--------|
 | 36 | In-memory rate limiting not distributed | Security | `server/src/services/auth/account.service.ts:20-30` | 4h | |
-| 37 | Missing Prettier configuration | Code Quality | Project root | 1h | |
+| 37 | ~~Missing Prettier configuration~~ | Code Quality | Project root | 1h | ✅ Done |
 | 38 | Connection pool not explicitly configured | Performance | `server/src/lib/prisma.ts` | 1h | |
 | 39 | 10-second shutdown timeout may be too short | Reliability | `server/src/index.ts:90-94` | 1h | |
+
+**Completed:**
+- **#37**: Added `.prettierrc` and `.prettierignore` at project root with `npm run format` and `npm run format:check` scripts
 
 ---
 
@@ -99,15 +108,15 @@ Nice-to-have improvements with minimal immediate impact.
 
 | Category | Critical | High | Medium | Low | Completed | Remaining |
 |----------|----------|------|--------|-----|-----------|-----------|
-| Observability | 4 | 2 | 1 | 0 | **4** | 3 |
+| Observability | 4 | 2 | 1 | 0 | **5** | 2 |
 | Testing | 2 | 3 | 0 | 0 | **1** | 4 |
 | DevOps | 2 | 2 | 1 | 0 | **2** | 3 |
 | Maintainability | 0 | 4 | 2 | 0 | **0** | 6 |
-| Reliability | 0 | 2 | 1 | 1 | **2** | 2 |
-| Performance | 0 | 3 | 1 | 1 | **1** | 4 |
-| Code Quality | 0 | 2 | 1 | 1 | **0** | 4 |
-| Security | 0 | 0 | 1 | 1 | **0** | 2 |
-| **Total** | **8** | **19** | **8** | **4** | **10** | **29** |
+| Reliability | 0 | 2 | 1 | 1 | **3** | 1 |
+| Performance | 0 | 3 | 1 | 1 | **2** | 3 |
+| Code Quality | 0 | 2 | 1 | 1 | **1** | 3 |
+| Security | 0 | 0 | 1 | 1 | **1** | 1 |
+| **Total** | **8** | **19** | **8** | **4** | **15** | **24** |
 
 ---
 
@@ -116,14 +125,14 @@ Nice-to-have improvements with minimal immediate impact.
 ### Sprint 1 (Quick Wins - 1 week)
 Focus: Immediate security and reliability fixes
 
-- [ ] #28 - Fix Next.js vulnerabilities (`npm audit fix`) - 1h
+- [x] #28 - Fix Next.js vulnerabilities (`npm audit fix`) - 1h ✅
 - [x] #9 - Add `unhandledRejection` handler - 1h ✅
 - [x] #10 - Add `uncaughtException` handler - 1h ✅
 - [x] #11 - Add HTTP compression middleware - 1h ✅
 - [x] #5 - Remove `|| true` from CI security scan - 1h ✅
-- [ ] #37 - Add Prettier configuration - 1h
+- [x] #37 - Add Prettier configuration - 1h ✅
 
-**Total: ~6 hours (4 completed, 2 remaining)**
+**Total: ~6 hours (6 completed) ✅ COMPLETE**
 
 ### Sprint 2 (Observability - 1-2 weeks)
 Focus: Production visibility
@@ -132,9 +141,9 @@ Focus: Production visibility
 - [x] #23 - Add request ID middleware - 2h ✅
 - [x] #24 - Fix client error boundary - 2h ✅
 - [x] #8 - Set up centralized logging - 5h ✅
-- [ ] #31 - Enhance health check endpoint - 2h
+- [x] #31 - Enhance health check endpoint - 2h ✅
 
-**Total: ~15 hours (13h completed, 2h remaining)**
+**Total: ~15 hours (15h completed) ✅ COMPLETE**
 
 ### Sprint 3 (Documentation & Quality - 1 week)
 Focus: Developer experience
@@ -173,11 +182,11 @@ Focus: Production hardening
 - [ ] #18 - Client component tests - 30h
 - [ ] #22 - Secret management solution - 8h
 - [ ] #25 - Optimize filter counts query - 4h
-- [ ] #26 - Add Cache-Control headers - 2h
+- [x] #26 - Add Cache-Control headers - 2h ✅
 - [ ] #29 - Reorganize types by domain - 4h
 - [ ] #30 - Add runtime security policies - 3h
 - [ ] #32 - Add image lazy loading - 2h
-- [ ] #33 - Add exchange rate retry logic - 2h
+- [x] #33 - Add exchange rate retry logic - 2h ✅
 - [ ] #34 - Standardize commit messages - 1h
 - [ ] #36 - Redis-backed rate limiting - 4h
 - [ ] #38 - Configure connection pool - 1h
@@ -190,11 +199,11 @@ Focus: Production hardening
 | Priority | Issues | Completed | Remaining Effort |
 |----------|--------|-----------|------------------|
 | Critical | 8 | 5 | ~54h |
-| High | 19 | 5 | ~86h |
-| Medium | 8 | 0 | ~17h |
-| Low | 4 | 0 | ~7h |
-| **Total** | **39** | **10** | **~164h** |
+| High | 19 | 7 | ~82h |
+| Medium | 8 | 3 | ~12h |
+| Low | 4 | 1 | ~6h |
+| **Total** | **39** | **15** | **~154h** |
 
-**Progress:** 10/39 issues completed (~26%)
-**Effort saved:** ~27h completed
-**Remaining:** ~164h (~4-5 sprints with 1 developer)
+**Progress:** 15/39 issues completed (~38%)
+**Effort saved:** ~35h completed
+**Remaining:** ~154h (~4 sprints with 1 developer)

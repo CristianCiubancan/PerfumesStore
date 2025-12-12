@@ -2,6 +2,7 @@ import { Request, Response } from 'express'
 import * as exchangeRateService from '../services/exchange-rate.service'
 import { createAuditLog } from '../lib/auditLogger'
 import { AppError } from '../middleware/errorHandler'
+import { CACHE } from '../config/constants'
 
 export async function getExchangeRates(_req: Request, res: Response): Promise<void> {
   const rates = await exchangeRateService.getExchangeRatesWithMeta()
@@ -14,11 +15,15 @@ export async function getExchangeRates(_req: Request, res: Response): Promise<vo
     )
   }
 
+  // Cache exchange rates for 1 hour - BNR updates daily
+  res.set('Cache-Control', `public, max-age=${CACHE.EXCHANGE_RATE_REVALIDATE_SECONDS}`)
   res.json({ data: rates })
 }
 
 export async function getSettings(_req: Request, res: Response): Promise<void> {
   const settings = await exchangeRateService.getExchangeRateSettings()
+  // Cache settings for 5 minutes - rarely change
+  res.set('Cache-Control', 'public, max-age=300')
   res.json({ data: { feePercent: settings.feePercent.toNumber() } })
 }
 

@@ -19,22 +19,28 @@ describe('API Routes Integration Tests', () => {
   describe('GET /api/health', () => {
     it('should return health status when database is connected', async () => {
       ;(prisma.$queryRaw as jest.Mock).mockResolvedValue([{ '?column?': 1 }])
+      // Mock exchange rate check
+      ;(prisma.exchangeRate.findFirst as jest.Mock).mockResolvedValue({
+        fetchedAt: new Date(),
+      })
 
       const response = await request(app).get('/api/health')
 
       expect(response.status).toBe(200)
-      expect(response.body.status).toBe('ok')
-      expect(response.body.database).toBe('connected')
+      // New health check format has services object
+      expect(response.body.services.database.status).toBe('healthy')
       expect(response.body.timestamp).toBeDefined()
     })
 
-    it('should return error when database is disconnected', async () => {
+    it('should return 503 when database is disconnected', async () => {
       ;(prisma.$queryRaw as jest.Mock).mockRejectedValue(new Error('Connection failed'))
 
       const response = await request(app).get('/api/health')
 
-      // Health endpoint throws on DB failure, caught by error handler
-      expect(response.status).toBe(500)
+      // Health endpoint returns 503 for unhealthy status
+      expect(response.status).toBe(503)
+      expect(response.body.status).toBe('unhealthy')
+      expect(response.body.services.database.status).toBe('unhealthy')
     })
   })
 

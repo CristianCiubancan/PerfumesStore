@@ -55,6 +55,8 @@ export async function deletePromotion(req: Request, res: Response): Promise<void
 export async function getPromotion(req: Request, res: Response): Promise<void> {
   const id = parseIdParam(req.params.id)
   const promotion = await promotionService.getPromotion(id)
+  // Cache individual promotion for 5 minutes
+  res.set('Cache-Control', 'public, max-age=300')
   res.json({ data: promotion })
 }
 
@@ -67,11 +69,15 @@ export async function listPromotions(req: Request, res: Response): Promise<void>
     isActive: parseBooleanParam(isActive),
   })
 
+  // Cache promotion list for 1 minute - admin may update frequently
+  res.set('Cache-Control', 'public, max-age=60')
   res.json({ data: result })
 }
 
 export async function getActivePromotion(_req: Request, res: Response): Promise<void> {
   const promotion = await promotionService.getActivePromotion()
   const serverTime = await promotionService.getServerTime()
+  // Short cache for active promotion - time-sensitive for countdown timers
+  res.set('Cache-Control', 'public, max-age=30')
   res.json({ data: { promotion, serverTime: serverTime.toISOString() } })
 }

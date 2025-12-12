@@ -32,6 +32,8 @@
     "lint:fix": "npm run lint:fix:server && npm run lint:fix:client",
     "lint:fix:server": "cd server && npm run lint:fix",
     "lint:fix:client": "cd client && npm run lint:fix || npm run lint -- --fix",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md}\"",
     "typecheck": "npm run typecheck:server && npm run typecheck:client",
     "typecheck:server": "cd server && npm run build",
     "typecheck:client": "cd client && npx tsc --noEmit",
@@ -46,7 +48,8 @@
     "stripe:webhook": "bash scripts/stripe-webhook.sh"
   },
   "devDependencies": {
-    "concurrently": "^8.2.2"
+    "concurrently": "^8.2.2",
+    "prettier": "^3.7.4"
   },
   "engines": {
     "node": ">=20.0.0",

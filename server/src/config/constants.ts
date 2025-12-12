@@ -45,6 +45,11 @@ export const EXCHANGE_RATE = {
   BNR_XML_URL: 'https://www.bnr.ro/nbrfxrates.xml',
   CRON_SCHEDULE: '0 * * * *', // Every hour at minute 0
   SETTINGS_SINGLETON_ID: 1,
+  STALE_THRESHOLD_HOURS: 25, // BNR updates daily, 25h allows for weekends + buffer
+  // Retry configuration for BNR fetch failures
+  RETRY_MAX_ATTEMPTS: 3,
+  RETRY_BASE_DELAY_MS: 1000, // 1 second base delay
+  RETRY_MAX_DELAY_MS: 10000, // 10 seconds max delay
 } as const
 
 // Cache Durations

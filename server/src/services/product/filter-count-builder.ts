@@ -260,11 +260,12 @@ async function countSeasons(
   const productIds = matchingProducts.map((p) => p.id)
 
   // Single aggregation query: count products per season
+  // In _ProductSeasons: A = Product ID, B = Season ID (Prisma orders by model name alphabetically)
   const seasonCounts = await prisma.$queryRaw<{ seasonId: number; count: bigint }[]>`
-    SELECT "A" as "seasonId", COUNT(DISTINCT "B") as count
+    SELECT "B" as "seasonId", COUNT(DISTINCT "A") as count
     FROM "_ProductSeasons"
-    WHERE "B" = ANY(${productIds}::int[])
-    GROUP BY "A"
+    WHERE "A" = ANY(${productIds}::int[])
+    GROUP BY "B"
   `
 
   // Get all seasons to ensure we return counts for all (even 0)
@@ -299,6 +300,7 @@ async function countOccasions(
   const productIds = matchingProducts.map((p) => p.id)
 
   // Single aggregation query: count products per occasion
+  // In _ProductOccasions: A = Occasion ID, B = Product ID (Prisma orders by model name alphabetically)
   const occasionCounts = await prisma.$queryRaw<{ occasionId: number; count: bigint }[]>`
     SELECT "A" as "occasionId", COUNT(DISTINCT "B") as count
     FROM "_ProductOccasions"

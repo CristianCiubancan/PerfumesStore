@@ -291,7 +291,8 @@ export function ProductFilters({
             {GENDERS.map((gender) => {
               const count = getGenderCount(gender)
               const disabled = isGenderDisabled(gender)
-              const label = count !== undefined
+              const isSelected = filters.gender === gender
+              const label = count !== undefined && !isSelected
                 ? `${t(`product.gender.${gender}`)} (${count})`
                 : t(`product.gender.${gender}`)
               return (
@@ -331,7 +332,8 @@ export function ProductFilters({
             {CONCENTRATIONS.map((conc) => {
               const count = getConcentrationCount(conc)
               const disabled = isConcentrationDisabled(conc)
-              const label = count !== undefined
+              const isSelected = filters.concentration === conc
+              const label = count !== undefined && !isSelected
                 ? `${t(`product.concentration.${conc}`)} (${count})`
                 : t(`product.concentration.${conc}`)
               return (
@@ -369,7 +371,8 @@ export function ProductFilters({
             {filterOptions?.fragranceFamilies.map((family) => {
               const count = getFragranceFamilyCount(family.id)
               const disabled = isFragranceFamilyDisabled(family.id)
-              const label = count !== undefined
+              const isSelected = filters.fragranceFamilyId === family.id
+              const label = count !== undefined && !isSelected
                 ? `${t(`product.fragranceFamily.${family.name}`)} (${count})`
                 : t(`product.fragranceFamily.${family.name}`)
               return (
@@ -501,7 +504,8 @@ export function ProductFilters({
             {filterOptions?.longevities.map((longevity) => {
               const count = getLongevityCount(longevity.id)
               const disabled = isLongevityDisabled(longevity.id)
-              const label = count !== undefined
+              const isSelected = filters.longevityId === longevity.id
+              const label = count !== undefined && !isSelected
                 ? `${t(`product.longevity.${longevity.name}`)} (${count})`
                 : t(`product.longevity.${longevity.name}`)
               return (
@@ -537,7 +541,8 @@ export function ProductFilters({
             {filterOptions?.sillages.map((sillage) => {
               const count = getSillageCount(sillage.id)
               const disabled = isSillageDisabled(sillage.id)
-              const label = count !== undefined
+              const isSelected = filters.sillageId === sillage.id
+              const label = count !== undefined && !isSelected
                 ? `${t(`product.sillage.${sillage.name}`)} (${count})`
                 : t(`product.sillage.${sillage.name}`)
               return (

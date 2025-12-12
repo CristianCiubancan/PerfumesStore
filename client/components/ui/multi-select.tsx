@@ -4,7 +4,6 @@ import * as React from 'react'
 import { ChevronDown, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
-// Badge import removed - using Button for keyboard accessibility (FE-002)
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -74,19 +73,18 @@ export function MultiSelect({
               selected.map((value) => {
                 const option = options.find((o) => o.value === value)
                 return (
-                  <Button
+                  <span
                     key={value}
-                    type="button"
-                    variant="secondary"
-                    size="sm"
-                    className="text-xs h-6 px-2 gap-1"
+                    role="button"
+                    tabIndex={-1}
+                    className="inline-flex items-center text-xs h-6 px-2 gap-1 rounded-md bg-secondary text-secondary-foreground hover:bg-secondary/80 cursor-pointer"
                     onPointerDown={handleBadgePointerDown}
                     onClick={() => removeOption(value)}
                     aria-label={`Remove ${option?.label || value}`}
                   >
                     {option?.label || value}
                     <X className="h-3 w-3" aria-hidden="true" />
-                  </Button>
+                  </span>
                 )
               })
             )}
@@ -96,8 +94,9 @@ export function MultiSelect({
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]" align="start">
         {options.map((option) => {
-          const isOptionDisabled = option.disabled || (option.count === 0 && !selected.includes(option.value))
-          const displayLabel = showCounts && option.count !== undefined
+          const isSelected = selected.includes(option.value)
+          const isOptionDisabled = option.disabled || (option.count === 0 && !isSelected)
+          const displayLabel = showCounts && option.count !== undefined && !isSelected
             ? `${option.label} (${option.count})`
             : option.label
 

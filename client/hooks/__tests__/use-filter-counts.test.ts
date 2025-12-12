@@ -3,7 +3,7 @@ import { renderHook, waitFor } from '@testing-library/react'
 import { useFilterCounts } from '../use-filter-counts'
 import { DEFAULT_FILTERS, FilterValues } from '../use-filter-params'
 import { FilterCounts } from '@/types'
-import { CurrencyCode, ExchangeRates } from '@/lib/currency-helpers'
+import { ExchangeRates } from '@/lib/currency-helpers'
 
 // Mock the API
 const mockGetFilterCounts = vi.fn()
@@ -162,7 +162,7 @@ describe('useFilterCounts', () => {
 
   describe('filter changes', () => {
     it('should refetch when filters change', async () => {
-      const { result, rerender } = renderHook(
+      const { rerender } = renderHook(
         ({ filters }) => useFilterCounts(filters),
         { initialProps: { filters: DEFAULT_FILTERS } }
       )
@@ -221,7 +221,7 @@ describe('useFilterCounts', () => {
       abortError.name = 'AbortError'
       mockGetFilterCounts.mockRejectedValue(abortError)
 
-      const { result } = renderHook(() => useFilterCounts(DEFAULT_FILTERS))
+      renderHook(() => useFilterCounts(DEFAULT_FILTERS))
 
       // Wait for the hook to process
       await waitFor(() => {

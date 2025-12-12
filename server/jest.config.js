@@ -33,4 +33,12 @@ module.exports = {
   testTimeout: 10000,
   clearMocks: true,
   restoreMocks: true,
+  // Force exit after tests complete to avoid hanging on open handles
+  forceExit: true,
+  // Detect open handles in CI for debugging
+  detectOpenHandles: process.env.CI === 'true',
+  // Use fake timers by default to prevent timer-related leaks
+  fakeTimers: {
+    enableGlobally: false, // Enable per-test as needed
+  },
 };

@@ -29,3 +29,9 @@ const nextConfig: NextConfig = {
 };
 
 export default withNextIntl(nextConfig);
+
+// Note: To enable Sentry error tracking in production:
+// 1. npm install @sentry/nextjs
+// 2. Set NEXT_PUBLIC_SENTRY_DSN environment variable
+// 3. Optionally run: npx @sentry/wizard@latest -i nextjs
+// The errorReporting.ts utility will automatically use Sentry when available.

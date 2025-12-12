@@ -161,7 +161,7 @@ jobs:
       - name: Run npm audit
         run: |
           cd ${{ matrix.directory }}
-          npm audit --audit-level=moderate || true
+          npm audit --audit-level=high
 
   # Docker Compose validation
   compose-validation:

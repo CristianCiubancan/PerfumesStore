@@ -161,8 +161,84 @@ services:
           cpus: '0.25'
           memory: 1G
 
+  # Automated database backups
+  # Runs pg_dump daily and keeps 7 days of backups
+  postgres-backup:
+    image: postgres:16-alpine
+    environment:
+      - PGHOST=postgres
+      - PGUSER=${POSTGRES_USER}
+      - PGPASSWORD=${POSTGRES_PASSWORD}
+      - PGDATABASE=${POSTGRES_DB}
+      - BACKUP_RETENTION_DAYS=${BACKUP_RETENTION_DAYS:-7}
+    volumes:
+      - postgres_backups:/backups
+    depends_on:
+      postgres:
+        condition: service_healthy
+    # Run backup script every day at 2 AM
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        # Install required utilities
+        apk add --no-cache dcron
+
+        # Create backup script
+        cat > /backup.sh << 'BACKUP_SCRIPT'
+        #!/bin/sh
+        set -e
+        TIMESTAMP=$$(date +%Y%m%d_%H%M%S)
+        BACKUP_FILE="/backups/backup_$${TIMESTAMP}.sql.gz"
+
+        echo "[$$TIMESTAMP] Starting database backup..."
+        pg_dump -Fc | gzip > "$$BACKUP_FILE"
+        echo "[$$TIMESTAMP] Backup completed: $$BACKUP_FILE"
+
+        # Remove backups older than retention period
+        echo "[$$TIMESTAMP] Cleaning old backups (keeping last $${BACKUP_RETENTION_DAYS} days)..."
+        find /backups -name "backup_*.sql.gz" -mtime +$${BACKUP_RETENTION_DAYS} -delete
+
+        # List remaining backups
+        echo "[$$TIMESTAMP] Current backups:"
+        ls -lh /backups/backup_*.sql.gz 2>/dev/null || echo "No backups found"
+        BACKUP_SCRIPT
+
+        chmod +x /backup.sh
+
+        # Add cron job (daily at 2 AM)
+        echo "0 2 * * * /backup.sh >> /var/log/backup.log 2>&1" | crontab -
+
+        # Run initial backup on startup
+        echo "Running initial backup..."
+        /backup.sh
+
+        # Start cron daemon in foreground
+        echo "Starting backup scheduler (daily at 2 AM)..."
+        crond -f -l 2
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "2"
+    networks:
+      - perfumes-prod-network
+    labels:
+      - "com.perfumesstore.service=backup"
+      - "com.perfumesstore.environment=production"
+      - "com.perfumesstore.description=PostgreSQL automated backup service"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 256M
+        reservations:
+          cpus: '0.1'
+          memory: 128M
+
 volumes:
   postgres_data:
+  postgres_backups:
 
 networks:
   perfumes-prod-network:

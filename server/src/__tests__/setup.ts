@@ -194,3 +194,21 @@ jest.mock('../lib/auditLogger', () => ({
 beforeEach(() => {
   jest.clearAllMocks()
 })
+
+// Clean up after all tests to prevent open handles
+afterAll(async () => {
+  // Clear any pending timers
+  jest.clearAllTimers()
+
+  // Ensure all mocks are restored
+  jest.restoreAllMocks()
+
+  // Get the mocked prisma and call disconnect
+  const { prisma } = await import('../lib/prisma')
+  if (prisma.$disconnect && typeof prisma.$disconnect === 'function') {
+    await prisma.$disconnect()
+  }
+
+  // Give time for any pending operations to complete
+  await new Promise(resolve => setTimeout(resolve, 100))
+})

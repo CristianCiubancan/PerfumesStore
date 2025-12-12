@@ -1,12 +1,14 @@
 import express, { raw } from 'express'
 import cors from 'cors'
 import helmet from 'helmet'
+import compression from 'compression'
 import cookieParser from 'cookie-parser'
 import morgan from 'morgan'
 import path from 'path'
 import { config } from './config'
 import routes from './routes'
 import { errorHandler, notFoundHandler } from './middleware/errorHandler'
+import { requestIdMiddleware } from './middleware/requestId'
 import { logger } from './lib/logger'
 import { prisma } from './lib/prisma'
 import { handleWebhook } from './controllers/checkout.controller'
@@ -20,6 +22,13 @@ import {
 } from './cron'
 
 const app = express()
+
+// Enable gzip/deflate compression for all responses
+// Compresses responses larger than 1KB with level 6 compression
+app.use(compression())
+
+// Request ID for tracing/correlation
+app.use(requestIdMiddleware)
 
 app.use(helmet({
   crossOriginResourcePolicy: { policy: 'cross-origin' },
@@ -96,3 +105,17 @@ async function gracefulShutdown(signal: string) {
 
 process.on('SIGTERM', () => gracefulShutdown('SIGTERM'))
 process.on('SIGINT', () => gracefulShutdown('SIGINT'))
+
+// Global error handlers for uncaught exceptions and unhandled rejections
+process.on('uncaughtException', (error: Error) => {
+  logger.error('Uncaught exception - process will exit', 'Process', error)
+  // Give time for the log to be written, then exit
+  setTimeout(() => process.exit(1), 1000)
+})
+
+process.on('unhandledRejection', (reason: unknown, promise: Promise<unknown>) => {
+  logger.error('Unhandled promise rejection', 'Process', {
+    reason: reason instanceof Error ? { message: reason.message, stack: reason.stack } : reason,
+    promise: String(promise),
+  })
+})

@@ -2,6 +2,7 @@
 
 import React, { Component, ErrorInfo, ReactNode } from "react";
 import { Button } from "@/components/ui/button";
+import { reportError } from "@/lib/errorReporting";
 
 interface Props {
   children: ReactNode;
@@ -9,6 +10,7 @@ interface Props {
   fallbackTitle?: string;
   fallbackMessage?: string;
   fallbackButtonText?: string;
+  componentName?: string;
 }
 
 interface State {
@@ -27,9 +29,12 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
-    if (process.env.NODE_ENV === 'development') {
-      console.error("ErrorBoundary caught an error:", error, errorInfo);
-    }
+    // Report error to tracking service (Sentry in production)
+    reportError(error, {
+      component: this.props.componentName || 'ErrorBoundary',
+      action: 'componentDidCatch',
+      componentStack: errorInfo.componentStack || undefined,
+    });
   }
 
   handleReset = (): void => {

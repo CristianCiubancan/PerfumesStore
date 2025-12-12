@@ -74,7 +74,7 @@ jest.mock('../templates', () => ({
 // Import after mocks
 import * as emailService from '../email.service'
 import { generateInvoicePDF } from '../invoice-pdf.service'
-import { templates, getTemplate } from '../templates'
+import { templates } from '../templates'
 
 describe('EmailService', () => {
   const sampleOrder: OrderWithItems = {

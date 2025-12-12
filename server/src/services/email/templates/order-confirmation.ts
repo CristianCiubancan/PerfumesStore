@@ -18,6 +18,7 @@ import {
   renderInfoRow,
 } from './base'
 import type { Order, OrderItem } from '@prisma/client'
+import { Decimal } from '@prisma/client/runtime/library'
 
 // ============================================================================
 // Types
@@ -351,15 +352,15 @@ export function getSampleData(): OrderConfirmationData {
       shippingState: 'Sector 1',
       shippingPostalCode: '010101',
       shippingCountry: 'Romania',
-      subtotalRON: { toNumber: () => 850.00 } as any,
-      discountRON: { toNumber: () => 85.00 } as any,
+      subtotalRON: new Decimal(850.00),
+      discountRON: new Decimal(85.00),
       discountPercent: 10,
-      totalRON: { toNumber: () => 765.00 } as any,
+      totalRON: new Decimal(765.00),
       stripeSessionId: 'cs_test_xxx',
       stripePaymentIntentId: 'pi_test_xxx',
-      paidAmountEUR: { toNumber: () => 153.00 } as any,
-      exchangeRateUsed: { toNumber: () => 4.97 } as any,
-      exchangeFeePercent: { toNumber: () => 2.00 } as any,
+      paidAmountEUR: new Decimal(153.00),
+      exchangeRateUsed: new Decimal(4.97),
+      exchangeFeePercent: new Decimal(2.00),
       status: 'PAID',
       createdAt: now,
       updatedAt: now,
@@ -375,8 +376,8 @@ export function getSampleData(): OrderConfirmationData {
           volumeMl: 100,
           imageUrl: '/uploads/products/dior-sauvage.jpg',
           quantity: 1,
-          unitPriceRON: { toNumber: () => 650.00 } as any,
-          totalPriceRON: { toNumber: () => 650.00 } as any,
+          unitPriceRON: new Decimal(650.00),
+          totalPriceRON: new Decimal(650.00),
           createdAt: now,
         },
         {
@@ -389,8 +390,8 @@ export function getSampleData(): OrderConfirmationData {
           volumeMl: 50,
           imageUrl: '/uploads/products/chanel-bleu.jpg',
           quantity: 2,
-          unitPriceRON: { toNumber: () => 100.00 } as any,
-          totalPriceRON: { toNumber: () => 200.00 } as any,
+          unitPriceRON: new Decimal(100.00),
+          totalPriceRON: new Decimal(200.00),
           createdAt: now,
         },
       ],

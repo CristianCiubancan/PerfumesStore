@@ -2,6 +2,7 @@ import { Resend } from 'resend'
 import { config } from '../../config'
 import { EMAIL } from '../../config/constants'
 import { logger } from '../../lib/logger'
+import { recordEmailSent } from '../../lib/metrics'
 import { generateInvoicePDF } from './invoice-pdf.service'
 import {
   templates,
@@ -69,6 +70,7 @@ export async function sendOrderConfirmationEmail(
         `Failed to send order confirmation email: ${result.error.message}`,
         'EmailService'
       )
+      recordEmailSent('order_confirmation', false)
       return { success: false, error: result.error.message }
     }
 
@@ -76,10 +78,12 @@ export async function sendOrderConfirmationEmail(
       `Order confirmation email sent for ${order.orderNumber} to ${customerEmail}`,
       'EmailService'
     )
+    recordEmailSent('order_confirmation', true)
     return { success: true, messageId: result.data?.id }
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Unknown error'
     logger.error(`Failed to send order confirmation email: ${message}`, 'EmailService')
+    recordEmailSent('order_confirmation', false)
     return { success: false, error: message }
   }
 }
@@ -113,14 +117,17 @@ export async function sendNewsletterWelcomeEmail(
         `Failed to send newsletter welcome email: ${result.error.message}`,
         'EmailService'
       )
+      recordEmailSent('newsletter_welcome', false)
       return { success: false, error: result.error.message }
     }
 
     logger.info(`Newsletter welcome email sent to ${email}`, 'EmailService')
+    recordEmailSent('newsletter_welcome', true)
     return { success: true, messageId: result.data?.id }
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Unknown error'
     logger.error(`Failed to send newsletter welcome email: ${message}`, 'EmailService')
+    recordEmailSent('newsletter_welcome', false)
     return { success: false, error: message }
   }
 }
@@ -183,8 +190,10 @@ export async function sendNewsletterCampaignByTemplate(
           if (sendResult.error) {
             result.failed++
             result.errors.push({ email: subscriber.email, error: sendResult.error.message })
+            recordEmailSent('newsletter_campaign', false)
           } else {
             result.sent++
+            recordEmailSent('newsletter_campaign', true)
           }
         } catch (err) {
           result.failed++
@@ -192,6 +201,7 @@ export async function sendNewsletterCampaignByTemplate(
             email: subscriber.email,
             error: err instanceof Error ? err.message : 'Unknown error',
           })
+          recordEmailSent('newsletter_campaign', false)
         }
       })
     )

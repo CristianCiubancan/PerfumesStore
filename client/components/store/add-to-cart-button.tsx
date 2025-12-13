@@ -115,6 +115,7 @@ export function AddToCartButton({
       className={cn(variant === 'full' && 'w-full', className)}
       onClick={handleAddToCart}
       disabled={isAdding}
+      data-testid="add-to-cart"
     >
       {isAdding ? (
         <Loader2 className="mr-2 h-4 w-4 animate-spin" />

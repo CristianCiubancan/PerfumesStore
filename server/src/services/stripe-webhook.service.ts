@@ -6,6 +6,7 @@ import { AppError } from '../middleware/errorHandler'
 import { sendOrderConfirmationEmail, normalizeLocale } from './email'
 import { prisma } from '../lib/prisma'
 import { withRetryResult } from '../lib/retry'
+import { recordOrder } from '../lib/metrics'
 import Stripe from 'stripe'
 
 export async function handleStripeWebhook(
@@ -60,6 +61,13 @@ async function processWebhookEvent(event: Stripe.Event): Promise<void> {
           `Payment completed for session: ${session.id}`,
           'StripeWebhook'
         )
+
+        // Record order metrics
+        if (order) {
+          // totalRON is stored in database as Decimal, convert to cents
+          const valueInCents = Math.round(parseFloat(order.totalRON.toString()) * 100)
+          recordOrder('PAID', 'stripe', valueInCents, 'RON')
+        }
 
         // Send order confirmation email with invoice (fire and forget)
         if (order) {

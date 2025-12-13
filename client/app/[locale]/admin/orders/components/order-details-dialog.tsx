@@ -128,8 +128,8 @@ export function OrderDetailsDialog({
                           src={fullImageUrl}
                           alt={item.productName}
                           fill
+                          sizes="64px"
                           className="object-cover"
-                          unoptimized
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-muted-foreground text-xs">

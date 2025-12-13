@@ -1,8 +1,8 @@
 # Stage 1: Dependencies
 FROM node:20-alpine AS deps
 WORKDIR /app
-COPY package.json ./
-RUN npm install
+COPY package.json package-lock.json ./
+RUN npm ci
 
 # Stage 2: Build
 FROM node:20-alpine AS builder
@@ -38,8 +38,8 @@ ENV NODE_ENV=production
 RUN apk add --no-cache curl postgresql-client
 
 # Install only production dependencies
-COPY package.json ./
-RUN npm install --omit=dev
+COPY package.json package-lock.json ./
+RUN npm ci --omit=dev
 
 # Copy Prisma schema and generate client for production
 COPY prisma ./prisma

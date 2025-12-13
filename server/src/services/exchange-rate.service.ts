@@ -4,6 +4,7 @@ import { XMLParser } from 'fast-xml-parser'
 import { EXCHANGE_RATE } from '../config/constants'
 import { logger } from '../lib/logger'
 import { AppError } from '../middleware/errorHandler'
+import { bnrCircuitBreaker } from '../lib/circuit-breaker'
 
 // Currencies we track
 const TRACKED_CURRENCIES = ['EUR', 'GBP'] as const
@@ -108,38 +109,41 @@ async function fetchBNRWithRetry(): Promise<Response> {
 }
 
 export async function fetchRatesFromBNR(): Promise<ParsedRates> {
-  const response = await fetchBNRWithRetry()
+  // Use circuit breaker to protect against BNR API failures
+  return bnrCircuitBreaker.execute(async () => {
+    const response = await fetchBNRWithRetry()
 
-  const xmlText = await response.text()
-  const parsed = xmlParser.parse(xmlText) as BNRXMLStructure
+    const xmlText = await response.text()
+    const parsed = xmlParser.parse(xmlText) as BNRXMLStructure
 
-  const rates = parsed.DataSet?.Body?.Cube?.Rate
-  if (!rates || !Array.isArray(rates)) {
-    throw new AppError('Invalid BNR XML structure', 503, 'BNR_PARSE_ERROR')
-  }
-
-  const rateMap = new Map<string, number>()
-  for (const rate of rates) {
-    const parsedRate = parseFloat(rate['#text'])
-    // Validate rate is within reasonable bounds (0.01 to 100 RON per unit)
-    if (isNaN(parsedRate) || parsedRate <= 0 || parsedRate > 100) {
-      logger.warn(`Invalid exchange rate for ${rate['@_currency']}: ${rate['#text']}`)
-      continue
+    const rates = parsed.DataSet?.Body?.Cube?.Rate
+    if (!rates || !Array.isArray(rates)) {
+      throw new AppError('Invalid BNR XML structure', 503, 'BNR_PARSE_ERROR')
     }
-    rateMap.set(rate['@_currency'], parsedRate)
-  }
 
-  const eurRate = rateMap.get('EUR')
-  const gbpRate = rateMap.get('GBP')
+    const rateMap = new Map<string, number>()
+    for (const rate of rates) {
+      const parsedRate = parseFloat(rate['#text'])
+      // Validate rate is within reasonable bounds (0.01 to 100 RON per unit)
+      if (isNaN(parsedRate) || parsedRate <= 0 || parsedRate > 100) {
+        logger.warn(`Invalid exchange rate for ${rate['@_currency']}: ${rate['#text']}`)
+        continue
+      }
+      rateMap.set(rate['@_currency'], parsedRate)
+    }
 
-  if (eurRate === undefined || gbpRate === undefined) {
-    throw new AppError('Failed to parse exchange rates from BNR XML', 503, 'BNR_PARSE_ERROR')
-  }
+    const eurRate = rateMap.get('EUR')
+    const gbpRate = rateMap.get('GBP')
 
-  return {
-    EUR: eurRate,
-    GBP: gbpRate,
-  }
+    if (eurRate === undefined || gbpRate === undefined) {
+      throw new AppError('Failed to parse exchange rates from BNR XML', 503, 'BNR_PARSE_ERROR')
+    }
+
+    return {
+      EUR: eurRate,
+      GBP: gbpRate,
+    }
+  })
 }
 
 export async function updateExchangeRates(): Promise<void> {

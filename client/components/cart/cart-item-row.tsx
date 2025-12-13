@@ -42,7 +42,7 @@ export function CartItemRow({ item, onRemove, onQuantityChange, discountPercent 
   const finalLineTotal = originalLineTotal - discountAmount
 
   return (
-    <div className="flex gap-4 py-4 border-b last:border-b-0">
+    <div className="flex gap-4 py-4 border-b last:border-b-0" data-testid="cart-item">
       {/* Product Image */}
       <Link href={`/product/${item.slug}`} className="flex-shrink-0">
         <div className="relative h-24 w-24 bg-muted rounded-lg overflow-hidden">

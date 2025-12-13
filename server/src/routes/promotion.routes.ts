@@ -3,6 +3,7 @@ import * as promotionController from '../controllers/promotion.controller'
 import { authenticate, authorize } from '../middleware/auth'
 import { csrfProtection } from '../middleware/csrf'
 import { validate } from '../middleware/validate'
+import { mediumEtag } from '../middleware/etag'
 import {
   createPromotionSchema,
   updatePromotionSchema,
@@ -14,8 +15,10 @@ import { asyncHandler } from '../lib/asyncHandler'
 const router = Router()
 
 // Public route - get active promotion (for homepage and cart)
+// Promotions can change throughout the day - use medium cache
 router.get(
   '/active',
+  mediumEtag,
   asyncHandler(promotionController.getActivePromotion)
 )
 

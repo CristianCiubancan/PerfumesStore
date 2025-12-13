@@ -1,4 +1,4 @@
-import express, { raw } from 'express'
+import express, { raw, Request, Response, NextFunction } from 'express'
 import cors from 'cors'
 import helmet from 'helmet'
 import compression from 'compression'
@@ -14,21 +14,53 @@ import { requestIdMiddleware } from './middleware/requestId'
 import { metricsMiddleware } from './lib/metrics'
 import { logger } from './lib/logger'
 import { prisma } from './lib/prisma'
+import { closeRedis } from './lib/redis'
 import { handleWebhook } from './controllers/checkout.controller'
 import { asyncHandler } from './lib/asyncHandler'
 import {
   registerCronJobs,
+  stopCronJobs,
   initExchangeRates,
   initTokenCleanup,
   initImageCleanup,
   initOrderCleanup,
 } from './cron'
 
+/**
+ * Request timeout middleware
+ * Aborts requests that exceed the configured timeout (30 seconds default)
+ */
+const REQUEST_TIMEOUT_MS = 30000
+
+function timeoutMiddleware(req: Request, res: Response, next: NextFunction): void {
+  const timeout = setTimeout(() => {
+    if (!res.headersSent) {
+      logger.warn(`Request timeout after ${REQUEST_TIMEOUT_MS}ms: ${req.method} ${req.path}`, 'Server')
+      res.status(503).json({
+        error: {
+          code: 'REQUEST_TIMEOUT',
+          message: 'Request timeout',
+        },
+      })
+    }
+  }, REQUEST_TIMEOUT_MS)
+
+  // Clear timeout when response finishes
+  res.on('finish', () => clearTimeout(timeout))
+  res.on('close', () => clearTimeout(timeout))
+
+  next()
+}
+
 const app = express()
 
 // Enable gzip/deflate compression for all responses
 // Compresses responses larger than 1KB with level 6 compression
 app.use(compression())
+
+// Request timeout middleware (30 seconds)
+// Must be early to catch all requests
+app.use(timeoutMiddleware)
 
 // Request ID for tracing/correlation
 app.use(requestIdMiddleware)
@@ -107,10 +139,27 @@ const server = app.listen(config.PORT, () => {
 async function gracefulShutdown(signal: string) {
   logger.info(`Received ${signal}, shutting down gracefully`, 'Server')
 
+  // Stop accepting new connections and close existing ones
   server.close(async () => {
-    await prisma.$disconnect()
-    logger.info('Server closed', 'Server')
-    process.exit(0)
+    try {
+      // Stop cron jobs first to prevent new work
+      stopCronJobs()
+      logger.info('Cron jobs stopped', 'Server')
+
+      // Close Redis connections
+      await closeRedis()
+      logger.info('Redis connections closed', 'Server')
+
+      // Finally disconnect from database
+      await prisma.$disconnect()
+      logger.info('Database disconnected', 'Server')
+
+      logger.info('Server closed', 'Server')
+      process.exit(0)
+    } catch (err) {
+      logger.error('Error during graceful shutdown', 'Server', err)
+      process.exit(1)
+    }
   })
 
   // Force exit after 30 seconds (allows time for long-running requests to complete)

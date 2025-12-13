@@ -6,6 +6,7 @@ import { config, isProduction } from '../config'
 import { generateCsrfToken, setCsrfCookie, clearCsrfCookie } from '../middleware/csrf'
 import { createAuditLog } from '../lib/auditLogger'
 import { AppError } from '../middleware/errorHandler'
+import { recordAuthAttempt } from '../lib/metrics'
 
 /**
  * Extract client context for audit logging
@@ -77,15 +78,25 @@ function clearAuthCookies(res: Response) {
 export async function register(req: Request, res: Response): Promise<void> {
   const input: RegisterInput = req.body
   const context = getTokenContext(req)
-  const result = await authService.register(input, context)
 
-  setAuthCookies(res, result.accessToken, result.refreshToken)
+  try {
+    const result = await authService.register(input, context)
 
-  res.status(201).json({
-    data: {
-      user: result.user,
-    },
-  })
+    // Record successful registration
+    recordAuthAttempt('register', true)
+
+    setAuthCookies(res, result.accessToken, result.refreshToken)
+
+    res.status(201).json({
+      data: {
+        user: result.user,
+      },
+    })
+  } catch (error) {
+    // Record failed registration
+    recordAuthAttempt('register', false)
+    throw error
+  }
 }
 
 export async function login(req: Request, res: Response): Promise<void> {
@@ -94,6 +105,9 @@ export async function login(req: Request, res: Response): Promise<void> {
 
   try {
     const result = await authService.login(input, context)
+
+    // Record successful login
+    recordAuthAttempt('login', true)
 
     setAuthCookies(res, result.accessToken, result.refreshToken)
 
@@ -117,6 +131,9 @@ export async function login(req: Request, res: Response): Promise<void> {
       },
     })
   } catch (error) {
+    // Record failed login
+    recordAuthAttempt('login', false)
+
     // Audit log for failed login attempt
     // Note: The LOGIN_FAILED action inherently indicates failure
     createAuditLog(req, {
@@ -165,15 +182,25 @@ export async function logoutAllDevices(req: Request, res: Response): Promise<voi
 export async function refresh(req: Request, res: Response): Promise<void> {
   const refreshToken = req.cookies.refreshToken
   const context = getTokenContext(req)
-  const result = await authService.refreshTokens(refreshToken, context)
 
-  setAuthCookies(res, result.accessToken, result.refreshToken)
+  try {
+    const result = await authService.refreshTokens(refreshToken, context)
 
-  res.json({
-    data: {
-      user: result.user,
-    },
-  })
+    // Record successful token refresh
+    recordAuthAttempt('refresh', true)
+
+    setAuthCookies(res, result.accessToken, result.refreshToken)
+
+    res.json({
+      data: {
+        user: result.user,
+      },
+    })
+  } catch (error) {
+    // Record failed token refresh
+    recordAuthAttempt('refresh', false)
+    throw error
+  }
 }
 
 export async function getProfile(req: Request, res: Response): Promise<void> {

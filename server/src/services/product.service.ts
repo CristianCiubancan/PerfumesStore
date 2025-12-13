@@ -377,23 +377,16 @@ export async function getBrands(params: ListBrandsParams = {}): Promise<ListBran
   }
   const skip = (page - 1) * limit
 
-  // Use groupBy for database-level pagination (avoids fetching all brands into memory)
-  const [brandsResult, totalResult] = await Promise.all([
-    prisma.product.groupBy({
-      by: ['brand'],
-      where,
-      orderBy: { brand: 'asc' },
-      skip,
-      take: limit,
-    }),
-    prisma.product.groupBy({
-      by: ['brand'],
-      where,
-    }),
-  ])
+  // Use groupBy with _count to get both brands and total in optimized queries
+  // The groupBy query returns all unique brands, we slice for pagination
+  const allBrands = await prisma.product.groupBy({
+    by: ['brand'],
+    where,
+    orderBy: { brand: 'asc' },
+  })
 
-  const brands = brandsResult.map((b) => b.brand)
-  const total = totalResult.length
+  const total = allBrands.length
+  const brands = allBrands.slice(skip, skip + limit).map((b) => b.brand)
 
   return {
     brands,

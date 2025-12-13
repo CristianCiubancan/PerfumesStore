@@ -41,8 +41,8 @@ export const ProductCard = memo(function ProductCard({ product, priority = false
   })()
 
   return (
-    <Card className="group overflow-hidden transition-all hover:shadow-lg">
-      <Link href={`/product/${product.slug}`}>
+    <Card className="group overflow-hidden transition-all hover:shadow-lg" data-testid="product-card">
+      <Link href={`/product/${product.slug}`} data-testid="product-link">
         <div className="relative aspect-square overflow-hidden bg-muted">
           {imageUrl ? (
             <Image

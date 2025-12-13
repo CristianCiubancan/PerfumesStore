@@ -1,0 +1,27 @@
+# Prometheus Configuration for PerfumesStore
+# This file configures Prometheus to scrape metrics from the application
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+alerting:
+  alertmanagers: []
+
+rule_files: []
+
+scrape_configs:
+  # Scrape Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Scrape PerfumesStore API server metrics
+  - job_name: 'perfumes-api'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['server:4000']
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        replacement: 'api-server'

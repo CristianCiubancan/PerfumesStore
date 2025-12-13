@@ -31,7 +31,7 @@ function LanguageSwitcherContent() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon">
+        <Button variant="ghost" size="icon" data-testid="language-switcher">
           <Globe className="h-5 w-5" />
           <span className="sr-only">{t('changeLanguage')}</span>
         </Button>

@@ -4,6 +4,7 @@ import { authenticate, authorize } from '../middleware/auth'
 import { csrfProtection } from '../middleware/csrf'
 import { validate } from '../middleware/validate'
 import { sensitiveRateLimiter } from '../middleware/rateLimit'
+import { shortEtag, mediumEtag, longEtag } from '../middleware/etag'
 import {
   createProductSchema,
   updateProductSchema,
@@ -17,32 +18,43 @@ import { asyncHandler } from '../lib/asyncHandler'
 
 const router = Router()
 
-// Public routes
+// Public routes with ETag caching
+
+// Filter options change rarely - use long cache
 router.get(
   '/filter-options',
+  longEtag,
   asyncHandler(productController.getFilterOptions)
 )
 
+// Filter counts depend on current filters - use medium cache
 router.get(
   '/filter-counts',
   validate(listProductsSchema),
+  mediumEtag,
   asyncHandler(productController.getFilterCounts)
 )
 
+// Brands list changes rarely - use long cache
 router.get(
   '/brands',
   validate(listBrandsSchema),
+  longEtag,
   asyncHandler(productController.getBrands)
 )
 
+// Stats change with orders - use short cache
 router.get(
   '/stats',
+  shortEtag,
   asyncHandler(productController.getStats)
 )
 
+// Product listings change with inventory - use short cache
 router.get(
   '/',
   validate(listProductsSchema),
+  shortEtag,
   asyncHandler(productController.listProducts)
 )
 
@@ -50,6 +62,7 @@ router.get(
 router.get(
   '/by-slug/:slug',
   validate(getProductBySlugSchema),
+  shortEtag,
   asyncHandler(productController.getProductBySlug)
 )
 
@@ -57,6 +70,7 @@ router.get(
 router.get(
   '/:id',
   validate(getProductSchema),
+  shortEtag,
   asyncHandler(productController.getProduct)
 )
 

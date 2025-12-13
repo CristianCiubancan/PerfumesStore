@@ -12,6 +12,24 @@ interface AuditOptions {
   newValue?: unknown
 }
 
+// Generate a random salt at startup if not configured
+// This ensures IP hashes are unique per server instance even without config
+const FALLBACK_SALT = crypto.randomBytes(32).toString('hex')
+
+// Log warning if using fallback salt (only once at startup)
+if (!process.env.AUDIT_IP_SALT) {
+  // Import logger lazily to avoid circular dependency issues at module load time
+  setImmediate(() => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { logger } = require('./logger')
+    logger.warn(
+      'AUDIT_IP_SALT environment variable not set. Using random per-instance salt. ' +
+      'Set AUDIT_IP_SALT in production for consistent IP hashing across restarts.',
+      'AuditLogger'
+    )
+  })
+}
+
 /**
  * Hash IP address for privacy-preserving audit logs
  * Uses SHA-256 to create a one-way hash of the IP address
@@ -21,8 +39,8 @@ function hashIpAddress(ip: string | undefined): string | undefined {
   if (!ip) return undefined
 
   // Use a server-specific salt from environment variable
-  // In production, this should be a secure random value stored in .env
-  const salt = process.env.AUDIT_IP_SALT || 'default-salt-change-in-production'
+  // Falls back to a random per-instance salt (logged warning at startup)
+  const salt = process.env.AUDIT_IP_SALT || FALLBACK_SALT
 
   return crypto
     .createHash('sha256')

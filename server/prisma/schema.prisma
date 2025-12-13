@@ -38,6 +38,9 @@ model RefreshToken {
   @@index([userId])
   @@index([tokenHash])
   @@index([expiresAt])
+  // Composite indexes for common queries
+  @@index([userId, revokedAt]) // Find valid tokens for a user
+  @@index([tokenHash, revokedAt, expiresAt]) // Token validation lookup
 }
 
 enum Role {
@@ -135,6 +138,12 @@ model Product {
   @@index([longevityId])
   @@index([sillageId])
   @@index([deletedAt])
+  // Composite indexes for common filter combinations
+  @@index([deletedAt, stock]) // Active products with stock
+  @@index([deletedAt, brand]) // Active products by brand
+  @@index([deletedAt, gender]) // Active products by gender
+  @@index([deletedAt, priceRON]) // Active products sorted by price
+  @@index([deletedAt, createdAt]) // Active products sorted by date
 }
 
 // Global promotion - only one active at a time
@@ -185,6 +194,10 @@ model AuditLog {
   @@index([entityId])
   @@index([action])
   @@index([createdAt])
+  // Composite indexes for common queries
+  @@index([entityType, createdAt]) // Logs by entity type with date
+  @@index([userId, createdAt]) // User's activity with date
+  @@index([action, createdAt]) // Actions over time
 }
 
 // Newsletter subscribers
@@ -237,6 +250,8 @@ model NewsletterCampaign {
   @@index([scheduledFor])
   @@index([templateId])
   @@index([createdAt])
+  // Composite index for finding campaigns to send
+  @@index([status, scheduledFor]) // Scheduled campaigns ready to send
 }
 
 // Order status enum
@@ -300,6 +315,10 @@ model Order {
   @@index([createdAt])
   @@index([orderNumber])
   @@index([stripeSessionId])
+  // Composite indexes for common queries
+  @@index([status, createdAt]) // Orders by status with date sorting
+  @@index([userId, status]) // User's orders by status
+  @@index([userId, createdAt]) // User's orders by date
 }
 
 // Order line items

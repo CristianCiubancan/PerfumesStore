@@ -227,7 +227,7 @@ export function ProductFilters({
     filters.maxRating
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" data-testid="filters">
       {/* Search */}
       <div className="space-y-2">
         <Label htmlFor="search">{t('common.search')}</Label>
@@ -239,6 +239,7 @@ export function ProductFilters({
             value={localFields.search}
             onChange={(e) => updateField('search', e.target.value)}
             className="pl-9"
+            data-testid="search"
           />
         </div>
       </div>

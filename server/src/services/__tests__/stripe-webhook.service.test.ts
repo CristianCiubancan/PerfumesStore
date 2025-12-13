@@ -5,6 +5,7 @@ import * as emailService from '../email'
 import { stripe } from '../../lib/stripe'
 import { config } from '../../config'
 import { prisma } from '../../lib/prisma'
+import { Prisma } from '@prisma/client'
 
 // Mock Stripe
 jest.mock('../../lib/stripe', () => ({
@@ -58,6 +59,7 @@ describe('StripeWebhookService', () => {
         ;(orderService.markOrderPaid as jest.Mock).mockResolvedValue({
           id: 1,
           status: 'PAID',
+          totalRON: new Prisma.Decimal(326.40),
         })
 
         const result = await handleStripeWebhook(
@@ -104,6 +106,11 @@ describe('StripeWebhookService', () => {
           },
         }
         ;(stripe.webhooks.constructEvent as jest.Mock).mockReturnValue(eventWithNullAmount)
+        ;(orderService.markOrderPaid as jest.Mock).mockResolvedValue({
+          id: 1,
+          status: 'PAID',
+          totalRON: new Prisma.Decimal(0),
+        })
 
         await handleStripeWebhook(
           Buffer.from(JSON.stringify(eventWithNullAmount)),
@@ -125,6 +132,7 @@ describe('StripeWebhookService', () => {
           guestEmail: null,
           orderLocale: 'en',
           status: 'PAID',
+          totalRON: new Prisma.Decimal(326.40),
         }
 
         ;(stripe.webhooks.constructEvent as jest.Mock).mockReturnValue(mockCompletedEvent)
@@ -160,6 +168,7 @@ describe('StripeWebhookService', () => {
           guestEmail: 'guest@example.com',
           orderLocale: 'ro',
           status: 'PAID',
+          totalRON: new Prisma.Decimal(326.40),
         }
 
         ;(stripe.webhooks.constructEvent as jest.Mock).mockReturnValue(mockCompletedEvent)
@@ -188,6 +197,7 @@ describe('StripeWebhookService', () => {
           guestEmail: 'test@example.com',
           orderLocale: 'en',
           status: 'PAID',
+          totalRON: new Prisma.Decimal(326.40),
         }
 
         ;(stripe.webhooks.constructEvent as jest.Mock).mockReturnValue(mockCompletedEvent)
@@ -213,6 +223,7 @@ describe('StripeWebhookService', () => {
           guestEmail: null,
           orderLocale: 'en',
           status: 'PAID',
+          totalRON: new Prisma.Decimal(326.40),
         }
 
         ;(stripe.webhooks.constructEvent as jest.Mock).mockReturnValue(mockCompletedEvent)
@@ -373,6 +384,11 @@ describe('StripeWebhookService', () => {
             },
           },
         }
+        ;(orderService.markOrderPaid as jest.Mock).mockResolvedValue({
+          id: 1,
+          status: 'PAID',
+          totalRON: new Prisma.Decimal(100.00),
+        })
 
         const result = await handleStripeWebhook(
           Buffer.from(JSON.stringify(event)),

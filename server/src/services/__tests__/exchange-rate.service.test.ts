@@ -1,6 +1,7 @@
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../lib/prisma'
 import { AppError } from '../../middleware/errorHandler'
+import { bnrCircuitBreaker } from '../../lib/circuit-breaker'
 
 // Mock fetch globally
 const mockFetch = jest.fn()
@@ -26,6 +27,8 @@ describe('ExchangeRateService', () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
+    // Reset circuit breaker to closed state before each test
+    bnrCircuitBreaker.forceReset()
   })
 
   describe('fetchRatesFromBNR', () => {

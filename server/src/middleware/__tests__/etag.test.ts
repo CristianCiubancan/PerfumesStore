@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express'
+import { Request, Response } from 'express'
 import { etagMiddleware, shortEtag, mediumEtag, longEtag } from '../etag'
 
 describe('ETag Middleware', () => {
@@ -55,7 +55,7 @@ describe('ETag Middleware', () => {
       mockRes.json!(responseBody)
 
       // Should set ETag header
-      expect(setHeaderSpy).toHaveBeenCalledWith('ETag', expect.stringMatching(/^W\/"[a-f0-9]+\"$/))
+      expect(setHeaderSpy).toHaveBeenCalledWith('ETag', expect.stringMatching(/^W\/"[a-f0-9]+"$/))
       // Should set Cache-Control header
       expect(setHeaderSpy).toHaveBeenCalledWith('Cache-Control', expect.stringContaining('max-age='))
     })
@@ -103,7 +103,7 @@ describe('ETag Middleware', () => {
       // Should NOT return 304
       expect(statusSpy).not.toHaveBeenCalledWith(304)
       // Should set new ETag
-      expect(setHeaderSpy).toHaveBeenCalledWith('ETag', expect.stringMatching(/^W\/"[a-f0-9]+\"$/))
+      expect(setHeaderSpy).toHaveBeenCalledWith('ETag', expect.stringMatching(/^W\/"[a-f0-9]+"$/))
     })
 
     it('should use custom maxAge in Cache-Control header', () => {

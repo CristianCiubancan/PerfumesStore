@@ -20,6 +20,13 @@ const envSchema = z.object({
   // Resend email configuration
   RESEND_API_KEY: z.string().optional(), // Optional - emails disabled if not set
   RESEND_FROM_EMAIL: z.string().email().optional(), // Required if RESEND_API_KEY is set
+  // OpenTelemetry configuration
+  OTEL_ENABLED: z.string().default('false').transform(v => v === 'true'),
+  OTEL_SERVICE_NAME: z.string().default('perfumes-store-api'),
+  OTEL_EXPORTER_OTLP_ENDPOINT: z.string().url().optional(), // e.g., http://localhost:4318
+  // Prometheus metrics configuration
+  METRICS_ENABLED: z.string().default('false').transform(v => v === 'true'),
+  METRICS_PORT: z.coerce.number().default(9090),
 })
 
 /**

@@ -8,8 +8,10 @@ import path from 'path'
 import { config } from './config'
 import routes from './routes'
 import swaggerRoutes from './swagger'
+import metricsRoutes from './routes/metrics'
 import { errorHandler, notFoundHandler } from './middleware/errorHandler'
 import { requestIdMiddleware } from './middleware/requestId'
+import { metricsMiddleware } from './lib/metrics'
 import { logger } from './lib/logger'
 import { prisma } from './lib/prisma'
 import { handleWebhook } from './controllers/checkout.controller'
@@ -30,6 +32,11 @@ app.use(compression())
 
 // Request ID for tracing/correlation
 app.use(requestIdMiddleware)
+
+// Prometheus metrics collection (must be early to capture all requests)
+if (config.METRICS_ENABLED) {
+  app.use(metricsMiddleware)
+}
 
 app.use(helmet({
   crossOriginResourcePolicy: { policy: 'cross-origin' },
@@ -77,6 +84,12 @@ app.use('/uploads', (req, res, next) => {
 
 // API documentation (Swagger UI) - available in all environments
 app.use('/api/docs', swaggerRoutes)
+
+// Prometheus metrics endpoint
+if (config.METRICS_ENABLED) {
+  app.use('/metrics', metricsRoutes)
+  logger.info(`Metrics endpoint available at /metrics`, 'Server')
+}
 
 app.use('/api', routes)
 app.use(notFoundHandler)

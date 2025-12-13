@@ -276,11 +276,6 @@ describe('CampaignController', () => {
 
     it('should send a campaign immediately', async () => {
       req.params = { id: '1' }
-      const sentCampaign = {
-        ...mockCampaign,
-        status: 'SENT',
-        sentAt: new Date(),
-      }
       const sendResult = { sent: 100, failed: 5 }
 
       ;(isEmailEnabled as jest.Mock).mockReturnValue(true)

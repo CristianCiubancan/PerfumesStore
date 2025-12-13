@@ -1,5 +1,6 @@
 import fs from 'fs'
 import path from 'path'
+import { trace } from '@opentelemetry/api'
 
 type LogLevel = 'info' | 'warn' | 'error' | 'debug'
 
@@ -10,6 +11,8 @@ interface LogEntry {
   context?: string
   data?: unknown
   requestId?: string
+  traceId?: string
+  spanId?: string
 }
 
 type LogTransport = (entry: LogEntry) => void | Promise<void>
@@ -54,11 +57,22 @@ function formatLog(entry: LogEntry): string {
   if (isDevelopment) {
     const prefix = entry.context ? `[${entry.context}]` : ''
     const requestIdStr = entry.requestId ? ` [req:${entry.requestId}]` : ''
+    const traceStr = entry.traceId ? ` [trace:${entry.traceId.slice(0, 8)}]` : ''
     const dataStr = entry.data ? ` ${JSON.stringify(entry.data)}` : ''
-    return `${entry.timestamp} ${entry.level.toUpperCase()}${requestIdStr} ${prefix} ${entry.message}${dataStr}`
+    return `${entry.timestamp} ${entry.level.toUpperCase()}${requestIdStr}${traceStr} ${prefix} ${entry.message}${dataStr}`
   }
   // Production: JSON format for log aggregation tools
   return JSON.stringify(entry)
+}
+
+function getTraceContext(): { traceId?: string; spanId?: string } {
+  const span = trace.getActiveSpan()
+  if (!span) return {}
+  const ctx = span.spanContext()
+  return {
+    traceId: ctx.traceId,
+    spanId: ctx.spanId,
+  }
 }
 
 function createLogEntry(
@@ -68,6 +82,7 @@ function createLogEntry(
   data?: unknown,
   requestId?: string
 ): LogEntry {
+  const { traceId, spanId } = getTraceContext()
   return {
     level,
     message,
@@ -75,6 +90,8 @@ function createLogEntry(
     context,
     data,
     requestId,
+    traceId,
+    spanId,
   }
 }
 

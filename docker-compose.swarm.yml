@@ -1,0 +1,208 @@
+# Docker Swarm Production Configuration with Secrets Management
+#
+# This file extends docker-compose.prod.yml for Docker Swarm deployments
+# with proper secret management using Docker Swarm secrets.
+#
+# SETUP SECRETS:
+#   echo "your-jwt-secret" | docker secret create jwt_secret -
+#   echo "your-jwt-refresh-secret" | docker secret create jwt_refresh_secret -
+#   echo "your-postgres-password" | docker secret create postgres_password -
+#   echo "your-stripe-secret-key" | docker secret create stripe_secret_key -
+#   echo "your-stripe-webhook-secret" | docker secret create stripe_webhook_secret -
+#   echo "your-resend-api-key" | docker secret create resend_api_key -
+#
+# DEPLOY:
+#   docker stack deploy -c docker-compose.swarm.yml perfumes-store
+#
+# VIEW SECRETS:
+#   docker secret ls
+#
+# ROTATE SECRET:
+#   docker secret rm old_secret
+#   echo "new-value" | docker secret create new_secret -
+#   docker service update --secret-rm old_secret --secret-add new_secret service_name
+
+version: '3.8'
+
+services:
+  client:
+    image: perfumes-store-client:${VERSION:-latest}
+    ports:
+      - "${CLIENT_PORT:-3000}:3000"
+    environment:
+      - NODE_ENV=production
+      - API_URL=http://server:4000
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+      - NEXT_PUBLIC_SITE_URL=${NEXT_PUBLIC_SITE_URL}
+      - NEXT_PUBLIC_SITE_NAME=${NEXT_PUBLIC_SITE_NAME:-Perfumes Store}
+      - NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=${NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY}
+    deploy:
+      replicas: 2
+      update_config:
+        parallelism: 1
+        delay: 10s
+        failure_action: rollback
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - perfumes-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  server:
+    image: perfumes-store-server:${VERSION:-latest}
+    ports:
+      - "${SERVER_PORT:-4000}:4000"
+    environment:
+      - NODE_ENV=production
+      - PORT=4000
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-perfumes}:DOCKER-SECRET:postgres_password@postgres:5432/${POSTGRES_DB:-perfumes_store}
+      - CLIENT_URL=${NEXT_PUBLIC_SITE_URL}
+      - BACKEND_URL=${NEXT_PUBLIC_API_URL}
+      - COOKIE_DOMAIN=${COOKIE_DOMAIN:-}
+      - REDIS_URL=redis://redis:6379/0
+      # Secrets are read from /run/secrets/* by the application
+      - USE_DOCKER_SECRETS=true
+    secrets:
+      - jwt_secret
+      - jwt_refresh_secret
+      - postgres_password
+      - stripe_secret_key
+      - stripe_webhook_secret
+      - resend_api_key
+    volumes:
+      - server_uploads:/app/uploads
+    deploy:
+      replicas: 2
+      update_config:
+        parallelism: 1
+        delay: 10s
+        failure_action: rollback
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - perfumes-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory", "128mb", "--maxmemory-policy", "allkeys-lru"]
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 256M
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - perfumes-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER:-perfumes}
+      - POSTGRES_PASSWORD_FILE=/run/secrets/postgres_password
+      - POSTGRES_DB=${POSTGRES_DB:-perfumes_store}
+    secrets:
+      - postgres_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: on-failure
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 2G
+        reservations:
+          cpus: '0.25'
+          memory: 1G
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-perfumes}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - perfumes-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+secrets:
+  jwt_secret:
+    external: true
+  jwt_refresh_secret:
+    external: true
+  postgres_password:
+    external: true
+  stripe_secret_key:
+    external: true
+  stripe_webhook_secret:
+    external: true
+  resend_api_key:
+    external: true
+
+volumes:
+  postgres_data:
+    driver: local
+  server_uploads:
+    driver: local
+
+networks:
+  perfumes-network:
+    driver: overlay
+    attachable: true

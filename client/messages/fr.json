@@ -1036,5 +1036,10 @@
       "title": "Erreur de Chargement de la Commande",
       "notFound": "Commande non trouvée"
     }
+  },
+  "offline": {
+    "title": "Vous etes hors ligne",
+    "description": "Veuillez verifier votre connexion Internet et reessayer.",
+    "retry": "Reessayer"
   }
 }

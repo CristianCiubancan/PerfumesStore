@@ -1036,5 +1036,10 @@
       "title": "Fehler beim Laden der Bestellung",
       "notFound": "Bestellung nicht gefunden"
     }
+  },
+  "offline": {
+    "title": "Sie sind offline",
+    "description": "Bitte uberprufen Sie Ihre Internetverbindung und versuchen Sie es erneut.",
+    "retry": "Erneut versuchen"
   }
 }

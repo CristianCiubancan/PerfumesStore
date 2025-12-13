@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { memo, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { ShoppingCart, Check, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
@@ -18,7 +18,7 @@ interface AddToCartButtonProps {
   showQuantityInCart?: boolean
 }
 
-export function AddToCartButton({
+export const AddToCartButton = memo(function AddToCartButton({
   product,
   quantity = 1,
   variant = 'default',
@@ -127,4 +127,6 @@ export function AddToCartButton({
       {buttonText}
     </Button>
   )
-}
+})
+
+AddToCartButton.displayName = 'AddToCartButton'

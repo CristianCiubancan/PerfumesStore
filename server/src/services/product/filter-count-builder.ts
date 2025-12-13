@@ -347,19 +347,23 @@ async function countSeasons(
   excludeField: ExcludeField
 ): Promise<IdFilterCount[]> {
   const { conditions, values } = buildRawSQLConditions(params, excludeField)
+  let paramIndex = values.length + 1
 
   // Build season join condition if not excluded and seasonIds are specified
   let seasonJoinSQL = ''
   if (excludeField !== 'seasonIds' && params.seasonIds && params.seasonIds.length > 0) {
     if (params.seasonMatchMode === 'all') {
-      // Product must have ALL specified seasons
-      const seasonConditions = params.seasonIds.map((id) =>
-        `EXISTS (SELECT 1 FROM "_ProductSeasons" ps WHERE ps."A" = p.id AND ps."B" = ${id})`
-      )
+      // Product must have ALL specified seasons - parameterized
+      const seasonConditions = params.seasonIds.map((id) => {
+        const idx = paramIndex++
+        values.push(id)
+        return `EXISTS (SELECT 1 FROM "_ProductSeasons" ps WHERE ps."A" = p.id AND ps."B" = $${idx})`
+      })
       seasonJoinSQL = ` AND ${seasonConditions.join(' AND ')}`
     } else {
-      // Product must have ANY of the specified seasons
-      seasonJoinSQL = ` AND EXISTS (SELECT 1 FROM "_ProductSeasons" ps WHERE ps."A" = p.id AND ps."B" = ANY(ARRAY[${params.seasonIds.join(',')}]))`
+      // Product must have ANY of the specified seasons - parameterized array
+      values.push(params.seasonIds)
+      seasonJoinSQL = ` AND EXISTS (SELECT 1 FROM "_ProductSeasons" ps WHERE ps."A" = p.id AND ps."B" = ANY($${paramIndex++}::int[]))`
     }
   }
 
@@ -367,12 +371,17 @@ async function countSeasons(
   let occasionJoinSQL = ''
   if (excludeField !== 'occasionIds' && params.occasionIds && params.occasionIds.length > 0) {
     if (params.occasionMatchMode === 'all') {
-      const occasionConditions = params.occasionIds.map((id) =>
-        `EXISTS (SELECT 1 FROM "_ProductOccasions" po WHERE po."B" = p.id AND po."A" = ${id})`
-      )
+      // Product must have ALL specified occasions - parameterized
+      const occasionConditions = params.occasionIds.map((id) => {
+        const idx = paramIndex++
+        values.push(id)
+        return `EXISTS (SELECT 1 FROM "_ProductOccasions" po WHERE po."B" = p.id AND po."A" = $${idx})`
+      })
       occasionJoinSQL = ` AND ${occasionConditions.join(' AND ')}`
     } else {
-      occasionJoinSQL = ` AND EXISTS (SELECT 1 FROM "_ProductOccasions" po WHERE po."B" = p.id AND po."A" = ANY(ARRAY[${params.occasionIds.join(',')}]))`
+      // Product must have ANY of the specified occasions - parameterized array
+      values.push(params.occasionIds)
+      occasionJoinSQL = ` AND EXISTS (SELECT 1 FROM "_ProductOccasions" po WHERE po."B" = p.id AND po."A" = ANY($${paramIndex++}::int[]))`
     }
   }
 
@@ -412,17 +421,23 @@ async function countOccasions(
   excludeField: ExcludeField
 ): Promise<IdFilterCount[]> {
   const { conditions, values } = buildRawSQLConditions(params, excludeField)
+  let paramIndex = values.length + 1
 
   // Build season join condition if not excluded and seasonIds are specified
   let seasonJoinSQL = ''
   if (excludeField !== 'seasonIds' && params.seasonIds && params.seasonIds.length > 0) {
     if (params.seasonMatchMode === 'all') {
-      const seasonConditions = params.seasonIds.map((id) =>
-        `EXISTS (SELECT 1 FROM "_ProductSeasons" ps WHERE ps."A" = p.id AND ps."B" = ${id})`
-      )
+      // Product must have ALL specified seasons - parameterized
+      const seasonConditions = params.seasonIds.map((id) => {
+        const idx = paramIndex++
+        values.push(id)
+        return `EXISTS (SELECT 1 FROM "_ProductSeasons" ps WHERE ps."A" = p.id AND ps."B" = $${idx})`
+      })
       seasonJoinSQL = ` AND ${seasonConditions.join(' AND ')}`
     } else {
-      seasonJoinSQL = ` AND EXISTS (SELECT 1 FROM "_ProductSeasons" ps WHERE ps."A" = p.id AND ps."B" = ANY(ARRAY[${params.seasonIds.join(',')}]))`
+      // Product must have ANY of the specified seasons - parameterized array
+      values.push(params.seasonIds)
+      seasonJoinSQL = ` AND EXISTS (SELECT 1 FROM "_ProductSeasons" ps WHERE ps."A" = p.id AND ps."B" = ANY($${paramIndex++}::int[]))`
     }
   }
 
@@ -430,12 +445,17 @@ async function countOccasions(
   let occasionJoinSQL = ''
   if (excludeField !== 'occasionIds' && params.occasionIds && params.occasionIds.length > 0) {
     if (params.occasionMatchMode === 'all') {
-      const occasionConditions = params.occasionIds.map((id) =>
-        `EXISTS (SELECT 1 FROM "_ProductOccasions" po WHERE po."B" = p.id AND po."A" = ${id})`
-      )
+      // Product must have ALL specified occasions - parameterized
+      const occasionConditions = params.occasionIds.map((id) => {
+        const idx = paramIndex++
+        values.push(id)
+        return `EXISTS (SELECT 1 FROM "_ProductOccasions" po WHERE po."B" = p.id AND po."A" = $${idx})`
+      })
       occasionJoinSQL = ` AND ${occasionConditions.join(' AND ')}`
     } else {
-      occasionJoinSQL = ` AND EXISTS (SELECT 1 FROM "_ProductOccasions" po WHERE po."B" = p.id AND po."A" = ANY(ARRAY[${params.occasionIds.join(',')}]))`
+      // Product must have ANY of the specified occasions - parameterized array
+      values.push(params.occasionIds)
+      occasionJoinSQL = ` AND EXISTS (SELECT 1 FROM "_ProductOccasions" po WHERE po."B" = p.id AND po."A" = ANY($${paramIndex++}::int[]))`
     }
   }
 

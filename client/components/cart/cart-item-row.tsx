@@ -1,5 +1,6 @@
 'use client'
 
+import { memo } from 'react'
 import Image from 'next/image'
 import { useTranslations } from 'next-intl'
 import { Trash2, Tag } from 'lucide-react'
@@ -17,7 +18,7 @@ interface CartItemRowProps {
   discountPercent: number | null
 }
 
-export function CartItemRow({ item, onRemove, onQuantityChange, discountPercent }: CartItemRowProps) {
+export const CartItemRow = memo(function CartItemRow({ item, onRemove, onQuantityChange, discountPercent }: CartItemRowProps) {
   const t = useTranslations('cart')
   const formatPrice = useFormattedPrice()
 
@@ -111,4 +112,6 @@ export function CartItemRow({ item, onRemove, onQuantityChange, discountPercent 
       </div>
     </div>
   )
-}
+})
+
+CartItemRow.displayName = 'CartItemRow'

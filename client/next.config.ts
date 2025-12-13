@@ -1,10 +1,18 @@
 import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
 import bundleAnalyzer from "@next/bundle-analyzer";
+import { withSentryConfig } from "@sentry/nextjs";
+import withSerwistInit from "@serwist/next";
 
 const withNextIntl = createNextIntlPlugin("./i18n/request.ts");
 const withBundleAnalyzer = bundleAnalyzer({
   enabled: process.env.ANALYZE === "true",
+});
+
+const withSerwist = withSerwistInit({
+  swSrc: "app/sw.ts",
+  swDest: "public/sw.js",
+  disable: process.env.NODE_ENV === "development",
 });
 
 const nextConfig: NextConfig = {
@@ -32,10 +40,31 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withBundleAnalyzer(withNextIntl(nextConfig));
+// Apply plugins in order: next-intl -> bundle-analyzer -> serwist -> sentry
+const configWithPlugins = withSerwist(withBundleAnalyzer(withNextIntl(nextConfig)));
 
-// Note: To enable Sentry error tracking in production:
-// 1. npm install @sentry/nextjs
-// 2. Set NEXT_PUBLIC_SENTRY_DSN environment variable
-// 3. Optionally run: npx @sentry/wizard@latest -i nextjs
-// The errorReporting.ts utility will automatically use Sentry when available.
+// Wrap with Sentry only if DSN is configured
+export default process.env.NEXT_PUBLIC_SENTRY_DSN
+  ? withSentryConfig(configWithPlugins, {
+      // Sentry webpack plugin options
+      org: process.env.SENTRY_ORG,
+      project: process.env.SENTRY_PROJECT,
+
+      // Only upload source maps in CI/production builds
+      silent: !process.env.CI,
+
+      // Upload source maps for better stack traces
+      widenClientFileUpload: true,
+
+      // Automatically instrument components
+      reactComponentAnnotation: {
+        enabled: true,
+      },
+
+      // Disable logger in production
+      disableLogger: true,
+
+      // Automatically instrument API routes
+      automaticVercelMonitors: true,
+    })
+  : configWithPlugins;

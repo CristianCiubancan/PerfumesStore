@@ -1036,5 +1036,10 @@
       "title": "Error Loading Order",
       "notFound": "Order not found"
     }
+  },
+  "offline": {
+    "title": "You're Offline",
+    "description": "Please check your internet connection and try again.",
+    "retry": "Try Again"
   }
 }

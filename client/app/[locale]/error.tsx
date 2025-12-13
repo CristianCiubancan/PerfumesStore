@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { useTranslations } from "next-intl";
+import * as Sentry from "@sentry/nextjs";
 import { Button } from "@/components/ui/button";
 
 export default function Error({
@@ -14,9 +15,16 @@ export default function Error({
   const t = useTranslations("error");
 
   useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
+    // Log to console in development
+    if (process.env.NODE_ENV === "development") {
       console.error("Page error:", error);
     }
+    // Report to Sentry in production
+    Sentry.captureException(error, {
+      extra: {
+        digest: error.digest,
+      },
+    });
   }, [error]);
 
   return (

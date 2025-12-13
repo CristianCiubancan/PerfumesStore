@@ -1,7 +1,8 @@
+import { memo } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 
-export function ProductCardSkeleton() {
+export const ProductCardSkeleton = memo(function ProductCardSkeleton() {
   return (
     <Card className="overflow-hidden">
       {/* Image placeholder */}
@@ -34,4 +35,6 @@ export function ProductCardSkeleton() {
       </CardContent>
     </Card>
   )
-}
+})
+
+ProductCardSkeleton.displayName = 'ProductCardSkeleton'

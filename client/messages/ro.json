@@ -1036,5 +1036,10 @@
       "title": "Eroare la Încărcare",
       "notFound": "Comanda nu a fost găsită"
     }
+  },
+  "offline": {
+    "title": "Esti Offline",
+    "description": "Te rugam sa verifici conexiunea la internet si sa incerci din nou.",
+    "retry": "Incearca din nou"
   }
 }

@@ -1036,5 +1036,10 @@
       "title": "Error al Cargar el Pedido",
       "notFound": "Pedido no encontrado"
     }
+  },
+  "offline": {
+    "title": "Estas sin conexion",
+    "description": "Por favor, comprueba tu conexion a Internet e intentalo de nuevo.",
+    "retry": "Intentar de nuevo"
   }
 }

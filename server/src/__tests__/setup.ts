@@ -190,6 +190,20 @@ jest.mock('../lib/auditLogger', () => ({
   },
 }))
 
+// Mock rate limiters to pass through in tests
+jest.mock('../middleware/rateLimit', () => {
+  const passThrough = (req: unknown, res: unknown, next: () => void) => next()
+  return {
+    authRateLimiter: passThrough,
+    refreshRateLimiter: passThrough,
+    apiRateLimiter: passThrough,
+    healthRateLimiter: passThrough,
+    sensitiveRateLimiter: passThrough,
+    newsletterRateLimiter: passThrough,
+    checkoutRateLimiter: passThrough,
+  }
+})
+
 // Clear all mocks before each test
 beforeEach(() => {
   jest.clearAllMocks()

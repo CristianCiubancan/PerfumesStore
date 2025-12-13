@@ -2,6 +2,7 @@
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import PlausibleProvider from 'next-plausible'
 import { useState, ReactNode, useEffect } from 'react'
 import { ThemeProvider } from '@/components/theme-provider'
 import { useAuthStore } from '@/store/auth'
@@ -60,17 +61,27 @@ export function Providers({ children }: { children: ReactNode }) {
     return () => window.removeEventListener('auth:unauthorized', handleUnauthorized)
   }, [clearAuth])
 
+  // Plausible domain from env, falls back to window.location.hostname
+  const plausibleDomain = process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN
+
   return (
-    <ThemeProvider
-      attribute="class"
-      defaultTheme="system"
-      enableSystem
-      disableTransitionOnChange
+    <PlausibleProvider
+      domain={plausibleDomain || ''}
+      enabled={!!plausibleDomain}
+      trackOutboundLinks
+      trackFileDownloads
     >
-      <QueryClientProvider client={queryClient}>
-        {children}
-        <ReactQueryDevtools initialIsOpen={false} />
-      </QueryClientProvider>
-    </ThemeProvider>
+      <ThemeProvider
+        attribute="class"
+        defaultTheme="system"
+        enableSystem
+        disableTransitionOnChange
+      >
+        <QueryClientProvider client={queryClient}>
+          {children}
+          <ReactQueryDevtools initialIsOpen={false} />
+        </QueryClientProvider>
+      </ThemeProvider>
+    </PlausibleProvider>
   )
 }

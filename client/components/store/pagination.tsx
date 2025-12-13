@@ -1,5 +1,6 @@
 'use client'
 
+import { memo } from 'react'
 import { useTranslations } from 'next-intl'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -10,7 +11,7 @@ interface PaginationProps {
   onPageChange: (page: number) => void
 }
 
-export function Pagination({
+export const Pagination = memo(function Pagination({
   currentPage,
   totalPages,
   onPageChange,
@@ -108,4 +109,6 @@ export function Pagination({
       </Button>
     </nav>
   )
-}
+})
+
+Pagination.displayName = 'Pagination'

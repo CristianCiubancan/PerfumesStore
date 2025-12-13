@@ -110,6 +110,15 @@ export async function generateMetadata({
       // google: 'your-google-verification-code',
       // yandex: 'your-yandex-verification-code',
     },
+    manifest: "/manifest.json",
+    appleWebApp: {
+      capable: true,
+      statusBarStyle: "default",
+      title: SITE_NAME,
+    },
+    formatDetection: {
+      telephone: false,
+    },
   };
 }
 

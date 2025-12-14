@@ -4,7 +4,7 @@ import { validate } from '../middleware/validate'
 import { authenticate } from '../middleware/auth'
 import { csrfProtection, generateCsrfToken, setCsrfCookie } from '../middleware/csrf'
 import { authRateLimiter, refreshRateLimiter } from '../middleware/rateLimit'
-import { registerSchema, loginSchema, changePasswordSchema } from '../schemas/auth'
+import { registerSchema, loginSchema, changePasswordSchema, forgotPasswordSchema, resetPasswordSchema } from '../schemas/auth'
 import { asyncHandler } from '../lib/asyncHandler'
 
 const router = Router()
@@ -29,5 +29,9 @@ router.post('/logout', authRateLimiter, csrfProtection, asyncHandler(authControl
 router.post('/logout-all', authRateLimiter, authenticate, csrfProtection, asyncHandler(authController.logoutAllDevices))
 router.get('/profile', authenticate, asyncHandler(authController.getProfile))
 router.post('/change-password', authenticate, csrfProtection, validate(changePasswordSchema), asyncHandler(authController.changePassword))
+
+// Password reset routes - no authentication required, rate limited for security
+router.post('/forgot-password', authRateLimiter, csrfProtection, validate(forgotPasswordSchema), asyncHandler(authController.forgotPassword))
+router.post('/reset-password', authRateLimiter, csrfProtection, validate(resetPasswordSchema), asyncHandler(authController.resetPassword))
 
 export default router

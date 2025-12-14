@@ -262,7 +262,8 @@
       "noAccount": "¿No tienes cuenta?",
       "signUpLink": "Regístrate",
       "success": "¡Bienvenido de nuevo!",
-      "unexpectedError": "Ha ocurrido un error inesperado"
+      "unexpectedError": "Ha ocurrido un error inesperado",
+      "forgotPassword": "¿Olvidaste tu contraseña?"
     },
     "register": {
       "title": "Crear una Cuenta",
@@ -281,6 +282,36 @@
       "signInLink": "Inicia sesión",
       "success": "¡Cuenta creada exitosamente!",
       "unexpectedError": "Ha ocurrido un error inesperado"
+    },
+    "forgotPassword": {
+      "title": "¿Olvidaste tu contraseña?",
+      "description": "Ingresa tu correo y te enviaremos un enlace para restablecer tu contraseña",
+      "email": "Correo electrónico",
+      "emailPlaceholder": "tu@ejemplo.com",
+      "submit": "Enviar enlace",
+      "submitting": "Enviando...",
+      "success": "Si existe una cuenta, recibirás un enlace de restablecimiento pronto",
+      "unexpectedError": "Ha ocurrido un error inesperado",
+      "rememberPassword": "¿Recuerdas tu contraseña?",
+      "signInLink": "Inicia sesión",
+      "checkEmailTitle": "Revisa tu correo",
+      "checkEmailDescription": "Te hemos enviado un enlace para restablecer tu contraseña. El enlace expirará en 1 hora.",
+      "backToLogin": "Volver al inicio de sesión"
+    },
+    "resetPassword": {
+      "title": "Restablecer Contraseña",
+      "description": "Ingresa tu nueva contraseña a continuación",
+      "newPassword": "Nueva Contraseña",
+      "newPasswordPlaceholder": "Crea una contraseña segura",
+      "confirmPassword": "Confirmar Contraseña",
+      "confirmPasswordPlaceholder": "Confirma tu nueva contraseña",
+      "submit": "Restablecer",
+      "submitting": "Restableciendo...",
+      "success": "¡Tu contraseña ha sido restablecida exitosamente!",
+      "unexpectedError": "Ha ocurrido un error inesperado",
+      "successTitle": "Contraseña Restablecida",
+      "successDescription": "Tu contraseña ha sido restablecida exitosamente. Ahora puedes iniciar sesión con tu nueva contraseña.",
+      "signInButton": "Iniciar Sesión"
     }
   },
   "admin": {

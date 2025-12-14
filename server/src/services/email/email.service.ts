@@ -1,6 +1,6 @@
 import { Resend } from 'resend'
 import { config } from '../../config'
-import { EMAIL } from '../../config/constants'
+import { AUTH, EMAIL } from '../../config/constants'
 import { logger } from '../../lib/logger'
 import { generateInvoicePDF } from './invoice-pdf.service'
 import {
@@ -121,6 +121,54 @@ export async function sendNewsletterWelcomeEmail(
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Unknown error'
     logger.error(`Failed to send newsletter welcome email: ${message}`, 'EmailService')
+    return { success: false, error: message }
+  }
+}
+
+/**
+ * Send password reset email with reset link
+ */
+export async function sendPasswordResetEmail(
+  email: string,
+  resetToken: string,
+  locale: Locale = 'ro'
+): Promise<{ success: boolean; messageId?: string; error?: string }> {
+  if (!isEmailEnabled()) {
+    logger.warn('Email service not configured - skipping password reset email', 'EmailService')
+    return { success: false, error: 'Email service not configured' }
+  }
+
+  try {
+    // Build reset URL with locale
+    const resetUrl = `${config.CLIENT_URL}/${locale}/reset-password?token=${resetToken}`
+
+    // Render email template
+    const { subject, html, text } = templates.passwordReset.render(
+      { resetUrl, expiryTime: AUTH.PASSWORD_RESET_TOKEN_EXPIRY_DISPLAY },
+      locale
+    )
+
+    const result = await resend!.emails.send({
+      from: config.RESEND_FROM_EMAIL!,
+      to: email,
+      subject,
+      html,
+      text,
+    })
+
+    if (result.error) {
+      logger.error(
+        `Failed to send password reset email: ${result.error.message}`,
+        'EmailService'
+      )
+      return { success: false, error: result.error.message }
+    }
+
+    logger.info(`Password reset email sent to ${email}`, 'EmailService')
+    return { success: true, messageId: result.data?.id }
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error'
+    logger.error(`Failed to send password reset email: ${message}`, 'EmailService')
     return { success: false, error: message }
   }
 }

@@ -16,6 +16,8 @@ export const AUTH = {
   REFRESH_TOKEN_COOKIE_MAX_AGE_MS: 7 * 24 * 60 * 60 * 1000, // 7 days in milliseconds
   TOKEN_CLEANUP_CRON_SCHEDULE: '*/10 * * * *', // Every 10 minutes
   BCRYPT_SALT_ROUNDS: 12,
+  PASSWORD_RESET_TOKEN_EXPIRY_MS: 60 * 60 * 1000, // 1 hour in milliseconds
+  PASSWORD_RESET_TOKEN_EXPIRY_DISPLAY: '1 hour',
 } as const
 
 // File Uploads

@@ -32,6 +32,16 @@
     "unsubscribe": "Puede darse de baja en cualquier momento haciendo clic en el enlace de nuestros correos.",
     "footer": "¡Manténgase perfumado/a!"
   },
+  "passwordReset": {
+    "subject": "Restablecer Contraseña - Perfumes Store",
+    "previewText": "Ha solicitado un restablecimiento de contraseña para su cuenta",
+    "title": "Restablecer su Contraseña",
+    "description": "Hemos recibido una solicitud para restablecer su contraseña. Haga clic en el botón de abajo para crear una nueva contraseña.",
+    "cta": "Restablecer Contraseña",
+    "expiryNotice": "Este enlace expirará en {time}. Si no solicitó esto, puede ignorar este correo de forma segura.",
+    "securityNotice": "Si no solicitó un restablecimiento de contraseña, ignore este correo o contacte al soporte si tiene inquietudes.",
+    "linkFallback": "Si el botón no funciona, copie y pegue este enlace:"
+  },
   "common": {
     "currency": "RON",
     "viewOrder": "Ver Pedido",

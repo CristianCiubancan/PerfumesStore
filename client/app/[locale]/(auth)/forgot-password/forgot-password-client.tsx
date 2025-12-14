@@ -23,56 +23,30 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form'
-import { loginSchema, LoginFormData } from '@/lib/schemas/auth'
+import { forgotPasswordSchema, ForgotPasswordFormData } from '@/lib/schemas/auth'
 import { authApi } from '@/lib/api/auth'
-import { useAuthStore } from '@/store/auth'
 import { ApiError } from '@/lib/api/client'
-import { Link, useRouter } from '@/i18n/routing'
-import { locales } from '@/i18n/config'
+import { Link } from '@/i18n/routing'
 
-export function LoginClient() {
-  const t = useTranslations('auth.login')
-  const router = useRouter()
-  const setAuth = useAuthStore((state) => state.setAuth)
+export function ForgotPasswordClient() {
+  const t = useTranslations('auth.forgotPassword')
   const [isLoading, setIsLoading] = useState(false)
+  const [isSubmitted, setIsSubmitted] = useState(false)
 
-  const form = useForm<LoginFormData>({
-    resolver: zodResolver(loginSchema),
+  const form = useForm<ForgotPasswordFormData>({
+    resolver: zodResolver(forgotPasswordSchema),
     defaultValues: {
       email: '',
-      password: '',
     },
   })
 
-  async function onSubmit(data: LoginFormData) {
+  async function onSubmit(data: ForgotPasswordFormData) {
     setIsLoading(true)
     try {
-      const response = await authApi.login(data)
-      setAuth(response.user)
+      await authApi.forgotPassword(data)
+      setIsSubmitted(true)
       toast.success(t('success'))
-
-      // Read returnTo from URL and redirect
-      const params = new URLSearchParams(window.location.search)
-      const returnTo = params.get('returnTo')
-
-      // SECURITY: Only allow relative URLs to prevent open redirect attacks
-      // Also prevent protocol-relative URLs (starting with //) which could redirect to external sites
-      let redirectTo = '/'
-      if (returnTo && returnTo.startsWith('/') && !returnTo.startsWith('//')) {
-        redirectTo = returnTo
-      }
-
-      // Strip locale prefix if present (next-intl router adds it automatically)
-      const localePattern = new RegExp(`^/(${locales.join('|')})(/.*)?$`)
-      const match = redirectTo.match(localePattern)
-      if (match) {
-        redirectTo = match[2] || '/'
-      }
-
-      router.push(redirectTo)
     } catch (err: unknown) {
-      // Clear password field on error for security
-      form.setValue('password', '')
       if (err instanceof ApiError) {
         toast.error(err.message)
       } else {
@@ -81,6 +55,32 @@ export function LoginClient() {
     } finally {
       setIsLoading(false)
     }
+  }
+
+  // Show success state after submission
+  if (isSubmitted) {
+    return (
+      <div className="flex-1 flex items-center justify-center bg-gradient-to-br from-background to-muted px-4 py-8">
+        <Card className="w-full max-w-md">
+          <CardHeader className="space-y-1">
+            <CardTitle className="text-2xl font-bold text-center">
+              {t('checkEmailTitle')}
+            </CardTitle>
+            <CardDescription className="text-center">
+              {t('checkEmailDescription')}
+            </CardDescription>
+          </CardHeader>
+          <CardFooter className="flex justify-center">
+            <Link
+              href="/login"
+              className="text-primary hover:underline font-medium"
+            >
+              {t('backToLogin')}
+            </Link>
+          </CardFooter>
+        </Card>
+      </div>
+    )
   }
 
   return (
@@ -115,32 +115,6 @@ export function LoginClient() {
                   </FormItem>
                 )}
               />
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <div className="flex items-center justify-between">
-                      <FormLabel>{t('password')}</FormLabel>
-                      <Link
-                        href="/forgot-password"
-                        className="text-sm text-muted-foreground hover:text-primary hover:underline"
-                      >
-                        {t('forgotPassword')}
-                      </Link>
-                    </div>
-                    <FormControl>
-                      <Input
-                        type="password"
-                        placeholder={t('passwordPlaceholder')}
-                        autoComplete="current-password"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
               <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? t('submitting') : t('submit')}
               </Button>
@@ -149,12 +123,12 @@ export function LoginClient() {
         </CardContent>
         <CardFooter className="flex justify-center">
           <p className="text-sm text-muted-foreground">
-            {t('noAccount')}{' '}
+            {t('rememberPassword')}{' '}
             <Link
-              href="/register"
+              href="/login"
               className="text-primary hover:underline font-medium"
             >
-              {t('signUpLink')}
+              {t('signInLink')}
             </Link>
           </p>
         </CardFooter>

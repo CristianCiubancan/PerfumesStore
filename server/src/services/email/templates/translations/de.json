@@ -32,6 +32,16 @@
     "unsubscribe": "Sie können sich jederzeit abmelden, indem Sie auf den Link in unseren E-Mails klicken.",
     "footer": "Bleiben Sie duftend!"
   },
+  "passwordReset": {
+    "subject": "Passwort Zurücksetzen - Perfumes Store",
+    "previewText": "Sie haben eine Passwort-Zurücksetzung für Ihr Konto angefordert",
+    "title": "Passwort Zurücksetzen",
+    "description": "Wir haben eine Anfrage erhalten, Ihr Passwort zurückzusetzen. Klicken Sie auf die Schaltfläche unten, um ein neues Passwort zu erstellen.",
+    "cta": "Passwort Zurücksetzen",
+    "expiryNotice": "Dieser Link läuft in {time} ab. Wenn Sie dies nicht angefordert haben, können Sie diese E-Mail ignorieren.",
+    "securityNotice": "Wenn Sie keine Passwort-Zurücksetzung angefordert haben, ignorieren Sie bitte diese E-Mail oder kontaktieren Sie den Support bei Bedenken.",
+    "linkFallback": "Wenn die Schaltfläche nicht funktioniert, kopieren Sie diesen Link:"
+  },
   "common": {
     "currency": "RON",
     "viewOrder": "Bestellung Ansehen",

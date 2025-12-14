@@ -26,6 +26,7 @@ import {
 export * from './token.service'
 export * from './password.service'
 export * from './account.service'
+export * from './password-reset.service'
 
 /**
  * Register a new user

@@ -3,6 +3,7 @@ import { Locale } from './translations'
 // Import all templates
 import * as orderConfirmation from './order-confirmation'
 import * as newsletterWelcome from './newsletter-welcome'
+import * as passwordReset from './password-reset'
 
 // Import campaign templates
 import * as campaignExamplePromo from './campaigns/example-promo'
@@ -19,6 +20,7 @@ export * from './campaign-base'
 // Re-export template types
 export type { OrderWithItems, OrderConfirmationData } from './order-confirmation'
 export type { NewsletterWelcomeData } from './newsletter-welcome'
+export type { PasswordResetData } from './password-reset'
 
 // ============================================================================
 // Template Registry
@@ -42,6 +44,7 @@ export interface EmailTemplate<TData = unknown> {
 const templateRegistry = new Map<string, EmailTemplate<unknown>>([
   ['order-confirmation', orderConfirmation as EmailTemplate<unknown>],
   ['newsletter-welcome', newsletterWelcome as EmailTemplate<unknown>],
+  ['password-reset', passwordReset as EmailTemplate<unknown>],
   // Campaign templates (category: 'campaign')
   ['campaign-example-promo', campaignExamplePromo as EmailTemplate<unknown>],
 ])
@@ -129,5 +132,10 @@ export const templates = {
     render: newsletterWelcome.render,
     getSampleData: newsletterWelcome.getSampleData,
     metadata: newsletterWelcome.metadata,
+  },
+  passwordReset: {
+    render: passwordReset.render,
+    getSampleData: passwordReset.getSampleData,
+    metadata: passwordReset.metadata,
   },
 }

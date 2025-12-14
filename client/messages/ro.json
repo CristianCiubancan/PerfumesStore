@@ -262,7 +262,8 @@
       "noAccount": "Nu ai cont?",
       "signUpLink": "Înregistrează-te",
       "success": "Bine ai revenit!",
-      "unexpectedError": "A apărut o eroare neașteptată"
+      "unexpectedError": "A apărut o eroare neașteptată",
+      "forgotPassword": "Ai uitat parola?"
     },
     "register": {
       "title": "Creează un Cont",
@@ -281,6 +282,36 @@
       "signInLink": "Autentifică-te",
       "success": "Contul a fost creat cu succes!",
       "unexpectedError": "A apărut o eroare neașteptată"
+    },
+    "forgotPassword": {
+      "title": "Ai Uitat Parola?",
+      "description": "Introdu adresa de email și îți vom trimite un link pentru resetarea parolei",
+      "email": "Email",
+      "emailPlaceholder": "tu@exemplu.com",
+      "submit": "Trimite Link de Resetare",
+      "submitting": "Se trimite...",
+      "success": "Dacă există un cont, vei primi un link de resetare în curând",
+      "unexpectedError": "A apărut o eroare neașteptată",
+      "rememberPassword": "Îți amintești parola?",
+      "signInLink": "Autentifică-te",
+      "checkEmailTitle": "Verifică-ți Email-ul",
+      "checkEmailDescription": "Ți-am trimis un link pentru resetarea parolei. Linkul va expira în 1 oră.",
+      "backToLogin": "Înapoi la autentificare"
+    },
+    "resetPassword": {
+      "title": "Resetează Parola",
+      "description": "Introdu noua ta parolă mai jos",
+      "newPassword": "Parolă Nouă",
+      "newPasswordPlaceholder": "Creează o parolă puternică",
+      "confirmPassword": "Confirmă Parola",
+      "confirmPasswordPlaceholder": "Confirmă noua parolă",
+      "submit": "Resetează Parola",
+      "submitting": "Se resetează...",
+      "success": "Parola a fost resetată cu succes!",
+      "unexpectedError": "A apărut o eroare neașteptată",
+      "successTitle": "Resetare Completă",
+      "successDescription": "Parola ta a fost resetată cu succes. Acum te poți autentifica cu noua parolă.",
+      "signInButton": "Autentifică-te"
     }
   },
   "admin": {

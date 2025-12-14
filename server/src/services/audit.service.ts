@@ -12,6 +12,8 @@ export type AuditAction =
   | 'LOGIN_FAILED'
   | 'LOGOUT'
   | 'PASSWORD_CHANGE'
+  | 'PASSWORD_RESET_REQUESTED'
+  | 'PASSWORD_RESET_COMPLETED'
 
 export type AuditEntityType =
   | 'PRODUCT'

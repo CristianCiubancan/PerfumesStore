@@ -32,6 +32,16 @@
     "unsubscribe": "Vous pouvez vous désabonner à tout moment en cliquant sur le lien dans nos emails.",
     "footer": "Restez parfumé(e)!"
   },
+  "passwordReset": {
+    "subject": "Réinitialiser Votre Mot de Passe - Perfumes Store",
+    "previewText": "Vous avez demandé une réinitialisation de mot de passe pour votre compte",
+    "title": "Réinitialiser Votre Mot de Passe",
+    "description": "Nous avons reçu une demande de réinitialisation de votre mot de passe. Cliquez sur le bouton ci-dessous pour créer un nouveau mot de passe.",
+    "cta": "Réinitialiser le Mot de Passe",
+    "expiryNotice": "Ce lien expirera dans {time}. Si vous n'avez pas fait cette demande, vous pouvez ignorer cet email.",
+    "securityNotice": "Si vous n'avez pas demandé de réinitialisation de mot de passe, veuillez ignorer cet email ou contacter le support si vous avez des inquiétudes.",
+    "linkFallback": "Si le bouton ne fonctionne pas, copiez et collez ce lien:"
+  },
   "common": {
     "currency": "RON",
     "viewOrder": "Voir la Commande",

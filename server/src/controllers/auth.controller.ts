@@ -1,11 +1,12 @@
 import { Request, Response } from 'express'
 import * as authService from '../services/auth.service'
-import { RegisterInput, LoginInput, ChangePasswordInput } from '../schemas/auth'
+import { RegisterInput, LoginInput, ChangePasswordInput, ForgotPasswordInput, ResetPasswordInput } from '../schemas/auth'
 import { AUTH } from '../config/constants'
 import { config, isProduction } from '../config'
 import { generateCsrfToken, setCsrfCookie, clearCsrfCookie } from '../middleware/csrf'
 import { createAuditLog } from '../lib/auditLogger'
 import { AppError } from '../middleware/errorHandler'
+import { sendPasswordResetEmail, normalizeLocale } from '../services/email/email.service'
 
 /**
  * Extract client context for audit logging
@@ -203,4 +204,61 @@ export async function changePassword(req: Request, res: Response): Promise<void>
   // Clear cookies since all sessions are invalidated
   clearAuthCookies(res)
   res.json({ data: result })
+}
+
+/**
+ * Request password reset
+ * SEC: Always returns success to prevent email enumeration
+ */
+export async function forgotPassword(req: Request, res: Response): Promise<void> {
+  const input: ForgotPasswordInput = req.body
+
+  // Extract locale from Accept-Language header or default to 'ro'
+  const locale = normalizeLocale(req.headers['accept-language']?.split(',')[0]?.split('-')[0])
+
+  // Create token (returns null if user doesn't exist, but we don't reveal this)
+  const token = await authService.createPasswordResetToken(input.email)
+
+  if (token) {
+    // Send email asynchronously - don't wait for it to avoid timing attacks
+    sendPasswordResetEmail(input.email, token, locale).catch((err) => {
+      // Log error but don't expose to user
+      console.error('Failed to send password reset email:', err)
+    })
+
+    // Audit log for password reset request
+    createAuditLog(req, {
+      action: 'PASSWORD_RESET_REQUESTED',
+      entityType: 'USER',
+      newValue: { email: input.email },
+    })
+  }
+
+  // Always return success to prevent email enumeration
+  res.json({
+    data: {
+      message: 'If an account exists with this email, you will receive a password reset link.',
+    },
+  })
+}
+
+/**
+ * Reset password with token
+ */
+export async function resetPassword(req: Request, res: Response): Promise<void> {
+  const input: ResetPasswordInput = req.body
+
+  await authService.resetPassword(input.token, input.newPassword)
+
+  // Audit log for password reset
+  createAuditLog(req, {
+    action: 'PASSWORD_RESET_COMPLETED',
+    entityType: 'USER',
+  })
+
+  res.json({
+    data: {
+      message: 'Password has been reset successfully. Please login with your new password.',
+    },
+  })
 }

@@ -17,6 +17,15 @@ export interface ChangePasswordData {
   newPassword: string
 }
 
+export interface ForgotPasswordData {
+  email: string
+}
+
+export interface ResetPasswordData {
+  token: string
+  newPassword: string
+}
+
 export const authApi = {
   register: (data: RegisterData) => api.post<AuthResponse>('/api/auth/register', data),
   login: (data: LoginData) => api.post<AuthResponse>('/api/auth/login', data),
@@ -24,4 +33,6 @@ export const authApi = {
   logoutAll: () => api.post<{ message: string }>('/api/auth/logout-all'),
   getProfile: () => api.get<User>('/api/auth/profile'),
   changePassword: (data: ChangePasswordData) => api.post<{ message: string }>('/api/auth/change-password', data),
+  forgotPassword: (data: ForgotPasswordData) => api.post<{ message: string }>('/api/auth/forgot-password', data),
+  resetPassword: (data: ResetPasswordData) => api.post<{ message: string }>('/api/auth/reset-password', data),
 }

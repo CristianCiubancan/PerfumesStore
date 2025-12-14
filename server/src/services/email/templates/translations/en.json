@@ -32,6 +32,16 @@
     "unsubscribe": "You can unsubscribe at any time by clicking the link in our emails.",
     "footer": "Stay fragrant!"
   },
+  "passwordReset": {
+    "subject": "Reset Your Password - Perfumes Store",
+    "previewText": "You requested a password reset for your account",
+    "title": "Reset Your Password",
+    "description": "We received a request to reset your password. Click the button below to create a new password.",
+    "cta": "Reset Password",
+    "expiryNotice": "This link will expire in {time}. If you didn't request this, you can safely ignore this email.",
+    "securityNotice": "If you didn't request a password reset, please ignore this email or contact support if you have concerns.",
+    "linkFallback": "If the button doesn't work, copy and paste this link:"
+  },
   "common": {
     "currency": "RON",
     "viewOrder": "View Order",

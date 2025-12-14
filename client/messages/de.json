@@ -262,7 +262,8 @@
       "noAccount": "Noch kein Konto?",
       "signUpLink": "Registrieren",
       "success": "Willkommen zurück!",
-      "unexpectedError": "Ein unerwarteter Fehler ist aufgetreten"
+      "unexpectedError": "Ein unerwarteter Fehler ist aufgetreten",
+      "forgotPassword": "Passwort vergessen?"
     },
     "register": {
       "title": "Konto erstellen",
@@ -281,6 +282,36 @@
       "signInLink": "Anmelden",
       "success": "Konto erfolgreich erstellt!",
       "unexpectedError": "Ein unerwarteter Fehler ist aufgetreten"
+    },
+    "forgotPassword": {
+      "title": "Passwort vergessen?",
+      "description": "Gib deine E-Mail-Adresse ein und wir senden dir einen Link zum Zurücksetzen",
+      "email": "E-Mail",
+      "emailPlaceholder": "du@beispiel.de",
+      "submit": "Link senden",
+      "submitting": "Wird gesendet...",
+      "success": "Falls ein Konto existiert, erhältst du in Kürze einen Link",
+      "unexpectedError": "Ein unerwarteter Fehler ist aufgetreten",
+      "rememberPassword": "Passwort eingefallen?",
+      "signInLink": "Anmelden",
+      "checkEmailTitle": "E-Mail prüfen",
+      "checkEmailDescription": "Wir haben dir einen Link zum Zurücksetzen gesendet. Der Link läuft in 1 Stunde ab.",
+      "backToLogin": "Zurück zur Anmeldung"
+    },
+    "resetPassword": {
+      "title": "Passwort zurücksetzen",
+      "description": "Gib unten dein neues Passwort ein",
+      "newPassword": "Neues Passwort",
+      "newPasswordPlaceholder": "Erstelle ein starkes Passwort",
+      "confirmPassword": "Passwort bestätigen",
+      "confirmPasswordPlaceholder": "Bestätige dein neues Passwort",
+      "submit": "Passwort zurücksetzen",
+      "submitting": "Wird zurückgesetzt...",
+      "success": "Dein Passwort wurde erfolgreich zurückgesetzt!",
+      "unexpectedError": "Ein unerwarteter Fehler ist aufgetreten",
+      "successTitle": "Passwort zurückgesetzt",
+      "successDescription": "Dein Passwort wurde erfolgreich zurückgesetzt. Du kannst dich jetzt mit deinem neuen Passwort anmelden.",
+      "signInButton": "Anmelden"
     }
   },
   "admin": {

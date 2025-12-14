@@ -43,6 +43,16 @@ export interface TranslationStrings {
     unsubscribe: string
     footer: string
   }
+  passwordReset: {
+    subject: string
+    previewText: string
+    title: string
+    description: string
+    cta: string
+    expiryNotice: string
+    securityNotice: string
+    linkFallback: string
+  }
   common: {
     currency: string
     viewOrder: string

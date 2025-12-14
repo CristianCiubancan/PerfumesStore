@@ -32,6 +32,16 @@
     "unsubscribe": "Vă puteți dezabona oricând făcând clic pe linkul din emailurile noastre.",
     "footer": "Rămâneți parfumați!"
   },
+  "passwordReset": {
+    "subject": "Resetare Parolă - Perfumes Store",
+    "previewText": "Ați solicitat resetarea parolei pentru contul dumneavoastră",
+    "title": "Resetați-vă Parola",
+    "description": "Am primit o solicitare de resetare a parolei dumneavoastră. Faceți clic pe butonul de mai jos pentru a crea o parolă nouă.",
+    "cta": "Resetează Parola",
+    "expiryNotice": "Acest link va expira în {time}. Dacă nu ați solicitat această resetare, puteți ignora acest email în siguranță.",
+    "securityNotice": "Dacă nu ați solicitat resetarea parolei, vă rugăm să ignorați acest email sau să contactați suportul dacă aveți îngrijorări.",
+    "linkFallback": "Dacă butonul nu funcționează, copiați și inserați acest link:"
+  },
   "common": {
     "currency": "RON",
     "viewOrder": "Vezi Comanda",

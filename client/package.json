@@ -10,7 +10,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "sync-shared": "cp -r ../shared/* ./shared/ 2>/dev/null || true",
+    "sync-shared": "mkdir -p ./shared && cp -r ../shared/* ./shared/ 2>/dev/null || true",
     "postinstall": "npm run sync-shared"
   },
   "dependencies": {

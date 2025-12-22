@@ -331,6 +331,15 @@ View your order: ${config.CLIENT_URL}/${locale}/orders
   `.trim()
 }
 
+// Helper to create mock Decimal for sample data
+interface MockDecimal {
+  toNumber: () => number
+}
+
+function mockDecimal(value: number): MockDecimal {
+  return { toNumber: () => value }
+}
+
 /**
  * Get sample data for preview
  */
@@ -351,15 +360,15 @@ export function getSampleData(): OrderConfirmationData {
       shippingState: 'Sector 1',
       shippingPostalCode: '010101',
       shippingCountry: 'Romania',
-      subtotalRON: { toNumber: () => 850.00 } as any,
-      discountRON: { toNumber: () => 85.00 } as any,
+      subtotalRON: mockDecimal(850.00),
+      discountRON: mockDecimal(85.00),
       discountPercent: 10,
-      totalRON: { toNumber: () => 765.00 } as any,
+      totalRON: mockDecimal(765.00),
       stripeSessionId: 'cs_test_xxx',
       stripePaymentIntentId: 'pi_test_xxx',
-      paidAmountEUR: { toNumber: () => 153.00 } as any,
-      exchangeRateUsed: { toNumber: () => 4.97 } as any,
-      exchangeFeePercent: { toNumber: () => 2.00 } as any,
+      paidAmountEUR: mockDecimal(153.00),
+      exchangeRateUsed: mockDecimal(4.97),
+      exchangeFeePercent: mockDecimal(2.00),
       status: 'PAID',
       createdAt: now,
       updatedAt: now,
@@ -375,8 +384,8 @@ export function getSampleData(): OrderConfirmationData {
           volumeMl: 100,
           imageUrl: '/uploads/products/dior-sauvage.jpg',
           quantity: 1,
-          unitPriceRON: { toNumber: () => 650.00 } as any,
-          totalPriceRON: { toNumber: () => 650.00 } as any,
+          unitPriceRON: mockDecimal(650.00),
+          totalPriceRON: mockDecimal(650.00),
           createdAt: now,
         },
         {
@@ -389,8 +398,8 @@ export function getSampleData(): OrderConfirmationData {
           volumeMl: 50,
           imageUrl: '/uploads/products/chanel-bleu.jpg',
           quantity: 2,
-          unitPriceRON: { toNumber: () => 100.00 } as any,
-          totalPriceRON: { toNumber: () => 200.00 } as any,
+          unitPriceRON: mockDecimal(100.00),
+          totalPriceRON: mockDecimal(200.00),
           createdAt: now,
         },
       ],

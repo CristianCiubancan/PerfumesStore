@@ -88,6 +88,30 @@ if npx prisma migrate deploy; then
     echo "Cleaning up pre-migration backup..."
     rm -f "$BACKUP_FILE"
   fi
+
+  # Check if database needs seeding (no products exist)
+  echo ""
+  echo "Checking if database needs seeding..."
+
+  # Recreate .pgpass for database check
+  PGPASS_FILE="$HOME/.pgpass"
+  echo "$DB_HOST:$DB_PORT:$DB_NAME:$DB_USER:$DB_PASS" > "$PGPASS_FILE"
+  chmod 600 "$PGPASS_FILE"
+
+  PRODUCT_COUNT=$(psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME" -t -c "SELECT COUNT(*) FROM \"Product\";" 2>/dev/null | tr -d '[:space:]' || echo "0")
+
+  rm -f "$PGPASS_FILE"
+
+  if [ "$PRODUCT_COUNT" = "0" ] || [ -z "$PRODUCT_COUNT" ]; then
+    echo "Database is empty. Running seed..."
+    if node dist/prisma/seed.js; then
+      echo "Database seeded successfully!"
+    else
+      echo "Warning: Database seeding failed. The application will start but may have no data."
+    fi
+  else
+    echo "Database already has $PRODUCT_COUNT products. Skipping seed."
+  fi
 else
   echo ""
   echo "========================================="

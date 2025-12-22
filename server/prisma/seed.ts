@@ -1,9 +1,27 @@
 import { PrismaClient, Role, Gender, Concentration } from '@prisma/client'
 import bcrypt from 'bcrypt'
 import crypto from 'crypto'
-import { generateSlug } from '../src/lib/slug'
 
 const prisma = new PrismaClient()
+
+// Inline generateSlug to make seed self-contained for production builds
+function generateSlug(brand: string, name: string, concentration: string): string {
+  const concentrationShort = concentration
+    .replace(/_/g, ' ')
+    .replace('Extrait de Parfum', 'Extrait')
+
+  const combined = `${brand} ${name} ${concentrationShort}`
+
+  return combined
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/&/g, 'and')
+    .replace(/['"']/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .replace(/-+/g, '-')
+}
 
 function generateSecurePassword(): string {
   return crypto.randomBytes(16).toString('base64url')

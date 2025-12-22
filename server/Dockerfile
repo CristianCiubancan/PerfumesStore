@@ -15,8 +15,8 @@ COPY --from=shared /. ../shared/
 # Generate Prisma client
 RUN npx prisma generate
 
-# Build TypeScript
-RUN npm run build
+# Build TypeScript (main app and seed)
+RUN npm run build:all
 
 # Stage 3: Production
 FROM node:20-alpine AS runner
@@ -52,6 +52,9 @@ COPY --from=builder /app/dist/shared /shared
 
 # Copy static assets (fonts for PDF generation)
 COPY --from=builder /app/src/assets ./dist/assets
+
+# Copy compiled seed script for database initialization
+COPY --from=builder /app/dist/prisma ./dist/prisma
 
 # Copy uploads directory (will be overwritten by volume mount)
 RUN mkdir -p uploads
